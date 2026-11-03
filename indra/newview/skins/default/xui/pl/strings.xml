@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
 	<string name="SUPPORT_SITE">
-		Portal Pomocy Firestorma
+		Portal Pomocy Second Life
 	</string>
 	<string name="StartupLoading">
 		Ładowanie przeglądarki [APP_NAME]...
@@ -216,7 +216,7 @@ Wersja serwera głosu (Voice Server): [VOICE_VERSION]
 	</string>
 	<string name="LoginFailedViewerNotPermitted">
 		Przeglądarka używana przez Ciebie nie ma już dostępu do Second Life. Proszę przejść na poniższą stronę i pobrać nową:
-https://www.firestormviewer.org/choose-your-platform/
+https://secondlife.com/support/downloads/
 
 Więcej informacji w naszym FAQ:
 http://secondlife.com/viewer-access-faq
@@ -543,7 +543,7 @@ Jeśli myślisz, że to błąd skontaktuj się z support@secondlife.com
 	</string>
 	<string name="TooltipPrice" value="[AMOUNT]L$: "/>
 	<string name="TooltipSLIcon">
-		Link do strony znajdującej się w oficjalnej domenie SecondLife.com, LindenLab.com lub firestormviewer.org.
+		Link do strony znajdującej się w oficjalnej domenie SecondLife.com lub LindenLab.com.
 	</string>
 	<string name="TooltipFlagScript">
 		Skrypt
@@ -846,8 +846,7 @@ są dozwolone.
 		Usługa niedostępna lub osiągnięto limit czasu.
 	</string>
 	<string name="AssetUploadRequestInvalid">
-		Błąd podczas przesyłania. Odwiedź
-https://www.firestormviewer.org/support aby uzyskać pomoc.
+		Błąd podczas przesyłania.
 	</string>
 	<string name="SettingValidationError">
 		Walidacja nie powiodła się - importowanie ustawień [NAME]
@@ -2764,16 +2763,16 @@ Jeśli ciągle otrzymujesz tą wiadomość, to skontaktuj się z pomocą technic
 		Rezydent, do którego wysłałeś/aś wiadomość prywatną znajduje się w trybie zajętości i nie chce, aby mu przeszkadzano. Oznacza to, iż Twoja wiadomość zostanie zapisana do przejrzenia na później.
 	</string>
 	<string name="AutoResponseModeDefault">
-		Rezydent, do którego wysłałeś/aś wiadomość prywatną aktywował w przeglądarce [APP_NAME] tryb autoodpowiedzi i nie chce, aby mu przeszkadzano. Oznacza to, iż Twoja wiadomość zostanie zapisana do przejrzenia na później.
+		Rezydent, do którego wysłałeś/aś wiadomość prywatną aktywował w [APP_NAME] tryb autoodpowiedzi i nie chce, aby mu przeszkadzano. Oznacza to, iż Twoja wiadomość zostanie zapisana do przejrzenia na później.
 	</string>
 	<string name="AutoResponseModeNonFriendsDefault">
-		Rezydent, do którego wysłałeś/aś wiadomość prywatną aktywował w przeglądarce [APP_NAME] tryb autoodpowiedzi i nie chce, aby mu przeszkadzano. Oznacza to, iż Twoja wiadomość zostanie zapisana do przejrzenia na później.
+		Rezydent, do którego wysłałeś/aś wiadomość prywatną aktywował w [APP_NAME] tryb autoodpowiedzi i nie chce, aby mu przeszkadzano. Oznacza to, iż Twoja wiadomość zostanie zapisana do przejrzenia na później.
 	</string>
 	<string name="RejectTeleportOffersResponseDefault">
-		Rezydent, do którego wysłałeś/aś wiadomość aktywował w przeglądarce [APP_NAME] tryb odrzucania próśb oraz propozycji teleportacji i nie chce, aby mu nimi przeszkadzano. Możesz w dalszym ciągu wysłać wiadomość prywatną ręcznie.
+		Rezydent, do którego wysłałeś/aś wiadomość aktywował w [APP_NAME] tryb odrzucania próśb oraz propozycji teleportacji i nie chce, aby mu nimi przeszkadzano. Możesz w dalszym ciągu wysłać wiadomość prywatną ręcznie.
 	</string>
 	<string name="RejectFriendshipRequestsResponseDefault">
-		Rezydent, do którego wysłałeś/aś wiadomość aktywował w przeglądarce [APP_NAME] tryb odrzucania zaproszeń do znajomych i nie chce, aby mu nimi przeszkadzano. Możesz w dalszym ciągu wysłać wiadomość prywatną ręcznie.
+		Rezydent, do którego wysłałeś/aś wiadomość aktywował w [APP_NAME] tryb odrzucania zaproszeń do znajomych i nie chce, aby mu nimi przeszkadzano. Możesz w dalszym ciągu wysłać wiadomość prywatną ręcznie.
 	</string>
 	<string name="MutedAvatarsResponseDefault">
 		Rezydent, do którego wysłałeś/aś wiadomość zablokował Cię.
@@ -3132,7 +3131,7 @@ Jeżeli nadal otrzymujesz ten komunikat, uruchom swój komputer ponownie.
 Czy chcesz wysłać raport na temat zawieszenia?
 	</string>
 	<string name="MBFreezeDetected">
-		Wygląda na to, że [APP_NAME] zawiesił się. Jeśli ten problem występuje regularnie, skontaktuj się ze wsparciem technicznym pod adresem https://www.firestormviewer.org/support.
+		Wygląda na to, że [APP_NAME] zawiesił się.
 	</string>
 	<string name="MBAlert">
 		Powiadomienie
@@ -4682,7 +4681,7 @@ Zainstaluj ponownie przeglądarkę z [DOWNLOAD_URL] i skontaktuj się z [SUPPORT
 		Instalowanie [APP_NAME]...
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		Twoja wersja klienta [APP_NAME] jest aktualizowana do najnowszej wersji. Prosimy o cierpliwość.
+		Twoja wersja [APP_NAME] jest aktualizowana do najnowszej wersji. Prosimy o cierpliwość.
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		Pobieranie aktualizacji...

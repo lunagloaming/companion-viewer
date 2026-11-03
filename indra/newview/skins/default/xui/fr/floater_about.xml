@@ -3,14 +3,14 @@
 	<tab_container name="about_tab">
 		<panel label="Informations" name="support_panel">
 			<text name="support_intro">
- Pour les dernières informations à propos de Firestorm, visitez
+ Companion Viewer est basé sur Firestorm :
  https://www.firestormviewer.org
 			</text>
 			<button label="Copier" name="copy_btn"/>
 		</panel>
 		<panel label="Auteurs Linden Lab" name="credits_panel">
 			<text name="linden_intro">
- Firestorm n'existerait pas sans la décision de Linden Lab de rendre son code source disponible.
+ Companion Viewer et Firestorm n'existeraient pas sans la décision de Linden Lab de rendre son code source disponible.
  Second Life est conçu par les Linden, 
  avec les contributions open source provenant de :
 			</text>

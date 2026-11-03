@@ -444,7 +444,7 @@ Mais baixa:
 			<text name="LOD_swap_label" value="Troca" tool_tip="Sua configuração atual baseada em RenderVolumeLODFactor."/>
 			<string name="ll_lod_tooltip_msg">Padrão do viewer Linden Lab Second Life ([FACTOR])</string>
 			<text name="LOD_swap_ll_default" value="LL"/>
-			<string name="fs_lod_tooltip_msg">Padrão do viewer [APP_NAME] ([FACTOR])</string>
+			<string name="fs_lod_tooltip_msg">Padrão do [APP_NAME] ([FACTOR])</string>
 			<text name="LOD_swap_usr_current" tool_tip="Seu fator de LOD atual."/>
 			<text name="LOD_swap_LOD_Change_label">
 				Alta ↔ Méd
