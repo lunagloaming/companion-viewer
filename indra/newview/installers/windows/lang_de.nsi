@@ -102,7 +102,7 @@ LangString CreateStartMenuEntry ${LANG_GERMAN} "Eintrag im Startmenü erstellen?
 LangString ForOpenSimSuffix ${LANG_GERMAN} "für OpenSimulator"
 
 LangString DeleteDocumentAndSettingsDP ${LANG_GERMAN} 'Dateien unterhalb von "Dokumente und Einstellungen werden gelöscht.'
-LangString UnChatlogsNoticeMB ${LANG_GERMAN} "Diese Deinstallation löscht NICHT die Companion-Viewer-Chatprotokolle und andere private Dateien. Sollen diese gelöscht werden, muss das CompanionViewer_x64-Verzeichnis im Anwendungsdaten-Verzeichnis manuell gelöscht werden."
+LangString UnChatlogsNoticeMB ${LANG_GERMAN} "Diese Deinstallation löscht NICHT die Companion-Viewer-Chatprotokolle und andere private Dateien. Sollen diese gelöscht werden, muss das CompanionViewer-Verzeichnis im Anwendungsdaten-Verzeichnis manuell gelöscht werden."
 LangString UnRemovePasswordsDP ${LANG_GERMAN} "Lösche gespeicherte Companion-Viewer-Passwörter."
 
 LangString MUI_TEXT_LICENSE_TITLE ${LANG_GERMAN} "VivoxVoice System Lizenz-Vereinbarung"

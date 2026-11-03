@@ -986,16 +986,16 @@ Push $2
 # Required since ProfileImagePath is of type REG_EXPAND_SZ
     ExpandEnvStrings $2 $2
 
-# Delete files in \Users\<User>\AppData\Roaming\CompanionViewer_x64
+# Delete files in \Users\<User>\AppData\Roaming\CompanionViewer
 # Remove all settings files but leave any other .txt files to preserve the chat logs
-    RMDir /r "$2\AppData\Roaming\CompanionViewer_x64\logs"
-    RMDir /r "$2\AppData\Roaming\CompanionViewer_x64\browser_profile"
-    RMDir /r "$2\AppData\Roaming\CompanionViewer_x64\user_settings"
-    Delete  "$2\AppData\Roaming\CompanionViewer_x64\*.xml"
-    Delete  "$2\AppData\Roaming\CompanionViewer_x64\*.bmp"
-    Delete  "$2\AppData\Roaming\CompanionViewer_x64\search_history.txt"
-    Delete  "$2\AppData\Roaming\CompanionViewer_x64\plugin_cookies.txt"
-    Delete  "$2\AppData\Roaming\CompanionViewer_x64\typed_locations.txt"
+    RMDir /r "$2\AppData\Roaming\CompanionViewer\logs"
+    RMDir /r "$2\AppData\Roaming\CompanionViewer\browser_profile"
+    RMDir /r "$2\AppData\Roaming\CompanionViewer\user_settings"
+    Delete  "$2\AppData\Roaming\CompanionViewer\*.xml"
+    Delete  "$2\AppData\Roaming\CompanionViewer\*.bmp"
+    Delete  "$2\AppData\Roaming\CompanionViewer\search_history.txt"
+    Delete  "$2\AppData\Roaming\CompanionViewer\plugin_cookies.txt"
+    Delete  "$2\AppData\Roaming\CompanionViewer\typed_locations.txt"
 # Delete files in \Users\<User>\AppData\Local\CompanionViewer
     ${If} ${ISOPENSIM} == "0"
         ${If} ${IS64BIT} == "0"
