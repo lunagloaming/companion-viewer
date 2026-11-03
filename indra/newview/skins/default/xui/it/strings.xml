@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
 	<string name="SUPPORT_SITE">
-		Portale di supporto di Firestorm
+		Portale di supporto di Second Life
 	</string>
 	<string name="StartupDetectingHardware">
 		Ricerca hardware...
@@ -207,7 +207,7 @@ Voice Server Version: [VOICE_VERSION]
 	</string>
 	<string name="LoginFailedViewerNotPermitted">
 		Il viewer utilizzato non è più in grado di accedere a Second Life. Visitare questa pagina per scaricare un nuovo viewer:
-https://www.firestormviewer.org/downloads/
+https://secondlife.com/support/downloads/
 
 Per maggiori informazioni, consultare le domande frequenti alla pagina:
 http://secondlife.com/viewer-access-faq
@@ -555,7 +555,7 @@ Se ritieni che si tratti di un errore, contatta support@secondlife.com
 	</string>
 	<string name="TooltipPrice" value="L$ [AMOUNT]:"/>
 	<string name="TooltipSLIcon">
-		Collegamento ad una pagina sul sito ufficiale SecondLife.com, LindenLab.com o firestormviewer.org.
+		Collegamento ad una pagina sul sito ufficiale SecondLife.com o LindenLab.com.
 	</string>
 	<string name="TooltipFlagScript">
 		Script
@@ -823,8 +823,7 @@ Se ritieni che si tratti di un errore, contatta support@secondlife.com
 		Servizio non disponibile o tempo scaduto
 	</string>
 	<string name="AssetUploadRequestInvalid">
-		Errore nella richiesta di invio. Visitare
-https://www.firestormviewer.org/support per avere aiuto nella soluzione.
+		Errore nella richiesta di invio.
 	</string>
 	<string name="texture">
 		texture
@@ -4645,7 +4644,7 @@ Reinstallare il browser da [DOWNLOAD_URL] e contattare [SUPPORT_SITE] se il prob
 		Installazione di [APP_NAME]...
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		Il viewer [APP_NAME] si sta aggiornando all&apos;ultima versione. Potrebbe volerci del tempo, attendere.
+		[APP_NAME] si sta aggiornando all&apos;ultima versione. Potrebbe volerci del tempo, attendere.
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		Scaricamento dell&apos;aggiornamento...

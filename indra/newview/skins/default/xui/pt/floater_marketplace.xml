@@ -13,15 +13,7 @@
 		<layout_panel name="external_controls">
 			<text name="plugin_fail_text">
 O plugin do navegador web parece estar demorando para abrir.
-Se o plugin não carregar, consulte:
-
-https://wiki.firestormviewer.org/fs_search_issues
-
-e
-
-https://wiki.firestormviewer.org/fs_media
-
-para possíveis etapas de solução.
+Se o plugin não carregar, reinicie o viewer.
 			</text>
 		</layout_panel>
 	</layout_stack>

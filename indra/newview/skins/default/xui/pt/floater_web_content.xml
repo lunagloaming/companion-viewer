@@ -16,13 +16,7 @@
 		<layout_panel name="external_controls">
 			<text name="plugin_fail_text">
 O plugin de navegador web está carregando.
-Se o plugin não carregar, há informações para solução em
-
-https://wiki.firestormviewer.org/fs_search_issues
-
-e
-
-https://wiki.firestormviewer.org/fs_media
+Se o plugin não carregar, reinicie o viewer.
 			</text>
 		</layout_panel>
 	</layout_stack>

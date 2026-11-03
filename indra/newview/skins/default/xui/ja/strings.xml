@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
 	<string name="SUPPORT_SITE">
-		Firestormサポートポータル
+		Second Lifeサポートポータル
 	</string>
 	<string name="StartupLoading">
 		[APP_NAME]をインストールしています…
@@ -205,7 +205,7 @@ LibVLCのバージョン：[LIBVLC_VERSION]
 	<string name="AditiGridLabelShort">Aditi（ベータ）</string>
 	<string name="LoginFailedViewerNotPermitted">
 		お使いの古いビューアでは、[CURRENT_GRID]にアクセスできません。以下のページから新しいビューアをダウンロードしてください：
-https://www.firestormviewer.org/choose-your-platform/
+https://secondlife.com/support/downloads/
 
 詳細については、ＦＡＱを参照してください：
 https://secondlife.com/viewer-access-faq
@@ -490,7 +490,7 @@ https://secondlife.com/viewer-access-faq
 	</string>
 	<string name="TooltipPrice" value="L$ [AMOUNT]："/>
 	<string name="TooltipSLIcon">
-		これは、SecondLife.com、LindenLab.com、または firestormviewer.org の公式ドメイン上のページにリンクします。
+		これは、SecondLife.com または LindenLab.com の公式ドメイン上のページにリンクします。
 	</string>
 	<string name="TooltipFlagScript">スクリプト</string>
 	<string name="TooltipFlagPhysics">物理効果</string>
@@ -2779,19 +2779,19 @@ https://support.secondlife.com よりSecond Lifeのサポートまでお問い�
 		この住民が「取り込み中」をオンにすると、あなたのメッセージが後で表示されるようになります。
 	</string>
 	<string name="AutoResponseModeDefault">
-		あなたがメッセージを送った住人は、[APP_NAME]ビューアの「自動応答モード」を有効にしており、邪魔されないよう要求しています。あなたのメッセージは、後で閲覧できるように住人のＩＭパネルに表示されます。
+		あなたがメッセージを送った住人は、[APP_NAME]の「自動応答モード」を有効にしており、邪魔されないよう要求しています。あなたのメッセージは、後で閲覧できるように住人のＩＭパネルに表示されます。
 	</string>
 	<string name="AutoResponseModeNonFriendsDefault">
-		あなたがメッセージを送った住人は、[APP_NAME]ビューアの「自動応答モード」を有効にしており、邪魔されないよう要求しています。あなたのメッセージは、後で閲覧できるように住人のＩＭパネルに表示されます。
+		あなたがメッセージを送った住人は、[APP_NAME]の「自動応答モード」を有効にしており、邪魔されないよう要求しています。あなたのメッセージは、後で閲覧できるように住人のＩＭパネルに表示されます。
 	</string>
 	<string name="RejectFriendshipRequestsResponseDefault">
-		あなたがメッセージを送った住民は、[APP_NAME]ビューアの「フレンドシップのリクエストをすべて拒否する」モードを有効にしています。これは、フレンドシップのリクエストに邪魔されないよう要求したことを意味します。ＩＭは手動で送信することもできます。
+		あなたがメッセージを送った住民は、[APP_NAME]の「フレンドシップのリクエストをすべて拒否する」モードを有効にしています。これは、フレンドシップのリクエストに邪魔されないよう要求したことを意味します。ＩＭは手動で送信することもできます。
 	</string>
 	<string name="MutedAvatarsResponseDefault">あなたがメッセージを送った住人は、あなたからのメッセージの送信をブロックしています。</string>
 	<string name="AwayAvatarResponseDefault">メッセージを送信した居住者は現在キーボードから離れています。メッセージは後で表示できるように居住者のＩＭパネルに表示されます。</string>
 	<!-- panel preferences chat-->
 	<string name="RejectTeleportOffersResponseDefault">
-		あなたがメッセージを送った住民は、[APP_NAME]ビューアの「すべてのテレポートのオファーとリクエストを拒否するモード」を有効にしました。これは、テレポートのオファーやリクエストに邪魔されないように要求したことを意味します。ＩＭは手動で送信することもできます。
+		あなたがメッセージを送った住民は、[APP_NAME]の「すべてのテレポートのオファーとリクエストを拒否するモード」を有効にしました。これは、テレポートのオファーやリクエストに邪魔されないように要求したことを意味します。ＩＭは手動で送信することもできます。
 	</string>
 	<!-- Mute -->
 	<string name="MuteByName">
@@ -3224,7 +3224,7 @@ https://support.secondlife.com よりSecond Lifeのサポートまでお問い�
 クラッシュ報告を送信しますか？
 	</string>
 	<string name="MBFreezeDetected">
-		[APP_NAME]がフリーズしたようです。この問題が頻繁に発生する場合は、https://www.firestormviewer.org/support からサポートにお問い合わせください。
+		[APP_NAME]がフリーズしたようです。
 	</string>
 	<string name="MBAlert">
 		通知
@@ -4783,7 +4783,7 @@ www.secondlife.com から最新バージョンをダウンロードしてくだ�
 		[APP_NAME]をインストールしています…
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		お使いの[APP_NAME]ビューアを最新バージョンに更新しています。数分かかることがありますのでしばらくお待ちください。
+		お使いの[APP_NAME]を最新バージョンに更新しています。数分かかることがありますのでしばらくお待ちください。
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		更新をダウンロードしています…

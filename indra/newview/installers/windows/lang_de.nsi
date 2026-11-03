@@ -59,7 +59,7 @@ LangString CheckAdministratorUnInstMB ${LANG_GERMAN} 'Sie besitzen ungenügende 
 LangString MissingSSE2 ${LANG_GERMAN} "Dieser PC besitzt möglicherweise keinen Prozessor mit SSE2-Unterstützung, die für die Ausführung von Companion Viewer ${VERSION_LONG} benötigt wird. Trotzdem installieren?"
 
 ; Extended cpu checks (AVX2)
-LangString MissingAVX2 ${LANG_GERMAN} "Ihre CPU unterstützt keine AVX2-Anweisungen. Bitte laden Sie die Version für ältere CPUs von %DLURL%-legacy-cpus/ herunter."
+LangString MissingAVX2 ${LANG_GERMAN} "Ihre CPU unterstützt keine AVX2-Anweisungen, die dieser Build von Companion Viewer benötigt."
 LangString AVX2Available ${LANG_GERMAN} "Ihre CPU unterstützt AVX2-Anweisungen. Sie können die für AVX2 optimierte Version für eine bessere Leistung unter %DLURL%/ herunterladen. Möchten Sie sie jetzt herunterladen?"
 LangString AVX2OverrideConfirmation ${LANG_GERMAN} "Falls Sie glauben, dass Ihr PC AVX2-Anweisungen unterstützt, können Sie die Installation dennoch durchführen. Möchten Sie fortfahren?"
 LangString AVX2OverrideNote ${LANG_GERMAN} "Durch das Übersteuern des Installers installieren Sie möglicherweise eine Version, die beim Starten direkt abstürzt. In diesem Fall installieren Sie bitte stattdessen die Standard-Version."
@@ -78,7 +78,7 @@ LangString CheckNetworkConnectionDP ${LANG_GERMAN} "Prüfe Netzwerkverbindung...
 
 ; error during installation
 LangString ErrorSecondLifeInstallRetry ${LANG_GERMAN} "Companion Viewer konnte nicht korrekt installiert werden, einige Dateien wurden eventuell nicht korrekt von der Installationroutine kopiert."
-LangString ErrorSecondLifeInstallSupport ${LANG_GERMAN} "Bitte laden Sie den Viewer erneut von https://www.firestormviewer.org/downloads/ und versuchen Sie die Installation erneut. Sollte das Problem weiterhin bestehen, dann kontaktieren Sie unseren Support unter https://www.firestormviewer.org/support/."
+LangString ErrorSecondLifeInstallSupport ${LANG_GERMAN} "Bitte installieren Sie den Viewer erneut."
 
 ; ask to remove user's data files
 LangString RemoveDataFilesMB ${LANG_GERMAN} "Einstellungs- und Cache-Dateien in Dokumente und Einstellungen löschen?"

@@ -4,7 +4,7 @@
 		Grid do Second Life:
 	</string>
 	<string name="SUPPORT_SITE">
-		Portal de suporte do Firestorm
+		Portal de suporte do Second Life
 	</string>
 	<string name="StartupLoading">
 		Carregando [APP_NAME]...
@@ -216,7 +216,7 @@ Versão do servidor de voz: [VOICE_VERSION]
 	</string>
 	<string name="LoginFailedViewerNotPermitted">
 		O viewer que você está usando não pode mais acessar o Second Life. Acesse a página abaixo para baixar um novo viewer:
-https://www.firestormviewer.org/choose-your-platform/
+https://secondlife.com/support/downloads/
 Para mais informações, veja o FAQ abaixo:
 http://secondlife.com/viewer-access-faq
 	</string>
@@ -536,7 +536,7 @@ Se você acredita que isso é um erro, entre em contato com support@secondlife.c
 		Você não pode vestir uma pasta com mais de [AMOUNT] itens. Você pode alterar esse limite em Avançado &gt; Mostrar configurações de depuração &gt; WearFolderLimit.
 	</string>
 	<string name="TooltipSLIcon">
-		Isso leva a uma página no domínio oficial SecondLife.com, LindenLab.com ou firestormviewer.org.
+		Isso leva a uma página no domínio oficial SecondLife.com ou LindenLab.com.
 	</string>
 	<string name="TooltipFlagScript">
 		Script
@@ -836,8 +836,7 @@ são permitidas.
 		Serviço indisponível ou tempo esgotado no upload.
 	</string>
 	<string name="AssetUploadRequestInvalid">
-Erro na solicitação de upload. Acesse
-https://www.firestormviewer.org/support para obter ajuda com este problema.
+Erro na solicitação de upload.
 	</string>
 	<string name="SettingValidationError">
 		Falha na validação ao importar a configuração [NAME]
@@ -2706,16 +2705,16 @@ Se você continuar recebendo esta mensagem, entre em contato com o suporte do Se
 		Este residente ativou o modo Não Perturbe e verá sua mensagem mais tarde.
 	</string>
 	<string name="AutoResponseModeDefault">
-		Este residente ativou o modo "Resposta automática" no viewer [APP_NAME]. Isso significa que ele não quer ser incomodado. Ele verá sua mensagem mais tarde.
+		Este residente ativou o modo "Resposta automática" no [APP_NAME]. Isso significa que ele não quer ser incomodado. Ele verá sua mensagem mais tarde.
 	</string>
 	<string name="AutoResponseModeNonFriendsDefault">
-		Este residente ativou o modo "Resposta automática" no viewer [APP_NAME]. Isso significa que ele não quer ser incomodado. Ele verá sua mensagem mais tarde.
+		Este residente ativou o modo "Resposta automática" no [APP_NAME]. Isso significa que ele não quer ser incomodado. Ele verá sua mensagem mais tarde.
 	</string>
 	<string name="RejectTeleportOffersResponseDefault">
-		Este residente ativou o modo "Recusar ofertas e solicitações de teleporte" no viewer [APP_NAME]. Isso significa que ele não quer ser incomodado com ofertas ou solicitações de teleporte. Você ainda pode enviar mensagem.
+		Este residente ativou o modo "Recusar ofertas e solicitações de teleporte" no [APP_NAME]. Isso significa que ele não quer ser incomodado com ofertas ou solicitações de teleporte. Você ainda pode enviar mensagem.
 	</string>
 	<string name="RejectFriendshipRequestsResponseDefault">
-		Este residente ativou o modo "Recusar todos os pedidos de amizade" no viewer [APP_NAME]. Isso significa que ele não quer ser incomodado com pedidos de amizade. Você ainda pode enviar mensagem.
+		Este residente ativou o modo "Recusar todos os pedidos de amizade" no [APP_NAME]. Isso significa que ele não quer ser incomodado com pedidos de amizade. Você ainda pode enviar mensagem.
 	</string>
 	<string name="MutedAvatarsResponseDefault">
 		Este residente bloqueou o recebimento das suas mensagens.
@@ -4596,7 +4595,7 @@ Reinstale o Viewer de [DOWNLOAD_URL] e entre em contato com [SUPPORT_SITE] se o 
 		Instalando [APP_NAME]...
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		Seu visualizador [APP_NAME] está sendo atualizado para a versão mais recente. Isso pode levar algum tempo, então por favor seja paciente.
+		Seu [APP_NAME] está sendo atualizado para a versão mais recente. Isso pode levar algum tempo, então por favor seja paciente.
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		Fazendo o download da atualização...

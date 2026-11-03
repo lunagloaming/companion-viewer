@@ -8,7 +8,7 @@
 		Grille de Second Life
 	</string>
 	<string name="SUPPORT_SITE">
-		Portail Assistance Firestorm
+		Portail Assistance Second Life
 	</string>
 	<string name="StartupLoading">
 		Chargement de [APP_NAME]...
@@ -203,7 +203,7 @@ Version serveur vocal : [VOICE_VERSION]
 		Quitter
 	</string>
 	<string name="create_account_url">
-		https://www.firestormviewer.org/join-secondlife/
+		https://join.secondlife.com/
 	</string>
 	<string name="AgniGridLabel">
 		Grille principale de Second Life (Agni)
@@ -509,7 +509,7 @@ Si vous pensez qu'il s'agit d'une erreur, veuillez contacter support@secondlife.
 	</string>
 	<string name="TooltipPrice" value="[AMOUNT] L$ :"/>
 	<string name="TooltipSLIcon">
-		Il s’agit d’un lien vers une page dans le domaine officiel SecondLife.com, LindenLab.com ou firestormviewer.org.
+		Il s’agit d’un lien vers une page dans le domaine officiel SecondLife.com ou LindenLab.com.
 	</string>
 	<string name="TooltipFlagScript">
 		Script
@@ -2734,16 +2734,16 @@ Si vous continuez à recevoir ce message, veuillez contacter l'assistance de Sec
 		Ce résident a activé Ne pas déranger et verra votre message plus tard.
 	</string>
 	<string name="AutoResponseModeDefault">
-		Le résident auquel vous avez envoyé un message a activé le mode réponse automatique du client [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé. Votre message sera quand même affiché dans la fenêtre de messagerie instantanée pour être consulté ultèrieurement.
+		Le résident auquel vous avez envoyé un message a activé le mode réponse automatique de [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé. Votre message sera quand même affiché dans la fenêtre de messagerie instantanée pour être consulté ultèrieurement.
 	</string>
 	<string name="AutoResponseModeNonFriendsDefault">
-		Le résident auquel vous avez envoyé un message a activé le mode réponse automatique du client [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé. Votre message sera quand même affiché dans la fenêtre de messagerie instantanée pour être consulté ultèrieurement.
+		Le résident auquel vous avez envoyé un message a activé le mode réponse automatique de [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé. Votre message sera quand même affiché dans la fenêtre de messagerie instantanée pour être consulté ultèrieurement.
 	</string>
 	<string name="RejectTeleportOffersResponseDefault">
-		Le résident auquel vous avez envoyé un message a activé le mode rejet de toutes les offres ou demandes de téléportation du client [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé par les offres ou demandes de téléportations. Vous pouvez quand même lui envoyer un message privé.
+		Le résident auquel vous avez envoyé un message a activé le mode rejet de toutes les offres ou demandes de téléportation de [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé par les offres ou demandes de téléportations. Vous pouvez quand même lui envoyer un message privé.
 	</string>
 	<string name="RejectFriendshipRequestsResponseDefault">
-		Le résident auquel vous avez envoyé un message a activé le mode rejet de toutes les demandes d'amitié du client [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé par les demandes de d'amitié. Vous pouvez quand même lui envoyer un message privé.
+		Le résident auquel vous avez envoyé un message a activé le mode rejet de toutes les demandes d'amitié de [APP_NAME], ce qui signifie qu'il a demandé à ne pas être dérangé par les demandes de d'amitié. Vous pouvez quand même lui envoyer un message privé.
 	</string>
 	<string name="MutedAvatarsResponseDefault">
 		Le résident à qui vous avez envoyé un message a bloqué l'envoi de tous message de votre part.
@@ -4731,7 +4731,7 @@ Veuillez réinstaller la le clientuse à partir de [DOWNLOAD_URL] et contacter [
 		Installation de [APP_NAME]...
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		Le client [APP_NAME] est en train d&apos;être mis à jour.  Cela peut prendre un certain temps, merci de votre patience.
+		[APP_NAME] est en train d&apos;être mis à jour.  Cela peut prendre un certain temps, merci de votre patience.
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		Mise à jour en cours...
