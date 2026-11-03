@@ -62,16 +62,6 @@ Ubuntu 24.04 LTS does not allow pip to install packages into the system Python (
 - Type all the subsequent commands in this virtual environment.
 - In case of issue or Python update, you can delete the `~/src/.venv` directory and create a new virtual environment again.
 
-### Install Autobuild
-
-Autobuild is a Linden Lab resource that does all the hard work.
-Activate the Python virtual environment first.
-You can install it using the same versions as our automated builds as follows:
-```
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-Check Autobuild version to be "autobuild 3.9.3" or higher: `autobuild --version`
 ## Download the source code
 
 There are two required repositories, the viewer itself and the build variables. An optional third repository is used to configure and package FMOD Studio.
@@ -90,6 +80,18 @@ git clone https://github.com/FirestormViewer/phoenix-firestorm.git NewDestinatio
 ```
  
 The rest of this document will assume the default directory, `phoenix-firestorm`
+
+### Install Autobuild
+
+Autobuild is a Linden Lab resource that does all the hard work.
+Activate the Python virtual environment first.
+You can install it using the same versions as our automated builds, as listed in the viewer's `requirements.txt`:
+```
+cd ~/src/phoenix-firestorm
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+Check Autobuild version to be "autobuild 3.9.3" or higher: `autobuild --version`
 
 ### Clone the Autobuild build variables
 
