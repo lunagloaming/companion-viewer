@@ -283,6 +283,26 @@ public:
     // value of gFrameCount the last time the face was touched by LLViewerTextureList::updateImageDecodePriority
     U32 mLastTextureUpdate = 0;
 
+    // <FS:Luna Witch> Colour changes in place (FSInPlaceColorUpdates, see LLVOVolume::setTEColor)
+    // Alpha class of a colour: 0 invisible (alpha 0 and no glow), 1 blended, 2 nearly opaque, 3 opaque.
+    // A face whose colour stays in one class stays in the same render batch.
+    static S32 fsAlphaClass(F32 alpha, F32 glow);
+    // False while a debug view draws invisible faces (show transparent, or highlights with scripted beacons):
+    // then hiding a face needs its group rebuilt, as LLVolumeGeometryManager::rebuildGeom decides what to draw.
+    static bool fsCanHideInPlace();
+    // Alpha class the face had when it was last put into a render batch, or -1 if it has no vertex buffer.
+    // A face hidden in place keeps its batch, and can be shown again in place if its new class matches.
+    S8 mFSBatchedAlphaClass = -1;
+    // Alpha class the face had before it was hidden in place, or -1, and when it was hidden. A group rebuild soon
+    // after keeps the face in the batch of that class (fsKeepHiddenInBatch), so scripted hide/show animations
+    // don't drop it, which would make its next show rebuild the group again.
+    S8 mFSHiddenFromAlphaClass = -1;
+    F32 mFSHiddenTime = 0.f;
+    bool fsKeepHiddenInBatch(const LLTextureEntry* te) const;
+    // A representative alpha for an alpha class
+    static F32 fsClassAlpha(S32 alpha_class);
+    // </FS:Luna Witch>
+
 private:
     LLPointer<LLVertexBuffer> mVertexBuffer;
     LLPointer<LLVertexBuffer> mVertexBufferGLTF;

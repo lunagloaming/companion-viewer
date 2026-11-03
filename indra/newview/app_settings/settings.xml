@@ -2959,6 +2959,94 @@
       <key>Value</key>
       <real>70.0</real>
     </map>
+    <key>FSVBOAllocTrace</key>
+    <map>
+      <key>Comment</key>
+      <string>Debug: log, once a minute, how much heap memory the GL driver allocates and frees inside the vertex buffer pool's GL calls (create, upload, delete), with a size histogram. Needs jemalloc (Linux) and __GL_THREADED_OPTIMIZATIONS=0 to attribute the driver's allocations. Also logs which object groups rebuild their geometry, what they hold and who queued the rebuilds (RebuildTrace).</string>
+      <key>Persist</key>
+      <integer>0</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>FSVBOGPUCopyUpload</key>
+    <map>
+      <key>Comment</key>
+      <string>Upload vertex/index data through a small staging buffer and a GPU-side copy instead of directly. Uploads are 2-4x faster, so scenes load faster, and the NVIDIA driver keeps less system memory (a few hundred MB in a crowd). Not used on Apple GPUs.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>FSHeapDecayMs</key>
+    <map>
+      <key>Comment</key>
+      <string>Linux with jemalloc: milliseconds freed memory pages stay with the allocator before they are returned to the system (jemalloc dirty_decay_ms and muzzy_decay_ms). 0 returns them at once: the GL driver reserves heap memory the size of every vertex buffer without writing most of it, and recycled pages would make those reservations resident. That saves about 0.8 GB per viewer in a crowd with no measurable frame rate cost. Negative leaves the allocator's own setting (10000, or MALLOC_CONF).</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>S32</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>FSInPlaceColorUpdates</key>
+    <map>
+      <key>Comment</key>
+      <string>Update a face's colour or alpha in its existing vertex buffer when the change can't move it to another render batch (it stays invisible, blended, nearly opaque or opaque). Otherwise every colour change rebuilds the object's whole group, for an attachment the whole attachment, and scripted fades and blinks on attachments did that thousands of times a minute in a crowd. Off restores the original behaviour.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>FSOctreeBridgeMoveSlack</key>
+    <map>
+      <key>Comment</key>
+      <string>How far, in multiples of its node's half size, the centre of an object in an attachment, moving linkset or animesh may wander outside its octree node before the object is moved to another node. Each move rebuilds the geometry of both nodes into new vertex buffers, and a swaying flexi prim near a node boundary used to cross it back and forth many times a second. 1 keeps objects in place until they are a whole half size outside; 0 moves them as soon as they leave (the original behaviour).</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>1.0</real>
+    </map>
+    <key>FSVBOReleaseStagingSecs</key>
+    <map>
+      <key>Comment</key>
+      <string>Free the viewer's system-memory copy of a vertex/index buffer once it has not been changed for this many seconds; it is read back from the GPU if the buffer changes again. Saves gigabytes of RAM in crowded regions. Not used on Apple GPUs. 0 keeps every copy.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>10.0</real>
+    </map>
+    <key>FSReadOnlyCacheRefreshSecs</key>
+    <map>
+      <key>Comment</key>
+      <string>When another viewer instance owns the texture cache (this one is read-only), re-read its index at most this often (seconds) after a cache miss, so textures it cached since this instance started can be used. 0 disables.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>U32</string>
+      <key>Value</key>
+      <integer>15</integer>
+    </map>
+    <key>FSLinuxMemPressureThreshold</key>
+    <map>
+      <key>Comment</key>
+      <string>Linux only: treat system memory as low when /proc/pressure/memory "some avg10" exceeds this percentage, even if free memory looks sufficient (e.g. with zram swap). Fast zram swap keeps this figure low even under heavy swapping, so the default is small. 0 disables.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>2.0</real>
+    </map>
     <key>CacheLocation</key>
     <map>
       <key>Comment</key>

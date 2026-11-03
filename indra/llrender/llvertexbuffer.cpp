@@ -36,6 +36,8 @@
 #include "llshadermgr.h"
 #include "llglslshader.h"
 #include "llmemory.h"
+#include "llframetimer.h" // <FS:Luna Witch/>
+#include "fsvbotrace.h" // <FS:Luna Witch/>
 #include <glm/gtc/type_ptr.hpp>
 
 //Next Highest Power Of Two
@@ -276,6 +278,7 @@ static GLuint gen_buffer()
 #if !LL_DARWIN
         if (!gGLManager.mIsAMD)
         {
+            FSVBOTrace::Scope trace(FSVBOTrace::CALL_GEN); // <FS:Luna Witch/>
             glGenBuffers(pool_size, sNamePool);
         }
         else
@@ -312,6 +315,7 @@ static void delete_buffers(S32 count, GLuint* buffers)
 
         if (!sFreeList[idx].empty())
         {
+            FSVBOTrace::Scope trace(FSVBOTrace::CALL_DELETE); // <FS:Luna Witch/>
             glDeleteBuffers((GLsizei)sFreeList[idx].size(), sFreeList[idx].data());
             sFreeList[idx].resize(0);
         }
@@ -420,7 +424,8 @@ public:
     }
 
     // increase the size to some common value (e.g. a power of two) to increase hit rate
-    void adjustSize(U32& size)
+    // <FS:Luna Witch> static, so a released CPU copy can be re-allocated at the pooled size
+    static void adjustSize(U32& size)
     {
         // size = nhpo2(size);  // (193/303)/580 MB (distributed/allocated)/reserved in VBO Pool. Overhead: 66 percent. Hit rate: 77 percent
 
@@ -452,8 +457,19 @@ public:
 
             mMisses++;
             name = gen_buffer();
-            glBindBuffer(type, name);
-            glBufferData(type, size, nullptr, GL_DYNAMIC_DRAW);
+            // <FS:Luna Witch> FSVBOAllocTrace
+            //glBindBuffer(type, name);
+            //glBufferData(type, size, nullptr, GL_DYNAMIC_DRAW);
+            {
+                FSVBOTrace::Scope trace(FSVBOTrace::CALL_BIND);
+                glBindBuffer(type, name);
+            }
+            {
+                FSVBOTrace::Scope trace(type == GL_ELEMENT_ARRAY_BUFFER ? FSVBOTrace::CALL_CREATE_INDEX
+                                                                        : FSVBOTrace::CALL_CREATE_VERTEX, size);
+                glBufferData(type, size, nullptr, GL_DYNAMIC_DRAW);
+            }
+            // </FS:Luna Witch>
             if (type == GL_ELEMENT_ARRAY_BUFFER)
             {
                 LLVertexBuffer::sGLRenderIndices = name;
@@ -475,6 +491,12 @@ public:
             Entry& entry = entries.back();
             name = entry.mGLName;
             data = entry.mData;
+            // <FS:Luna Witch> the buffer's CPU copy may have been released while it was in use
+            if (!data)
+            {
+                data = (U8*)ll_aligned_malloc_16(size);
+            }
+            // </FS:Luna Witch>
 
             entries.pop_back();
             if (entries.empty())
@@ -492,7 +514,8 @@ public:
         llassert(type == GL_ARRAY_BUFFER || type == GL_ELEMENT_ARRAY_BUFFER);
         llassert(size >= 2);
         llassert(name != 0);
-        llassert(data != nullptr);
+        // <FS:Luna Witch> data is null when the CPU copy was released (LLVertexBuffer::releaseStaging)
+        //llassert(data != nullptr);
 
         clean();
 
@@ -1042,6 +1065,128 @@ void LLVertexBuffer::flushBuffers()
     sMappedBuffers.resize(0);
 }
 
+// <FS:Luna Witch> Every vertex/index buffer keeps a CPU copy of its contents for its whole lifetime,
+// although (except on Apple) the copy is only the source of glBufferSubData when the buffer is unmapped.
+// In a crowded region that is gigabytes of static geometry nobody touches again. Free the copy once a
+// buffer has stayed unmapped for sStagingReleaseSecs, and read the contents back from GL if it is ever
+// mapped again, so callers still see the old data in the parts they don't overwrite.
+F32 LLVertexBuffer::sStagingReleaseSecs = 0.f;
+
+// Buffers that may hold a releasable CPU copy (main thread only). Never destroyed, so buffers freed
+// during static destruction can still unlist themselves.
+static std::vector<LLVertexBuffer*>& staged_buffers()
+{
+    static std::vector<LLVertexBuffer*>* sBuffers = new std::vector<LLVertexBuffer*>();
+    return *sBuffers;
+}
+
+static size_t sStagingSweepPos = 0;
+static U64 sStagingReleasedBytes = 0;   // CPU copies currently released
+static U64 sStagingRestoredBytes = 0;   // total read back from GL
+static U32 sStagingReleases = 0;
+static U32 sStagingRestores = 0;
+
+static U8* read_back_gl_buffer(GLuint name, U32 size)
+{
+    U32 alloc_size = size;
+    LLDefaultVBOPool::adjustSize(alloc_size); // the pool may hand this copy to a buffer of the pooled size
+    U8* data = (U8*)ll_aligned_malloc_16(alloc_size);
+    // GL_COPY_READ_BUFFER leaves the array/element bindings (sGLRenderBuffer/sGLRenderIndices) alone
+    glBindBuffer(GL_COPY_READ_BUFFER, name);
+    glGetBufferSubData(GL_COPY_READ_BUFFER, 0, size, data);
+    glBindBuffer(GL_COPY_READ_BUFFER, 0);
+    return data;
+}
+
+void LLVertexBuffer::touchStaging()
+{
+    mLastMapTime = LLFrameTimer::getElapsedSeconds();
+    if (mStagedIndex == U32_MAX && !gGLManager.mIsApple)
+    {
+        auto& buffers = staged_buffers();
+        mStagedIndex = (U32)buffers.size();
+        buffers.push_back(this);
+    }
+}
+
+void LLVertexBuffer::releaseStaging()
+{
+    if (mMappedData && mGLBuffer)
+    {
+        ll_aligned_free_16(mMappedData);
+        mMappedData = nullptr;
+        sStagingReleasedBytes += mSize;
+    }
+    if (mMappedIndexData && mGLIndices)
+    {
+        ll_aligned_free_16(mMappedIndexData);
+        mMappedIndexData = nullptr;
+        sStagingReleasedBytes += mIndicesSize;
+    }
+    ++sStagingReleases;
+}
+
+void LLVertexBuffer::restoreStaging()
+{
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_VERTEX;
+    if (mGLBuffer && !mMappedData)
+    {
+        mMappedData = read_back_gl_buffer(mGLBuffer, mSize);
+        sStagingReleasedBytes -= mSize;
+        sStagingRestoredBytes += mSize;
+    }
+    if (mGLIndices && !mMappedIndexData)
+    {
+        mMappedIndexData = read_back_gl_buffer(mGLIndices, mIndicesSize);
+        sStagingReleasedBytes -= mIndicesSize;
+        sStagingRestoredBytes += mIndicesSize;
+    }
+    ++sStagingRestores;
+}
+
+//static
+void LLVertexBuffer::releaseIdleStaging()
+{
+    static F64 last_log = 0.0;
+    F64 now = LLFrameTimer::getElapsedSeconds();
+    if (now - last_log >= 60.0 && (sStagingReleases || sStagingReleasedBytes))
+    {
+        last_log = now;
+        LL_INFOS("VBOStaging") << "CPU copies released: " << sStagingReleasedBytes / 1048576 << " MB now, "
+            << sStagingReleases << " releases; read back from GL: " << sStagingRestores << " times, "
+            << sStagingRestoredBytes / 1048576 << " MB; " << staged_buffers().size() << " buffers listed" << LL_ENDL;
+        if (sAllocTrace)
+        {
+            FSVBOTrace::log();
+        }
+    }
+
+    if (sStagingReleaseSecs <= 0.f || gGLManager.mIsApple)
+    {
+        return;
+    }
+
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_VERTEX;
+    auto& buffers = staged_buffers();
+    F64 cutoff = now - sStagingReleaseSecs;
+    // visit a slice per frame; a full pass over ~100k buffers takes about a second at 30 fps
+    size_t count = llmin(buffers.size(), (size_t)4096);
+    for (size_t i = 0; i < count; ++i)
+    {
+        if (sStagingSweepPos >= buffers.size())
+        {
+            sStagingSweepPos = 0;
+        }
+        LLVertexBuffer* buffer = buffers[sStagingSweepPos++];
+        if (!buffer->mMapped && !buffer->mKeepStaging && buffer->mLastMapTime < cutoff
+            && ((buffer->mMappedData && buffer->mGLBuffer) || (buffer->mMappedIndexData && buffer->mGLIndices)))
+        {
+            buffer->releaseStaging();
+        }
+    }
+}
+// </FS:Luna Witch>
+
 //static
 U32 LLVertexBuffer::calcOffsets(const U32& typemask, U32* offsets, U32 num_vertices)
 {
@@ -1094,6 +1239,18 @@ LLVertexBuffer::~LLVertexBuffer()
     destroyGLBuffer();
     destroyGLIndices();
 
+    // <FS:Luna Witch> unlist from the staged buffers
+    if (mStagedIndex != U32_MAX)
+    {
+        auto& buffers = staged_buffers();
+        LLVertexBuffer* last = buffers.back();
+        buffers[mStagedIndex] = last;
+        last->mStagedIndex = mStagedIndex;
+        buffers.pop_back();
+        mStagedIndex = U32_MAX;
+    }
+    // </FS:Luna Witch>
+
     if (mMappedData)
     {
         LL_ERRS() << "Failed to clear vertex buffer's vertices" << LL_ENDL;
@@ -1119,6 +1276,7 @@ void LLVertexBuffer::genBuffer(U32 size)
 
         mSize = size;
         sVBOPool->allocate(GL_ARRAY_BUFFER, mSize, mGLBuffer, mMappedData);
+        touchStaging(); // <FS:Luna Witch/>
     }
 }
 
@@ -1134,6 +1292,7 @@ void LLVertexBuffer::genIndices(U32 size)
         llassert(mMappedIndexData == nullptr);
         mIndicesSize = size;
         sVBOPool->allocate(GL_ELEMENT_ARRAY_BUFFER, mIndicesSize, mGLIndices, mMappedIndexData);
+        touchStaging(); // <FS:Luna Witch/>
     }
 }
 
@@ -1188,6 +1347,12 @@ void LLVertexBuffer::destroyGLBuffer()
     if (mGLBuffer || mMappedData)
     {
         LL_PROFILE_ZONE_SCOPED_CATEGORY_VERTEX;
+        // <FS:Luna Witch>
+        if (mGLBuffer && !mMappedData)
+        {
+            sStagingReleasedBytes -= mSize;
+        }
+        // </FS:Luna Witch>
         //llassert(sVBOPool);
         if (sVBOPool)
         {
@@ -1205,6 +1370,12 @@ void LLVertexBuffer::destroyGLIndices()
     if (mGLIndices || mMappedIndexData)
     {
         LL_PROFILE_ZONE_SCOPED_CATEGORY_VERTEX;
+        // <FS:Luna Witch>
+        if (mGLIndices && !mMappedIndexData)
+        {
+            sStagingReleasedBytes -= mIndicesSize;
+        }
+        // </FS:Luna Witch>
         //llassert(sVBOPool);
         if (sVBOPool)
         {
@@ -1303,6 +1474,12 @@ U8* LLVertexBuffer::mapVertexBuffer(LLVertexBuffer::AttributeType type, U32 inde
     {
         U32 start = mOffsets[type] + sTypeSize[type] * index;
         U32 end = start + sTypeSize[type] * count-1;
+        // <FS:Luna Witch> FSVBOAllocTrace: who writes upload data
+        if (sAllocTrace)
+        {
+            FSVBOTrace::traceMapSite(end - start + 1, mUploaded);
+        }
+        // </FS:Luna Witch>
 
         bool flagged = false;
         // flag region as mapped
@@ -1340,6 +1517,12 @@ U8* LLVertexBuffer::mapIndexBuffer(U32 index, S32 count)
     {
         U32 start = sizeof(U16) * index;
         U32 end = start + sizeof(U16) * count-1;
+        // <FS:Luna Witch> FSVBOAllocTrace: who writes upload data
+        if (sAllocTrace)
+        {
+            FSVBOTrace::traceMapSite(end - start + 1, mUploaded);
+        }
+        // </FS:Luna Witch>
 
         bool flagged = false;
         // flag region as mapped
@@ -1369,6 +1552,55 @@ U8* LLVertexBuffer::mapIndexBuffer(U32 index, S32 count)
 //  end -- last byte to copy (NOT last byte + 1)
 //  data -- data to be flushed
 //  dst -- mMappedData or mMappedIndexData
+// <FS:Luna Witch> Write uploads into one small staging buffer and copy them into the target on the GPU.
+// Standalone, the NVIDIA driver kept a system-memory copy of data uploaded with glBufferSubData but not of
+// data copied with glCopyBufferSubData (2 GB of buffers: +2087 MB driver memory directly, +40 MB this way),
+// and uploads were 2-4x faster. In the viewer the speedup holds (scenes load visibly faster) but driver
+// memory only fell from 4.06 to 3.65 GB: most of it is reserved at glBufferData(NULL) instead.
+bool LLVertexBuffer::sGPUCopyUpload = false;
+
+static void upload_via_gpu_copy(GLenum target, U32 offset, U32 size, const U8* data)
+{
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_VERTEX;
+    FSVBOTrace::Scope trace(FSVBOTrace::CALL_UPLOAD, size);
+    constexpr U32 staging_size = 4 * 1024 * 1024;
+    // per thread, since binding state belongs to the thread's GL context
+    thread_local GLuint staging = 0;
+    thread_local U32 staging_pos = 0;
+
+    if (!staging)
+    {
+        glGenBuffers(1, &staging);
+        glBindBuffer(GL_COPY_READ_BUFFER, staging);
+        glBufferData(GL_COPY_READ_BUFFER, staging_size, nullptr, GL_STREAM_DRAW);
+        staging_pos = 0;
+    }
+    else
+    {
+        glBindBuffer(GL_COPY_READ_BUFFER, staging);
+    }
+
+    while (size > 0)
+    {
+        U32 n = llmin(size, staging_size);
+        if (staging_pos + n > staging_size)
+        {
+            // orphan: the driver hands out fresh storage instead of waiting for pending copies
+            glBufferData(GL_COPY_READ_BUFFER, staging_size, nullptr, GL_STREAM_DRAW);
+            staging_pos = 0;
+        }
+        glBufferSubData(GL_COPY_READ_BUFFER, staging_pos, n, data);
+        glCopyBufferSubData(GL_COPY_READ_BUFFER, target, staging_pos, offset, n);
+        staging_pos += (n + 15) & ~15U;
+        offset += n;
+        data += n;
+        size -= n;
+    }
+
+    glBindBuffer(GL_COPY_READ_BUFFER, 0);
+}
+// </FS:Luna Witch>
+
 void LLVertexBuffer::flush_vbo(GLenum target, U32 start, U32 end, void* data, U8* dst)
 {
     if (gGLManager.mIsApple)
@@ -1393,8 +1625,17 @@ void LLVertexBuffer::flush_vbo(GLenum target, U32 start, U32 end, void* data, U8
             LL_PROFILE_ZONE_NUM(end);
             LL_PROFILE_ZONE_NUM(end-start);
 
+            // <FS:Luna Witch>
+            if (sGPUCopyUpload)
+            {
+                upload_via_gpu_copy(target, start, end - start + 1, (const U8*)data);
+                return;
+            }
+            // </FS:Luna Witch>
+
             constexpr U32 block_size = 65536;
 
+            FSVBOTrace::Scope trace(FSVBOTrace::CALL_UPLOAD, end - start + 1); // <FS:Luna Witch/>
             for (U32 i = start; i <= end; i += block_size)
             {
                 //LL_PROFILE_ZONE_NAMED_CATEGORY_VERTEX("glBufferSubData block");
@@ -1414,6 +1655,16 @@ void LLVertexBuffer::unmapBuffer()
 
 void LLVertexBuffer::_mapBuffer()
 {
+    // <FS:Luna Witch> bring back a released CPU copy before anyone reads or writes through it
+    if (!gGLManager.mIsApple)
+    {
+        mLastMapTime = LLFrameTimer::getElapsedSeconds();
+        if ((mGLBuffer && !mMappedData) || (mGLIndices && !mMappedIndexData))
+        {
+            restoreStaging();
+        }
+    }
+    // </FS:Luna Witch>
     if (!mMapped)
     {
         mMapped = true;
@@ -1512,6 +1763,7 @@ void LLVertexBuffer::_unmapBuffer()
 
             flush_vbo(GL_ARRAY_BUFFER, start, end, (U8*)mMappedData + start, mMappedData);
             mMappedVertexRegions.clear();
+            mUploaded = true; // <FS:Luna Witch/>
         }
 
         if (!mMappedIndexRegions.empty())
@@ -1545,6 +1797,7 @@ void LLVertexBuffer::_unmapBuffer()
 
             flush_vbo(GL_ELEMENT_ARRAY_BUFFER, start, end, (U8*)mMappedIndexData + start, mMappedIndexData);
             mMappedIndexRegions.clear();
+            mUploaded = true; // <FS:Luna Witch/>
         }
     }
 }

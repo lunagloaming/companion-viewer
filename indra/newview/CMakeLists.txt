@@ -148,6 +148,7 @@ set(viewer_SOURCE_FILES
     fsfloatervramusage.cpp
     fsfloaterwearablefavorites.cpp
     fsfloaterwhitelisthelper.cpp
+    fsinstanceslots.cpp
     fsjointpose.cpp
     fskeywords.cpp
     fslslbridge.cpp
@@ -181,6 +182,7 @@ set(viewer_SOURCE_FILES
     fsradarentry.cpp
     fsradarlistctrl.cpp
     fsradarmenu.cpp
+    fsrebuildtrace.cpp # <FS:Luna Witch/>
     fsregioncross.cpp
     fsscriptlibrary.cpp
     fsscrolllistctrl.cpp
@@ -1016,6 +1018,7 @@ set(viewer_HEADER_FILES
     fsfloatervramusage.h
     fsfloaterwearablefavorites.h
     fsfloaterwhitelisthelper.h
+    fsinstanceslots.h
     fsjointpose.h
     fsgridhandler.h
     fskeywords.h
@@ -1050,6 +1053,7 @@ set(viewer_HEADER_FILES
     fsradarentry.h
     fsradarlistctrl.h
     fsradarmenu.h
+    fsrebuildtrace.h # <FS:Luna Witch/>
     fsregioncross.h
     fsscriptlibrary.h
     fsscrolllistctrl.h
