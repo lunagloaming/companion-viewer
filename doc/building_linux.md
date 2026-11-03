@@ -4,11 +4,11 @@
 > Please note that we do not give support for compiling the viewer on your own. However, there is a self-compilers group in Second Life that can be joined to ask questions related to compiling the viewer: [Firestorm Self Compilers](https://tinyurl.com/firestorm-self-compilers)
 
 This procedure is based on discussions with the Firestorm Linux development team and is the only one recommended for Firestorm for Linux. System requirements are:
-- Ubuntu 22.04 LTS (x86_64) - fully upgraded (this is also now the minimum requirement for running the viewer).
+- Ubuntu 24.04 LTS (x86_64) - fully upgraded (this matches the environment used to build the official Linux releases).
 - 16GB or more RAM ([Low Memory Caution](#common-issuesbugsglitches-and-solutions))
 - 64GB hard drive space 
 - 4 or more core CPU (you could get by with 2 cores, but the process will take much longer)
-- GCC 11 compiler (which is the default version on Ubuntu 22.04 LTS)
+- GCC 14 compiler (available on Ubuntu 24.04 LTS as the `gcc-14` and `g++-14` packages; it is not the default version)
 
 It is recommended that you use a virtual machine for compiling, ensuring the guest can meet the hardware requirements.
 
@@ -36,35 +36,32 @@ A few packages must be installed on the build system. Some may already be instal
 |                 |                  |               |                    |                  |        |
 | --------------- | ---------------- | ------------- | ------------------ | ---------------- | ------ |
 | libgl1-mesa-dev | libglu1-mesa-dev | libpulse-dev  | build-essential    | python3-pip      | git    |
-| libssl-dev      | libxinerama-dev  | libxrandr-dev | libfontconfig-dev  | libfreetype6-dev | gcc-11 |
-| cmake           |                  |               |                    |                  |        |
+| libssl-dev      | libxinerama-dev  | libxrandr-dev | libfontconfig-dev  | libfreetype6-dev | gcc-14 |
+| g++-14          | cmake            | python3-venv  |                    |                  |        |
 
 ```
-sudo apt install libgl1-mesa-dev libglu1-mesa-dev libpulse-dev build-essential python3-pip git libssl-dev libxinerama-dev libxrandr-dev libfontconfig-dev libfreetype6-dev gcc-11 cmake
+sudo apt install libgl1-mesa-dev libglu1-mesa-dev libpulse-dev build-essential python3-pip git libssl-dev libxinerama-dev libxrandr-dev libfontconfig-dev libfreetype6-dev gcc-14 g++-14 cmake python3-venv
 ```
 
-### Optional: Set up a Python virtual environment
+Ubuntu 24.04 LTS defaults to GCC 13, so tell the build to use GCC 14 instead. Run this before configuring, or add it to `~/.bashrc` or `~/.profile`:
 
-If you do not want to install the required Python packages into the default Python directory, you can optionally create a virtual environment.
+```
+export CC=gcc-14
+export CXX=g++-14
+```
+
+### Set up a Python virtual environment
+
+Ubuntu 24.04 LTS does not allow pip to install packages into the system Python (pip stops with an `externally-managed-environment` error), so the required Python packages must be installed into a virtual environment.
 
 - Create the Python virtual environment (only once):
-  `python -m venv .venv`
+  `python3 -m venv ~/src/.venv`
 - Activate the virtual environment:
-  `source .venv/bin/activate`
+  `source ~/src/.venv/bin/activate`
 - Activate the virtual environment each time you want to build.
 - Type all the subsequent commands in this virtual environment.
-- In case of issue or Python update, you can delete this .venv directory and create a new virtual environment again.
+- In case of issue or Python update, you can delete the `~/src/.venv` directory and create a new virtual environment again.
 
-### Install Autobuild
-
-Autobuild is a Linden Lab resource that does all the hard work.
-If you created a Python virtual environment, activate it first.
-You can install it using the same versions as our automated builds as follows:
-```
-sudo pip3 install --upgrade pip
-pip install -r requirements.txt
-```
-Check Autobuild version to be "autobuild 3.9.3" or higher: `autobuild --version`
 ## Download the source code
 
 There are two required repositories, the viewer itself and the build variables. An optional third repository is used to configure and package FMOD Studio.
@@ -83,6 +80,18 @@ git clone https://github.com/FirestormViewer/phoenix-firestorm.git NewDestinatio
 ```
  
 The rest of this document will assume the default directory, `phoenix-firestorm`
+
+### Install Autobuild
+
+Autobuild is a Linden Lab resource that does all the hard work.
+Activate the Python virtual environment first.
+You can install it using the same versions as our automated builds, as listed in the viewer's `requirements.txt`:
+```
+cd ~/src/phoenix-firestorm
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+Check Autobuild version to be "autobuild 3.9.3" or higher: `autobuild --version`
 
 ### Clone the Autobuild build variables
 
@@ -286,6 +295,7 @@ If you encounter errors or run into problems, please first double check that you
 ### Common issues/bugs/glitches and solutions
 
 - **Virtual memory exhausted, c++ fatal error, or similar out-of-memory issues** may occur if you are building the viewer for the first time, or re-building after a very large set of changes were added. Sometimes restarting the build command will let you recover, sometimes you have to restart the build system. To avoid that from happening, add ram to your virtual environment, or add swap space, something on the order of 10GB or more. As well, reducing the number of CPU cores assigned, down to 4 or less, will lower ram usage.
+- **Missing GLIBC_2.39 or GLIBCXX symbols when running the viewer:** The official Linux releases are built on Ubuntu 24.04 LTS with GCC 14 and glibc 2.39. Older LTS or enterprise-style distributions may not provide a new enough glibc or libstdc++ to run them. If you see errors about a missing `GLIBC_2.39` or newer `GLIBCXX` symbols, your distribution is likely too old for these builds. Update your system, use a distro-specific package where available, or build the viewer locally.
 - **Missing libraries/applications/packages:** This may occur if you did not or could not install the packages shown above, or are attempting to use this procedure with a different Linux OS, or are attempting to build a 32-bit viewer. Start over, making sure you are using the right OS, reinstall all packages as listed, and do not attempt to make a 32-bit viewer.
 - **SDL2:** Currently the SDL2 install/update process has a problem if the SDL2 files already exist. The workaround is to delete those files:
 ```
