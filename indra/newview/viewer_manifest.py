@@ -2173,7 +2173,7 @@ class LinuxManifest(ViewerManifest):
         icon_path = self.icon_path()
         print("DEBUG: icon_path '%s'" % icon_path)
         with self.prefix(src=icon_path) :
-            self.path("firestorm_256.png","firestorm_48.png")
+            self.path("firestorm_256.png","companionviewer_48.png")
             #with self.prefix(dst="res-sdl") :
             #    self.path("firestorm_256.bmp","ll_icon.BMP")
 
