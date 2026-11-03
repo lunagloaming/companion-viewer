@@ -3,14 +3,14 @@
 	<tab_container name="about_tab">
 		<panel label="資訊" name="support_panel">
 			<text name="support_intro">
-如需瞭解有關 Firestorm 的最新資訊，請存取
+Companion Viewer 以 Firestorm 為基礎：
 https://www.firestormviewer.org
 			</text>
 			<button label="複製到剪貼簿" name="copy_btn" />
 		</panel>
 		<panel label="鳴謝" name="credits_panel">
 			<text name="linden_intro">
-如果沒有林登實驗室將第二人生檢視器原始碼開放的決定，Firestorm 就不可能出現。
+如果沒有林登實驗室將第二人生檢視器原始碼開放的決定，Companion Viewer 和 Firestorm 就不可能出現。
 
 "第二人生"由林登實驗室提供、
 開放原始碼的貢獻者：

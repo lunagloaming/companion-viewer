@@ -3,14 +3,14 @@
 	<tab_container name="about_tab">
 		<panel label="Информация" name="support_panel">
 			<text name="support_intro">
-				Новая информация о Firestorm доступна по адресу 
+				Companion Viewer основан на Firestorm:
 https://www.firestormviewer.org
 			</text>
 			<button label="Копировать в буфер" name="copy_btn"/>
 		</panel>
 		<panel label="Благодарности" name="credits_panel">
 			<text name="linden_intro">
-				Создание Firestorma не было бы возможно без решения Linden Lab об обнародовании кода оригинального клиента Second Life.
+				Создание Companion Viewer и Firestorm не было бы возможно без решения Linden Lab об обнародовании кода оригинального клиента Second Life.
 
 Linden это:
 			</text>

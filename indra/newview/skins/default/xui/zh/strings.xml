@@ -8,16 +8,16 @@
 		[當前伺服器]
 	</string>
 	<string name="APP_NAME">
-		Firestorm
+		Companion Viewer
 	</string>
 	<string name="CAPITALIZED_APP_NAME">
-		FIRESTORM
+		COMPANION VIEWER
 	</string>
 	<string name="SECOND_LIFE_GRID">
 		第二人生
 	</string>
 	<string name="SUPPORT_SITE">
-		Firestorm支援網站
+		Second Life支援網站
 	</string>
 	<!-- Will be set in fsgridhandler.cpp / llviewernetwork.cpp -->
 	<string name="VIEWER_GENERATION">
@@ -27,7 +27,7 @@
 		V[VERSION]
 	</string>
 	<string name="APP_NAME_ABBR">
-		FS
+		CV
 	</string>
 	<string name="StartupLoading">
 		[APP_NAME]載入中...
@@ -237,7 +237,7 @@ Voice Server Version: [VOICE_VERSION]
 		退出
 	</string>
 	<string name="create_account_url">
-		https://www.firestormviewer.org/join-secondlife/
+		https://join.secondlife.com/
 	</string>
 	<string name="AgniGridLabel">
 		第二人生主網路 (Agni)
@@ -246,11 +246,11 @@ Voice Server Version: [VOICE_VERSION]
 		第二人生測試網路 (Aditi)
 	</string>
 	<string name="ViewerDownloadURL">
-		https://www.firestormviewer.org/choose-your-platform/
+		https://secondlife.com/support/downloads/
 	</string>
 	<string name="LoginFailedViewerNotPermitted">
 目前版本檢視器已無法繼續登入第二人生, 請前往以下網站下載最新版本檢視器:
-https://www.firestormviewer.org/choose-your-platform/
+https://secondlife.com/support/downloads/
 
 更多相關資訊, 請檢視下面的常見問題解答:
 http://secondlife.com/viewer-access-faq
@@ -602,7 +602,7 @@ support@secondlife.com.
 	</string>
 	<string name="TooltipPrice" value="[AMOUNT] L$: " />
 	<string name="TooltipSLIcon">
-		該連結指向 SecondLife.com、LindenLab.com 或 firestormviewer.org 官方頁面.
+		該連結指向 SecondLife.com 或 LindenLab.com 官方頁面.
 	</string>
 	<string name="TooltipFlagScript">
 		指令碼
@@ -846,9 +846,7 @@ support@secondlife.com.
 	<string name="ReleaseNotes">
 		發行說明
 	</string>
-	<string name="RELEASE_NOTES_BASE_URL" translate="false">
-		https://wiki.firestormviewer.org/changelog:firestorm_change_log_
-	</string>
+	<string name="RELEASE_NOTES_BASE_URL" translate="false"></string>
 	<string name="LoadingData">
 		載入中...
 	</string>
@@ -915,7 +913,7 @@ support@secondlife.com.
 	</string>
 	<string name="AssetUploadRequestInvalid">
 
-上傳請求錯誤。請存取：https://www.firestormviewer.org/support 尋求幫助。
+上傳請求錯誤。
 	</string>
 	<!-- Settings errors -->
 	<string name="SettingValidationError">
@@ -4973,7 +4971,7 @@ support@secondlife.com.
 		[APP_NAME] 安裝中...
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		你的 [APP_NAME] Viewer 正在更新為最新發行版。可能要等一會，請耐心稍候。
+		你的 [APP_NAME] 正在更新為最新發行版。可能要等一會，請耐心稍候。
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		更新下載中...

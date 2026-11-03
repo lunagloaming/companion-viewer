@@ -351,7 +351,7 @@
       <combo_box.drop_down_button
         font="SansSerifLarge"/>
       <combo_box.item
-        label="Firestorm"
+        label="Companion Viewer"
         name="Firestorm"
         value="settings_firestorm.xml" />
       <combo_box.item
@@ -385,8 +385,10 @@
     image_unselected="PushButton_Login"
     image_pressed="PushButton_Login_Pressed"
     image_hover_unselected="PushButton_Login_Over"
+    image_disabled="PushButton_Disabled"
     label="Log In"
     label_color="White"
+    label_color_disabled="LtGray"
     font="SansSerifLarge"
     name="connect_btn"
     width="140"

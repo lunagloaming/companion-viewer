@@ -140,7 +140,7 @@
     <key>Type</key>
     <string>Boolean</string>
     <key>Value</key>
-    <integer>0</integer>
+    <integer>1</integer>
   </map>
   <key>GridListDownload</key>
   <map>
@@ -888,7 +888,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
 
   <key>RadarReportChatRangeLeave</key>
@@ -1264,7 +1264,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <boolean>0</boolean>
+      <boolean>1</boolean>
     </map>
     <key>RestrainedLoveDebug</key>
     <map>
@@ -1814,7 +1814,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>ApplyColorImmediately</key>
     <map>
@@ -1859,7 +1859,7 @@
     <key>Type</key>
     <string>Boolean</string>
     <key>Value</key>
-    <integer>0</integer>
+    <integer>1</integer>
   </map>
   <key>PrivateLocalLookAtTarget</key>
   <map>
@@ -1870,7 +1870,7 @@
     <key>Type</key>
     <string>Boolean</string>
     <key>Value</key>
-    <integer>0</integer>
+    <integer>1</integer>
   </map>
   <key>PrivatePointAtTarget</key>
   <map>
@@ -1881,7 +1881,7 @@
     <key>Type</key>
     <string>Boolean</string>
     <key>Value</key>
-    <integer>0</integer>
+    <integer>1</integer>
   </map>
   <key>ArrowKeysAlwaysMove</key>
     <map>
@@ -1925,7 +1925,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>0.5</real>
+      <real>0.0</real>
     </map>
     <key>AudioLevelMaster</key>
     <map>
@@ -1947,7 +1947,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>0.3</real>
+      <real>1</real>
     </map>
     <key>AudioLevelMic</key>
     <map>
@@ -1958,7 +1958,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>1.0</real>
+      <real>0.0</real>
     </map>
     <key>AudioLevelMusic</key>
     <map>
@@ -1969,7 +1969,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>0.3</real>
+      <real>1</real>
     </map>
     <key>AudioLevelSFX</key>
     <map>
@@ -1980,7 +1980,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>0.5</real>
+      <real>0.0</real>
     </map>
     <key>AudioLevelUI</key>
     <map>
@@ -1991,7 +1991,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>0.5</real>
+      <real>1.0</real>
     </map>
     <key>AudioLevelVoice</key>
     <map>
@@ -2002,7 +2002,7 @@
       <key>Type</key>
       <string>F32</string>
       <key>Value</key>
-      <real>0.7</real>
+      <real>0.0</real>
     </map>
     <key>AudioLevelWind</key>
     <map>
@@ -2990,7 +2990,7 @@
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-      <integer>2048</integer>
+      <integer>19968</integer>
     </map>
     <key>FSDiskCacheHighWaterPercent</key>
     <map>
@@ -3133,7 +3133,7 @@
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-      <integer>2048</integer>
+      <integer>19968</integer>
     </map>
     <key>CacheValidateCounter</key>
     <map>
@@ -3396,7 +3396,7 @@
       <key>Type</key>
       <string>S32</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>2</integer>
     </map>
     <key>ChatConsoleFontSize</key>
     <map>
@@ -5129,7 +5129,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>DisableCrashLogger</key>
     <map>
@@ -5269,7 +5269,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>DoubleClickShowWorldMap</key>
     <map>
@@ -5412,7 +5412,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>EnableCollisionSounds</key>
     <map>
@@ -5423,7 +5423,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>EnableMouselook</key>
     <map>
@@ -5434,7 +5434,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
       <key>Backup</key>
       <integer>0</integer>
     </map>
@@ -5458,7 +5458,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>EventURL</key>
     <map>
@@ -6074,7 +6074,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>ForceMissingType</key>
     <map>
@@ -6241,7 +6241,7 @@
       <key>Type</key>
       <string>String</string>
       <key>Value</key>
-      <string>https://wiki.firestormviewer.org/[TOPIC]</string>
+      <string />
       <key>Backup</key>
       <integer>0</integer>
     </map>
@@ -6254,7 +6254,7 @@
       <key>Type</key>
       <string>String</string>
       <key>Value</key>
-      <string>https://wiki.firestormviewer.org/start#basic_functions</string>
+      <string />
       <key>Backup</key>
       <integer>0</integer>
     </map>    
@@ -8268,7 +8268,7 @@
     <key>Type</key>
     <string>Boolean</string>
     <key>Value</key>
-    <integer>1</integer>
+    <integer>0</integer>
   </map>
   <key>MediaOnAPrimUI</key>
   <map>
@@ -9011,7 +9011,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>MuteAudio</key>
     <map>
@@ -9055,7 +9055,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>MuteUI</key>
     <map>
@@ -9077,7 +9077,7 @@
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>MuteWhenMinimized</key>
     <map>
@@ -10016,7 +10016,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>PlayTypingAnim</key>
     <map>
@@ -10027,7 +10027,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>PlaySoundFriendIM</key>
     <map>
@@ -10236,7 +10236,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-	  <integer>13</integer>
+	  <integer>42</integer>
     </map>
   <key>PreviewRenderSize</key>  
   <map>
@@ -14165,7 +14165,7 @@ Change of this parameter will affect the layout of buttons in notification toast
 			<key>Type</key>
 			<string>String</string>
 			<key>Value</key>
-			<string>https://phoenixviewer.com/app/file-a-jira/?environment=[ENVIRONMENT]</string>
+			<string />
 		</map>
 	<key>RevokePermsOnStopAnimation</key>
     <map>
@@ -14857,7 +14857,7 @@ Change of this parameter will affect the layout of buttons in notification toast
   <key>FSUseLegacyUnsupportedHardwareChecks</key>
     <map>
       <key>Comment</key>
-      <string>If enabled, Firestorm will perform utterly pointless checks that probably made sense in 2004.</string>
+      <string>If enabled, Companion Viewer will perform utterly pointless checks that probably made sense in 2004.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -14868,7 +14868,7 @@ Change of this parameter will affect the layout of buttons in notification toast
   <key>FSUseStandaloneGroupFloater</key>
     <map>
       <key>Comment</key>
-      <string>If enabled, Firestorm will use a standalone floater for each group profile.</string>
+      <string>If enabled, Companion Viewer will use a standalone floater for each group profile.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -14885,7 +14885,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
 	<key>ShowScriptErrorsLocation</key>
     <map>
@@ -15170,7 +15170,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
 	<key>FSSearchGroupMaturity</key>
     <map>
@@ -15183,7 +15183,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-	  <integer>13</integer>
+	  <integer>42</integer>
     </map>
     <key>ShowPGEvents</key>
     <map>
@@ -15222,7 +15222,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>ShowPGLand</key>
     <map>
@@ -15261,7 +15261,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>ShowPGClassifieds</key>
     <map>
@@ -15300,7 +15300,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>ShowPGSims</key>
     <map>
@@ -15339,7 +15339,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>ShowNearClip</key>
     <map>
@@ -15451,7 +15451,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>ShowStartLocation</key>
     <map>
@@ -16709,7 +16709,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <real>0</real>
+      <real>1</real>
     </map>
     <key>UIResizeBarHeight</key>
     <map>
@@ -17672,7 +17672,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>UseDefaultColorPicker</key>
     <map>
@@ -17716,7 +17716,7 @@ Change of this parameter will affect the layout of buttons in notification toast
         <key>Type</key>
         <string>Boolean</string>
         <key>Value</key>
-        <integer>1</integer>
+        <integer>0</integer>
     </map>
     <key>EnvironmentPersistAcrossLogin</key>
     <map>
@@ -19382,7 +19382,7 @@ Change of this parameter will affect the layout of buttons in notification toast
 			<key>Type</key>
 			<string>Boolean</string>
 			<key>Value</key>
-			<integer>1</integer>
+			<integer>0</integer>
 		</map>
 		<key>FSCmdLineAnnounceToChannel</key>
 		<map>
@@ -19758,7 +19758,7 @@ Change of this parameter will affect the layout of buttons in notification toast
 			<key>Type</key>
 			<string>Boolean</string>
 			<key>Value</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</map>
 		<key>DebugLookAtShowNames</key>
 		<map>
@@ -22190,7 +22190,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>Type</key>
     <string>Boolean</string>
     <key>Value</key>
-    <integer>1</integer>
+    <integer>0</integer>
   </map>
   <key>FSChatbarNamePrediction</key>
   <map>
@@ -22297,7 +22297,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>String</string>
       <key>Value</key>
-      <string>Firestorm</string>
+      <string>Companion Viewer</string>
     </map>
   <key>FSSkinCurrentThemeReadableName</key>
     <map>
@@ -22803,7 +22803,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
   <key>FSAreaSearchAdvanced</key>
   <map>
@@ -23080,7 +23080,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>2</integer>
     </map>
     <key>PlayModeUISndNewIncomingGroupIMSession</key>
     <map>
@@ -23091,7 +23091,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>2</integer>
     </map>
     <key>PlayModeUISndNewIncomingConfIMSession</key>
     <map>
@@ -23102,7 +23102,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>2</integer>
     </map>
     <key>PlayModeUISndStartIM</key>
     <map>
@@ -23201,7 +23201,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>PlayModeUISndTrackerBeacon</key>
     <map>
@@ -23366,7 +23366,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>PlayModeUISndWindowClose</key>
     <map>
@@ -23534,7 +23534,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>UISndRadarChatEnter</key>
     <map>
@@ -23731,7 +23731,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSUseStandalonePlaceDetailsFloater</key>
     <map>
       <key>Comment</key>
-      <string>If enabled, Firestorm will use a standalone floater for each landmark details, teleport history details and parcel details view.</string>
+      <string>If enabled, Companion Viewer will use a standalone floater for each landmark details, teleport history details and parcel details view.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -23742,7 +23742,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSUseStandaloneTeleportHistoryFloater</key>
     <map>
       <key>Comment</key>
-      <string>If enabled, Firestorm will use a standalone floater for the teleport history view.</string>
+      <string>If enabled, Companion Viewer will use a standalone floater for the teleport history view.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -23753,7 +23753,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSUseStandaloneBlocklistFloater</key>
     <map>
       <key>Comment</key>
-      <string>If enabled, Firestorm will use a standalone floater for the blocklist.</string>
+      <string>If enabled, Companion Viewer will use a standalone floater for the blocklist.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -23764,7 +23764,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSDisableIMChiclets</key>
     <map>
       <key>Comment</key>
-      <string>If enabled, Firestorm will not show any group / IM chat chiclets (notifications envelope and sum of IMs will remain on the screen).</string>
+      <string>If enabled, Companion Viewer will not show any group / IM chat chiclets (notifications envelope and sum of IMs will remain on the screen).</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -23786,7 +23786,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSDisableMouseWheelCameraZoom</key>
     <map>
       <key>Comment</key>
-      <string>If true, Firestorm will not use mouse wheel to zoom in/out the camera.</string>
+      <string>If true, Companion Viewer will not use mouse wheel to zoom in/out the camera.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -23808,7 +23808,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSEnableVolumeControls</key>
     <map>
         <key>Comment</key>
-        <string>If true, Firestorm will show volume controls (sounds, media, stream) in upper right corner of the screen. Useful, if skin already has its own controls.</string>
+        <string>If true, Companion Viewer will show volume controls (sounds, media, stream) in upper right corner of the screen. Useful, if skin already has its own controls.</string>
         <key>Persist</key>
         <integer>1</integer>
         <key>Type</key>
@@ -23819,7 +23819,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSResetCameraOnMovement</key>
     <map>
         <key>Comment</key>
-        <string>If true, Firestorm will reset camera on avatar movement.</string>
+        <string>If true, Companion Viewer will reset camera on avatar movement.</string>
         <key>Persist</key>
         <integer>1</integer>
         <key>Type</key>
@@ -23830,7 +23830,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSShowInterfaceInMouselook</key>
     <map>
         <key>Comment</key>
-        <string>If true, Firestorm will show user interface in mouselook mode.</string>
+        <string>If true, Companion Viewer will show user interface in mouselook mode.</string>
         <key>Persist</key>
         <integer>1</integer>
         <key>Type</key>
@@ -25080,7 +25080,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSFlashOnScriptDialog</key>
     <map>
       <key>Comment</key>
-      <string>Flash/Bounce the app icon when a script dialog is received and Firestorm is not in focus</string>
+      <string>Flash/Bounce the app icon when a script dialog is received and Companion Viewer is not in focus</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -25091,7 +25091,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSFlashOnMessage</key>
     <map>
       <key>Comment</key>
-      <string>Flash/Bounce the app icon when a new message is received and Firestorm is not in focus</string>
+      <string>Flash/Bounce the app icon when a new message is received and Companion Viewer is not in focus</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -25102,7 +25102,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSFlashOnObjectIM</key>
     <map>
       <key>Comment</key>
-      <string>Flash/Bounce the app icon when a new instant message from an object is received and Firestorm is not in focus.</string>
+      <string>Flash/Bounce the app icon when a new instant message from an object is received and Companion Viewer is not in focus.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -25424,7 +25424,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSRadarShowMutedAndDerendered</key>
     <map>
@@ -25698,7 +25698,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSUseShiftWhisper</key>
     <map>
@@ -25709,7 +25709,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSUseAltOOC</key>
     <map>
@@ -25720,7 +25720,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSComboboxSubstringSearch</key>
     <map>
@@ -26155,7 +26155,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSNoVersionPopup</key>
     <map>
       <key>Comment</key>
-      <string>Disables version popup on the Firestorm Login page</string>
+      <string>Disables version popup on the Companion Viewer Login page</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
@@ -26295,7 +26295,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>FSLegacyNameCacheExpiration</key>
     <map>
@@ -26826,7 +26826,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSWearableFavoritesSortOrder</key>
     <map>
@@ -27365,7 +27365,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSUseChatMentionAutoComplete</key>
     <map>
@@ -27472,7 +27472,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSLimitTextureVRAMUsage</key>
     <map>
@@ -27911,7 +27911,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>0</integer>
+      <integer>1</integer>
     </map>
     <key>FSResetSkeletonOnStandUp</key>
     <map>
@@ -28009,7 +28009,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>OmnifilterControls</key>
     <map>
         <key>Comment</key>
-        <string>If true, Firestorm will show the omnifilter controls (enable, drop down) in upper right corner of the screen. Useful, if multiple omnifilter rule sets are being used.</string>
+        <string>If true, Companion Viewer will show the omnifilter controls (enable, drop down) in upper right corner of the screen. Useful, if multiple omnifilter rule sets are being used.</string>
         <key>Persist</key>
         <integer>1</integer>
         <key>Type</key>
@@ -28054,7 +28054,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSUseFSLegacySearch</key>
     <map>
       <key>Comment</key>
-      <string>Uses Firestorm&apos;s legacy search if enabled - the Linden Lab version instead if disabled</string>
+      <string>Uses Companion Viewer&apos;s legacy search if enabled - the Linden Lab version instead if disabled</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>

@@ -13,13 +13,7 @@
 		<layout_panel name="external_controls">
 			<text name="plugin_fail_text">
 網頁瀏覽器插件正在載入中。
-若插件載入失敗，請訪問以下連結取得故障排除指南：
-
-https://wiki.firestormviewer.org/fs_search_issues
-
-及
-
-https://wiki.firestormviewer.org/fs_media
+如果外掛程式未載入，請重新啟動檢視器。
 			</text>
 		</layout_panel>
 	</layout_stack>

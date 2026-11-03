@@ -42,7 +42,7 @@ Versão do servidor de voz: [VOICE_VERSION]
 	<tab_container name="about_tab">
 		<panel label="Info" name="support_panel">
 			<text name="support_intro">    
-For the latest information about Firestorm, visit    
+Companion Viewer is based on Firestorm:
 https://www.firestormviewer.org
     		</text>
 			<button label="Copiar" name="copy_btn"/>
@@ -50,7 +50,7 @@ https://www.firestormviewer.org
 		</panel>
 		<panel label="Créditos" name="credits_panel">
 			<text name="linden_intro">
-				Firestorm não seria possível sem a decisão da Linden Lab de disponibilizar o código-fonte do visualizador do Second Life.
+				Companion Viewer e Firestorm não seriam possíveis sem a decisão da Linden Lab de disponibilizar o código-fonte do visualizador do Second Life.
 
 O Second Life é oferecido pela Linden Lab,
 com contribuições de código aberto de:

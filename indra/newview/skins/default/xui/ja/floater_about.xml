@@ -3,14 +3,14 @@
 	<tab_container name="about_tab">
 		<panel label="情報" name="support_panel">
 			<text name="support_intro">
-Firestormの最新情報については下記サイトにて
+Companion ViewerはFirestormをベースにしています：
 https://www.firestormviewer.org
 			</text>
 			<button label="コピー" name="copy_btn"/>
 		</panel>
 		<panel label="Linden Labクレジット" name="credits_panel">
 			<text name="linden_intro">
-Firestormは、Linden LabがSecond Lifeビューアのソースコードを公開するという決定がなければ実現できませんでした。
+Companion ViewerとFirestormは、Linden LabがSecond Lifeビューアのソースコードを公開するという決定がなければ実現できませんでした。
 
 Second LifeはLindenによって提供されており、
 以下のオープンソースの貢献により実現しています：

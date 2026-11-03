@@ -8,7 +8,7 @@
 		Second Life-Grid:
 	</string>
 	<string name="SUPPORT_SITE">
-		Firestorm Support-Portal
+		Second Life Support-Portal
 	</string>
 	<string name="StartupLoading">
 		[APP_NAME] wird geladen...
@@ -213,7 +213,7 @@ Voice-Serverversion: [VOICE_VERSION]
 		Beenden
 	</string>
 	<string name="create_account_url">
-		https://www.firestormviewer.org/join-secondlife/
+		https://join.secondlife.com/
 	</string>
 	<string name="AgniGridLabel">
 		Second Life Main Grid (Agni)
@@ -226,7 +226,7 @@ Voice-Serverversion: [VOICE_VERSION]
 	</string>
 	<string name="LoginFailedViewerNotPermitted">
 		Mit dem von Ihnen verwendeten Viewer ist der Zugriff nicht mehr möglich. Laden Sie von den folgenden Seite einen neuen Viewer herunter:
-https://www.firestormviewer.org/choose-your-platform/
+https://secondlife.com/support/downloads/
 
 Weitere Informationen finden Sie auf der folgenden FAQ-Seite: 
 http://secondlife.com/viewer-access-faq
@@ -603,7 +603,7 @@ Wenn Sie der Ansicht sind, dass Sie diese Meldung fälschlicherweise erhalten ha
 	</string>
 	<string name="TooltipPrice" value="[AMOUNT] L$"/>
 	<string name="TooltipSLIcon">
-		Führt zu einer Seite in der offiziellen Domäne SecondLife.com, LindenLab.com oder firestormviewer.org.
+		Führt zu einer Seite in der offiziellen Domäne SecondLife.com oder LindenLab.com.
 	</string>
 	<string name="TooltipOutboxDragToWorld">
 		Sie können keine Objekte aus dem Marktplatz-Auflistungsordner rezzen
@@ -879,8 +879,7 @@ sind erlaubt.
 		Dienst nicht verfügbar oder Zeitüberschreitung beim Upload.
 	</string>
 	<string name="AssetUploadRequestInvalid">
-Fehler in der Upload-Anforderung. Bitte besuchen Sie
-https://www.firestormviewer.org/support für Hilfe zum Lösen des Problems.
+Fehler in der Upload-Anforderung.
 	</string>
 	<string name="SettingValidationError">
 		Validierung für das Importieren der Einstellungen [NAME] fehlgeschlagen
@@ -2821,16 +2820,16 @@ Falls diese Meldung weiterhin angezeigt wird, wenden Sie sich unter http://suppo
 		Dieser Einwohner hat den Nicht-stören-Modus aktiviert und wird Ihre Nachricht später sehen.
 	</string>
 	<string name="AutoResponseModeDefault">
-		Dieser Einwohner hat den [APP_NAME]-Viewer-Modus „Automatische Antwort“ aktiviert. Dies bedeutet, dass er nicht gestört werden möchte. Er wird Ihre Nachricht später sehen.
+		Dieser Einwohner hat den [APP_NAME]-Modus „Automatische Antwort“ aktiviert. Dies bedeutet, dass er nicht gestört werden möchte. Er wird Ihre Nachricht später sehen.
 	</string>
 	<string name="AutoResponseModeNonFriendsDefault">
-		Dieser Einwohner hat den [APP_NAME]-Viewer-Modus „Automatische Antwort“ aktiviert. Dies bedeutet, dass er nicht gestört werden möchte. Er wird Ihre Nachricht später sehen.
+		Dieser Einwohner hat den [APP_NAME]-Modus „Automatische Antwort“ aktiviert. Dies bedeutet, dass er nicht gestört werden möchte. Er wird Ihre Nachricht später sehen.
 	</string>
 	<string name="RejectTeleportOffersResponseDefault">
-		Dieser Einwohner hat den [APP_NAME]-Viewer-Modus „Teleport-Angebote und -Anforderungen abweisen“ aktiviert. Dies bedeutet, dass er nicht mit Teleport-Angeboten oder -Anforderungen gestört werden möchte. Sie können Ihm weiterhin eine Nachricht senden.
+		Dieser Einwohner hat den [APP_NAME]-Modus „Teleport-Angebote und -Anforderungen abweisen“ aktiviert. Dies bedeutet, dass er nicht mit Teleport-Angeboten oder -Anforderungen gestört werden möchte. Sie können Ihm weiterhin eine Nachricht senden.
 	</string>
 	<string name="RejectFriendshipRequestsResponseDefault">
-		Dieser Einwohner hat den [APP_NAME]-Viewer-Modus „Alle Freundschaftsanfragen abweisen“ aktiviert. Dies bedeutet, dass er nicht mit Freundschaftsanfragen gestört werden möchte. Sie können Ihm weiterhin eine Nachricht senden.
+		Dieser Einwohner hat den [APP_NAME]-Modus „Alle Freundschaftsanfragen abweisen“ aktiviert. Dies bedeutet, dass er nicht mit Freundschaftsanfragen gestört werden möchte. Sie können Ihm weiterhin eine Nachricht senden.
 	</string>
 	<string name="MutedAvatarsResponseDefault">
 		Dieser Einwohner hat den Empfang Ihrer Nachrichten blockiert.
@@ -3252,7 +3251,7 @@ Falls diese Nachricht erneut angezeigt wird, starten Sie Ihren Computer bitte ne
 Möchten Sie einen Absturz-Bericht einschicken?
 	</string>
 	<string name="MBFreezeDetected">
-		[APP_NAME] scheint eingefroren zu sein. Falls dieses Problem regelmäßig auftritt, kontaktieren Sie den Support unter https://www.firestormviewer.org/support.
+		[APP_NAME] scheint eingefroren zu sein.
 	</string>
 	<string name="MBAlert">
 		Benachrichtigung
@@ -4813,7 +4812,7 @@ Bitte installieren Sie den Viewer von [DOWNLOAD_URL] erneut und wenden Sie sich 
 		[APP_NAME] wird installiert...
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		Ihr [APP_NAME]-Viewer wird aktualisiert.  Dies kann einen Moment dauern. Wir bitten um Ihr Verständnis.
+		Ihr [APP_NAME] wird aktualisiert.  Dies kann einen Moment dauern. Wir bitten um Ihr Verständnis.
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		Aktualisierung wird heruntergeladen...

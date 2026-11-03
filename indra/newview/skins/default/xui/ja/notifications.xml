@@ -39,7 +39,7 @@
 		<usetemplate name="okbutton" yestext="ＯＫ"/>
 	</notification>
 	<notification name="BadInstallation">
-		[APP_NAME]のアップデート時にエラーが発生しました。[https://www.firestormviewer.org/downloads 最新バージョンのビューアをダウンロード]してください。
+		[APP_NAME]のアップデート時にエラーが発生しました。最新バージョンのビューアをダウンロードしてください。
 		<usetemplate name="okbutton" yestext="ＯＫ"/>
 	</notification>
 	<notification name="FoundLegacyNsisInstallation">
@@ -3782,12 +3782,12 @@ Webページにリンクすると、他人がこの場所に簡単にアクセ�
 	<notification name="MeshUploadErrorDetails">
 		[LABEL]をアップロードできませんでした：[MESSAGE]
 [DETAILS]
-詳しくは、Firestorm.logをご覧ください。
+詳しくは、CompanionViewer.logをご覧ください。
 	</notification>
 	<notification name="MeshUploadError">
 		[LABEL]をアップロードできませんでした：[MESSAGE]
 
-詳しくは、Firestorm.logをご覧ください。
+詳しくは、CompanionViewer.logをご覧ください。
 	</notification>
 	<notification name="MeshUploadPermError">
 		メッシュのアップロード許可をリクエスト時にエラーが発生しました。
@@ -3887,7 +3887,6 @@ UDP：3478, 3479, 5060, 5062, 6250, 12000-32000
 ルーターのSIP ALG機能を無効にします。
 
 音声通話は利用できなくなります。
-https://wiki.firestormviewer.org/fs_voice
 		<usetemplate ignoretext="ビューアが音声サーバーに接続できない場合の警告" name="okignore" yestext="ＯＫ"/>
 	</notification>
 	<notification name="NoVoiceConnect-GIAB">
@@ -3895,7 +3894,6 @@ https://wiki.firestormviewer.org/fs_voice
 
 ボイスチャットによるコミュニケーションが利用できません。
 お使いのネットワークやファイアウォールの設定を確認してください。
-[https://wiki.firestormviewer.org/fs_voice]
 		<usetemplate name="okbutton" yestext="ＯＫ"/>
 	</notification>
 	<notification name="AvatarRezLeftNotification">
@@ -5543,8 +5541,8 @@ http://opensimulator.org/wiki/inventory を使用して問題を修正できま�
 	</notification>
 	<notification name="CurrencyURIOverrideReceived">
 		このリージョンでは、サードパーティの通貨ポータルを指定することを選択しました。
-Firestorm Viewer を通じて行われる通貨の購入は、お客様（ユーザー）と通貨の提供者または販売者との間の取引であることにご注意ください。
-Firestorm Viewer、Phoenix Firestorm Viewer Project Inc.、またはそのチームは、そのような取引から直接的または間接的に生じる費用または損害について一切責任を負いません。
+Companion Viewer を通じて行われる通貨の購入は、お客様（ユーザー）と通貨の提供者または販売者との間の取引であることにご注意ください。
+Companion Viewer、Phoenix Firestorm Viewer Project Inc.、またはそのチームは、そのような取引から直接的または間接的に生じる費用または損害について一切責任を負いません。
 これらの利用規約に同意しない場合は、このビューアを使用して金融取引を行うことはできません。
 		<usetemplate ignoretext="リージョンが新しい通貨ヘルパーを設定するとき" name="okignore" yestext="ＯＫ"/>
 	</notification>
@@ -5732,8 +5730,8 @@ Firestorm Viewer、Phoenix Firestorm Viewer Project Inc.、またはそのチー
 		Windlightsの一括インポートが完了しました。
 	</notification>
 	<notification name="FSAOScriptedNotification">
-		Firestormアニメーションオーバーライド：[AO_MESSAGE]
-		<usetemplate ignoretext="スクリプトオブジェクトがFirestormアニメーションオーバーライダーにアクセスしたときに警告" name="notifyignore"/>
+		Companion Viewerアニメーションオーバーライド：[AO_MESSAGE]
+		<usetemplate ignoretext="スクリプトオブジェクトがCompanion Viewerアニメーションオーバーライダーにアクセスしたときに警告" name="notifyignore"/>
 	</notification>
 	<notification name="WarnForceLoginURL">
 		ログインスプラッシュスクリーンのＵＲＬはテスト目的で上書きされます。
@@ -5763,10 +5761,6 @@ Firestorm Viewer、Phoenix Firestorm Viewer Project Inc.、またはそのチー
 		[APP_NAME]のパフォーマンスを向上させるには、ホワイトリストに登録してください。
 
 一部のウイルス対策プログラムでは、[APP_NAME]の一部を誤ってブロックし、パフォーマンスが低下したり、一部の機能が誤動作したりする場合があります。これらの問題を防ぐには、[APP_NAME]をウイルス対策プログラムのホワイトリスト (または除外リスト) に追加することを強くお勧めします。これにより、ビューアがスムーズに動作します。
-
-[APP_NAME]をホワイトリストに登録する方法 (除外するファイルとフォルダのリストを含む) の詳細については、次のガイドをご覧ください。
-
-https://wiki.firestormviewer.org/antivirus_whitelisting
 	</notification>
 	<!-- <FS:TJ> Detect and notify if the viewer is trying to run as admin on Windows -->
 	<notification name="ViewerProcessRunningAsAdmin">

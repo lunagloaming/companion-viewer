@@ -235,7 +235,813 @@
     <key>FSBandwidthTooHigh</key>
     <map>
       <key>Comment</key>
-      <string>Enables Firestorm bandwidth warning over 1500 KBPS</string>
+      <string>Enables Companion Viewer bandwidth warning over 1500 KBPS</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <!-- Companion Viewer: alerts that start hidden on a new install (unchecked in
+         Preferences > Notifications > Alerts). Alerts that guard against something
+         hard to undo stay shown, as do alerts not listed here. -->
+    <key>AgentComplexity</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>AgentComplexityWithVisibility</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>AutoAdjustHDRSky</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>AutoWearNewClothing</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>AutorespondModeSet</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>AutorespondNonFriendsModeSet</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>CanNotRemoveConnectedGrid</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>Cannot enter parcel: no payment info on file</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>CantSelectReflectionProbe</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ClickActionNotPayable</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ClothingLoading</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ConfirmClearDebugSearchURL</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ConfirmCloseAll</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ConfirmHideUI</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ConfirmLeaveCall</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ConfirmPickDebugSearchURL</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ConfirmQuit</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ControlNameCopiedToClipboard</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>CopySLURL</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>DebugSettingsWarning</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>DefaultLabelMissing</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>DeleteItems</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>DeleteNotecard</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>DoNotDisturbModeSet</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>FSAOScriptedNotification</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>FSLargeOutfitsWarningInThisSession</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>FirstJoinSupportGroup2</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>GlobalOnlineStatusToggle</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>HUDComplexityWarning</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ImageUploadResized</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>InventoryValidationFailed</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>LSLColorCopiedToClipboard</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>LivePreviewUnavailable</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>LivePreviewUnavailablePBR</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>MaterialImagesWereScaled</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>MediaFileDownloadUnsupported</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>MediaPluginFailed</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>NoHavok</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>NoVoiceConnect</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>NotAgeVerified</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>OldGPUDriver</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>OmnifilterImportInstructions</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>OutboxFolderCreated</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>OutboxImportComplete</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ParticleScriptCopiedToClipboard</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>ParticleScriptInjected</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>PreferenceChatPathChanged</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>RejectAllGroupInvitesModeSet</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>RejectFriendshipRequestsModeSet</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>RejectTeleportOffersModeSet</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>RiggedMeshAttachedToHUD</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>SkinDefaultsChangeSettings</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportFromLandmark</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportToClassified</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportToHistoryEntry</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportToPick</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportViaSLAPP</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportedByAttachment</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportedByObjectOnParcel</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TeleportedHomeExperienceRemoved</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>TrustedExperienceEntry</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>UnknownGPU</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>UnsupportedHardware</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>VoiceEffectsNotSupported</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>VoiceEffectsWillExpire</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchAccountHistory</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchJoinNow</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchLSLGuide</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchLSLWiki</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchPublicIssue</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchQAWiki</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchSecurityIssues</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
+    <key>WebLaunchSupportWiki</key>
+    <map>
+      <key>Comment</key>
+      <string>Show notification with this name</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>

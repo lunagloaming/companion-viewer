@@ -405,7 +405,7 @@
 			<text name="LOD_swap_usr_label" value="您的" tool_tip="基於RenderVolumeLODFactor的當前設定。" />
 			<text name="LOD_swap_label" value="細節層次切換" />
 			<string name="ll_lod_tooltip_msg">林登實驗室第二人生檢視器標準 ([FACTOR])</string>
-			<string name="fs_lod_tooltip_msg">[APP_NAME]檢視器標準 ([FACTOR])</string>
+			<string name="fs_lod_tooltip_msg">[APP_NAME] 標準 ([FACTOR])</string>
 			<text name="LOD_swap_usr_current" tool_tip="您當前的細節層次等級。" />
 			<text name="LOD_swap_LOD_Change_label">
 高 ↔ 中

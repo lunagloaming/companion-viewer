@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <strings>
 	<string name="SUPPORT_SITE">
-		Firestorm Support Portal
+		Second Life Support Portal
 	</string>
 	<string name="StartupDetectingHardware">
 		Detekterer hardware...
@@ -3643,7 +3643,7 @@ Hvis du bliver ved med at modtage denne besked, kontakt venligst [SUPPORT_SITE].
 		Installerer [APP_NAME]...
 	</string>
 	<string name="UpdaterUpdatingDescriptive">
-		Din [APP_NAME] klient bliver opdateret til nyeste version.  Dette kan tage noget tid, så venligst vær tålmodig.
+		Din [APP_NAME] bliver opdateret til nyeste version.  Dette kan tage noget tid, så venligst vær tålmodig.
 	</string>
 	<string name="UpdaterProgressBarTextWithEllipses">
 		Download færdig...

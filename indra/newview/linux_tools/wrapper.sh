@@ -33,7 +33,9 @@ cd "${RUN_PATH}"
 ./etc/register_secondlifeprotocol.sh
 
 # Re-register the application with the desktop system every launch, for now.
-./etc/refresh_desktop_app_entry.sh
+# Companion Viewer: not on every launch, where it added a second menu entry beside launchers set
+# up by hand (e.g. one per install). install.sh still runs it once, at install time.
+#./etc/refresh_desktop_app_entry.sh
 
 ## Before we mess with LD_LIBRARY_PATH, save the old one to restore for
 ##  subprocesses that care.
@@ -67,7 +69,7 @@ done
 # Don't quote $LL_WRAPPER because, if empty, it should simply vanish from the
 # command line. But DO quote "${ARGS[@]}": preserve separate args as
 # individually quoted.
-$LL_WRAPPER bin/do-not-directly-run-firestorm-bin "${ARGS[@]}"
+$LL_WRAPPER bin/do-not-directly-run-companionviewer-bin "${ARGS[@]}"
 LL_RUN_ERR=$?
 
 # Handle any resulting errors

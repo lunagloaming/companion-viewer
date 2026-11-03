@@ -43,7 +43,7 @@ enum Choice { LATER = 0, SEND = 1, DECLINE = 2, DETAILS = 3 };
 int message(const std::string& text, const SDL_MessageBoxButtonData* buttons, int count)
 {
     const SDL_MessageBoxData box = {SDL_MESSAGEBOX_WARNING, nullptr,
-        "Firestorm crash report — BugSplat", text.c_str(), count, buttons, nullptr};
+        "Companion Viewer crash report — BugSplat", text.c_str(), count, buttons, nullptr};
     int choice = -1;
     if (!SDL_ShowMessageBox(&box, &choice))
     {
@@ -87,7 +87,7 @@ int review(FSCrashReport::Report& report)
     constexpr SDL_MessageBoxButtonData back[] = {
         {SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT | SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT, LATER, "Back"}
     };
-    std::string prompt = "Firestorm closed unexpectedly. Send a crash report to Firestorm via BugSplat?\n\n"
+    std::string prompt = "Companion Viewer closed unexpectedly. Send a crash report via BugSplat?\n\n"
                          "The report includes a crash dump and diagnostic information.\n"
                          "Your crash-reporting preferences control inclusion of your name and settings.\n"
                          "Choose Report details to see the files before sending.";

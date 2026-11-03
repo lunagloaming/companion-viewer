@@ -13,13 +13,7 @@
 		<layout_panel name="external_controls">
 			<text name="plugin_fail_text">
 Das Web-Browser-Plugin lädt gerade.
-Sollte das Plugin nicht laden, sind Informationen zur Problemlösung erhältlich unter
-
-https://wiki.firestormviewer.org/fs_search_issues
-
-und
-
-https://wiki.firestormviewer.org/fs_media
+Sollte das Plugin nicht laden, starten Sie den Viewer neu.
 			</text>
 		</layout_panel>
 	</layout_stack>
