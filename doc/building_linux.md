@@ -37,10 +37,10 @@ A few packages must be installed on the build system. Some may already be instal
 | --------------- | ---------------- | ------------- | ------------------ | ---------------- | ------ |
 | libgl1-mesa-dev | libglu1-mesa-dev | libpulse-dev  | build-essential    | python3-pip      | git    |
 | libssl-dev      | libxinerama-dev  | libxrandr-dev | libfontconfig-dev  | libfreetype6-dev | gcc-14 |
-| g++-14          | cmake            |               |                    |                  |        |
+| g++-14          | cmake            | python3-venv  |                    |                  |        |
 
 ```
-sudo apt install libgl1-mesa-dev libglu1-mesa-dev libpulse-dev build-essential python3-pip git libssl-dev libxinerama-dev libxrandr-dev libfontconfig-dev libfreetype6-dev gcc-14 g++-14 cmake
+sudo apt install libgl1-mesa-dev libglu1-mesa-dev libpulse-dev build-essential python3-pip git libssl-dev libxinerama-dev libxrandr-dev libfontconfig-dev libfreetype6-dev gcc-14 g++-14 cmake python3-venv
 ```
 
 Ubuntu 24.04 LTS defaults to GCC 13, so tell the build to use GCC 14 instead. Run this before configuring, or add it to `~/.bashrc` or `~/.profile`:
@@ -50,25 +50,25 @@ export CC=gcc-14
 export CXX=g++-14
 ```
 
-### Optional: Set up a Python virtual environment
+### Set up a Python virtual environment
 
-If you do not want to install the required Python packages into the default Python directory, you can optionally create a virtual environment.
+Ubuntu 24.04 LTS does not allow pip to install packages into the system Python (pip stops with an `externally-managed-environment` error), so the required Python packages must be installed into a virtual environment.
 
 - Create the Python virtual environment (only once):
-  `python -m venv .venv`
+  `python3 -m venv ~/src/.venv`
 - Activate the virtual environment:
-  `source .venv/bin/activate`
+  `source ~/src/.venv/bin/activate`
 - Activate the virtual environment each time you want to build.
 - Type all the subsequent commands in this virtual environment.
-- In case of issue or Python update, you can delete this .venv directory and create a new virtual environment again.
+- In case of issue or Python update, you can delete the `~/src/.venv` directory and create a new virtual environment again.
 
 ### Install Autobuild
 
 Autobuild is a Linden Lab resource that does all the hard work.
-If you created a Python virtual environment, activate it first.
+Activate the Python virtual environment first.
 You can install it using the same versions as our automated builds as follows:
 ```
-sudo pip3 install --upgrade pip
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 Check Autobuild version to be "autobuild 3.9.3" or higher: `autobuild --version`
