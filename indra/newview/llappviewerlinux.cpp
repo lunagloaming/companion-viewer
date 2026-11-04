@@ -223,7 +223,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char **argv)
     // window class / Wayland app id that desktop entries match (StartupWMClass), so it also keeps
     // this viewer apart from Firestorm and the Linden viewer in the taskbar. The copyright line is
     // attribution and stays.
-    //SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_IDENTIFIER_STRING, "com.secondlife.indra.viewer");
+    //SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_IDENTIFIER_STRING, "org.firestormviewer.firestorm");
     //SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_CREATOR_STRING, "The Phoenix Firestorm Project, Inc.");
     //SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_URL_STRING, "https://www.firestormviewer.org/");
     SDL_SetAppMetadataProperty(SDL_PROP_APP_METADATA_IDENTIFIER_STRING, "io.github.lunagloaming.CompanionViewer");
