@@ -21,8 +21,11 @@ export mesa_glthread=true
 #export ASAN_OPTIONS="halt_on_error=0 detect_leaks=1 symbolize=1"
 #export UBSAN_OPTIONS="print_stacktrace=1 print_summary=1 halt_on_error=0"
 
-FSJEMALLOC="$(pwd)/lib/libjemalloc.so"
-if [ -f ${FSJEMALLOC} ]
+# <FS:Luna Witch> FS_JEMALLOC_LIB selects another jemalloc, e.g. a system build with heap profiling
+#FSJEMALLOC="$(pwd)/lib/libjemalloc.so"
+FSJEMALLOC="${FS_JEMALLOC_LIB:-$(pwd)/lib/libjemalloc.so}"
+# </FS:Luna Witch>
+if [ -f "${FSJEMALLOC}" ]
 then
         echo "Using jemalloc"
         export LD_PRELOAD="${LD_PRELOAD}:${FSJEMALLOC}"
@@ -50,17 +53,6 @@ export SAVED_LD_LIBRARY_PATH="${LD_LIBRARY_PATH}"
 
 # Add our library directory
 export LD_LIBRARY_PATH="$PWD/lib:${LD_LIBRARY_PATH}"
-
-# <FS:Luna Witch> Preload the bundled jemalloc again: the upstream wrapper cleanup stopped loading it,
-# although it is still packaged, and the memory work (FSHeapDecayMs) relies on it.
-# FS_JEMALLOC_LIB selects another jemalloc, e.g. a system build with heap profiling.
-FSJEMALLOC="${FS_JEMALLOC_LIB:-$(pwd)/lib/libjemalloc.so}"
-if [ -f "${FSJEMALLOC}" ]
-then
-	echo "Using jemalloc"
-	export LD_PRELOAD="${LD_PRELOAD}:${FSJEMALLOC}"
-fi
-# </FS:Luna Witch>
 
 # Copy "$@" to ARGS array specifically to delete the --skip-gridargs switch.
 # The gridargs.dat file is no more, but we still want to avoid breaking
