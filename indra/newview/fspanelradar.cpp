@@ -29,6 +29,7 @@
 #include "fspanelradar.h"
 
 // libs
+#include "llcheckboxctrl.h"
 #include "llfiltereditor.h"
 #include "lluictrlfactory.h"
 #include "llmenubutton.h"
@@ -102,6 +103,7 @@ FSPanelRadar::FSPanelRadar()
     mColumnBits["seen"] = 128;
     mColumnBits["range"] = 256;
     mColumnBits["has_notes"] = 512;
+    mColumnBits["greeted"] = 1024;
 }
 
 FSPanelRadar::~FSPanelRadar()
@@ -396,6 +398,11 @@ void FSPanelRadar::updateList(const std::vector<LLSD>& entries, const LLSD& stat
         row_data["columns"][10]["column"] = "seen_sort";
         row_data["columns"][10]["value"] = entry["seen"].asString() + "_" + entry["name"].asString();
 
+        const LLUUID avatar_id = entry["id"].asUUID();
+        row_data["columns"][11]["column"] = "greeted";
+        row_data["columns"][11]["type"] = "checkbox";
+        row_data["columns"][11]["value"] = FSRadar::getInstance()->isGreeted(avatar_id);
+
         LLScrollListItem* row = mRadarList->addElement(row_data);
 
         static S32 rangeColumnIndex = mRadarList->getColumn("range")->mIndex;
@@ -403,6 +410,17 @@ void FSPanelRadar::updateList(const std::vector<LLSD>& entries, const LLSD& stat
         static S32 voiceLevelColumnIndex = mRadarList->getColumn("voice_level")->mIndex;
         static S32 flagsColumnIndex = mRadarList->getColumn("flags")->mIndex;
         static S32 ageColumnIndex = mRadarList->getColumn("age")->mIndex;
+        static S32 greetedColumnIndex = mRadarList->getColumn("greeted")->mIndex;
+
+        // The list is rebuilt on every radar update, so each change goes
+        // straight to FSRadar, which keeps the marks for the whole session.
+        if (auto greetedCell = dynamic_cast<LLScrollListCheck*>(row->getColumn(greetedColumnIndex)); greetedCell)
+        {
+            greetedCell->getCheckBox()->setCommitCallback([avatar_id](LLUICtrl* ctrl, const LLSD&)
+            {
+                FSRadar::getInstance()->setGreeted(avatar_id, ctrl->getValue().asBoolean());
+            });
+        }
 
         LLScrollListText* radarRangeCell = (LLScrollListText*)row->getColumn(rangeColumnIndex);
         radarRangeCell->setColor(LLColor4(options["range_color"]));
