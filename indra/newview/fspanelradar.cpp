@@ -125,7 +125,7 @@ FSPanelRadar::~FSPanelRadar()
 bool FSPanelRadar::postBuild()
 {
     mRadarList = getChild<FSRadarListCtrl>("radar_list");
-    mRadarList->setFilterColumn(0);
+    mRadarList->setFilterColumn(mRadarList->getColumn("name")->mIndex);
     mRadarList->setContextMenu(&FSFloaterRadarMenu::gFSRadarMenu);
     mRadarList->setDoubleClickCallback(boost::bind(&FSPanelRadar::onRadarListDoubleClicked, this));
     mRadarList->setCommitCallback(boost::bind(&FSPanelRadar::onRadarListCommitted, this));
@@ -558,7 +558,7 @@ void FSPanelRadar::onColumnDisplayModeChanged()
         current_sort_asc = true;
     }
     mRadarList->sortByColumn(current_sort_col, current_sort_asc);
-    mRadarList->setFilterColumn(0);
+    mRadarList->setFilterColumn(mRadarList->getColumn("name")->mIndex);
 
     mRadarList->dirtyColumns();
 }
