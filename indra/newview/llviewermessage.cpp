@@ -156,6 +156,7 @@
 #include "omnifilterengine.h"       // <FS:Zi> Omnifilter support
 #include "permissionstracker.h"     // <FS:Zi> Permissions Tracker
 #include "tea.h" // <FS:AW opensim currency support>
+#include "fsmoneylog.h" // <FS:Luna Witch/>
 #include "NACLantispam.h"
 #include "chatbar_as_cmdline.h"
 
@@ -5761,6 +5762,10 @@ void process_time_dilation(LLMessageSystem *msg, void **user_data)
 
 void process_money_balance_reply( LLMessageSystem* msg, void** )
 {
+    // <FS:Luna Witch> Log every balance change to money_log.txt, whatever the notification settings
+    FSMoneyLog::record(msg);
+    // </FS:Luna Witch>
+
     S32 balance = 0;
     S32 credit = 0;
     S32 committed = 0;
