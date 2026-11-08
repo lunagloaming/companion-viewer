@@ -167,7 +167,7 @@
 						 layout="topleft"
 						 left="0"
 						 top_pad="0"
-						 sort_column="0"
+						 sort_column="1"
 						 sort_ascending="true"
 						 name="radar_list"
 						 draw_stripes="true"
@@ -176,6 +176,11 @@
 						 persist_sort_order="true"
 						 primary_sort_only="true"
 						 width="321">
+							<radar_list.columns
+							 label=""
+							 name="greeted"
+							 tool_tip="Greeted: your own checklist of who you have greeted. Cleared at every login."
+							 width="20"/>
 							<radar_list.columns
 							 label="Name"
 							 name="name"
@@ -224,11 +229,6 @@
 							 label="Range"
 							 name="range"
 							 width="61"/>
-							<radar_list.columns
-							 label="Greeted"
-							 name="greeted"
-							 tool_tip="Your own checklist of who you have greeted. Cleared at every login."
-							 width="50"/>
 							<radar_list.columns
 							 name="seen_sort"
 							 width="-1"/>
