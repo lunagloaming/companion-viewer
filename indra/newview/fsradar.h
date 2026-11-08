@@ -31,6 +31,7 @@
 
 #include "fsradarentry.h"
 #include <unordered_map>
+#include <unordered_set>
 
 class LLAvatarName;
 
@@ -81,6 +82,12 @@ public:
 
     void getCurrentData(std::vector<LLSD>& entries, LLSD& stats) const { entries = mRadarEntriesData; stats = mAvatarStats; }
     std::shared_ptr<FSRadarEntry> getEntry(const LLUUID& avatar_id);
+
+    // Greeted marks are a personal checklist for this session only. They are
+    // kept apart from the radar entries so leaving range and coming back
+    // keeps the mark, and they are never saved.
+    bool isGreeted(const LLUUID& avatar_id) const { return mGreetedAvatars.contains(avatar_id); }
+    void setGreeted(const LLUUID& avatar_id, bool greeted);
 
     // internals
     class Updater
@@ -144,6 +151,7 @@ private:
     time_t                  mRadarLastBulkOffsetRequestTime;
 
     LLUUID                  mTrackedAvatarId;
+    std::unordered_set<LLUUID> mGreetedAvatars;
     LLSD                    mAvatarStats;
 
     radar_update_callback_t mUpdateSignal;

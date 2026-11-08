@@ -225,6 +225,11 @@
 							 name="range"
 							 width="61"/>
 							<radar_list.columns
+							 label="Greeted"
+							 name="greeted"
+							 tool_tip="Your own checklist of who you have greeted. Cleared at every login."
+							 width="50"/>
+							<radar_list.columns
 							 name="seen_sort"
 							 width="-1"/>
 						</radar_list>
