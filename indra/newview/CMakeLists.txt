@@ -156,6 +156,7 @@ set(viewer_SOURCE_FILES
     fslslpreprocviewer.cpp
     fsmaniprotatejoint.cpp
     fsmaniptranslatejoint.cpp
+    fsmoneylog.cpp # <FS:Luna Witch/>
     fsmoneytracker.cpp
     fsnamelistavatarmenu.cpp
     fsnearbychatbarlistener.cpp
@@ -1023,6 +1024,7 @@ set(viewer_HEADER_FILES
     fslslbridgerequest.h
     fslslpreproc.h
     fslslpreprocviewer.h
+    fsmoneylog.h # <FS:Luna Witch/>
     fsmoneytracker.h
     fsmaniprotatejoint.h
     fsmaniptranslatejoint.h
