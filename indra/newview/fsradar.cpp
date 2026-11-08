@@ -849,6 +849,18 @@ std::shared_ptr<FSRadarEntry> FSRadar::getEntry(const LLUUID& avatar_id)
     return nullptr;
 }
 
+void FSRadar::setGreeted(const LLUUID& avatar_id, bool greeted)
+{
+    if (greeted)
+    {
+        mGreetedAvatars.insert(avatar_id);
+    }
+    else
+    {
+        mGreetedAvatars.erase(avatar_id);
+    }
+}
+
 void FSRadar::teleportToAvatar(const LLUUID& targetAv)
 // Teleports user to last scanned location of nearby avatar
 // Note: currently teleportViaLocation is disrupted by enforced landing points set on a parcel.
