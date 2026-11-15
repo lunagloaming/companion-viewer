@@ -136,7 +136,6 @@ private:
 
     void updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range, time_t now);
     void refreshSoon();
-    std::string greetingName(const LLUUID& avatar_id) const;
 
     std::unique_ptr<Updater> mRadarListUpdater;
 

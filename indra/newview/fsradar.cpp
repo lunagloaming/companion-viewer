@@ -88,7 +88,7 @@ namespace
     // Appends a line to greetings_log.txt in the account's folder. Everything
     // the greeting marks do is written there, so a session can be gone
     // through afterwards.
-    void logGreeting(std::string_view event, const LLUUID& avatar_id = LLUUID::null, std::string_view name = {}, std::string_view details = {})
+    void writeGreetingLine(const std::string& time, std::string_view event, const LLUUID& avatar_id, std::string_view name, std::string_view details)
     {
         if (gDirUtilp->getLindenUserDir().empty())
         {
@@ -105,7 +105,6 @@ namespace
             return;
         }
 
-        const std::string now = LLDate::now().asString();
         if (is_new)
         {
             out << "# What the Greeted marks on the nearby people list did, written by the viewer. Tab-separated:\n"
@@ -114,10 +113,26 @@ namespace
         if (!session_started)
         {
             session_started = true;
-            out << now << "\tsession started\t\t\t" << cleanField(LLVersionInfo::instance().getChannelAndVersion()) << '\n';
+            out << time << "\tsession started\t\t\t" << cleanField(LLVersionInfo::instance().getChannelAndVersion()) << '\n';
         }
-        out << now << '\t' << event << '\t' << cleanField(name) << '\t'
+        out << time << '\t' << event << '\t' << cleanField(name) << '\t'
             << (avatar_id.notNull() ? avatar_id.asString() : std::string()) << '\t' << cleanField(details) << '\n';
+    }
+
+    void logGreeting(std::string_view event, const LLUUID& avatar_id = LLUUID::null, std::string_view name = {}, std::string_view details = {})
+    {
+        writeGreetingLine(LLDate::now().asString(), event, avatar_id, name, details);
+    }
+
+    // For lines about someone whose name may not be known yet: the line is
+    // written once it is, with the time of the event.
+    void logGreetingAbout(std::string_view event, const LLUUID& avatar_id, std::string_view details = {})
+    {
+        LLAvatarNameCache::get(avatar_id,
+            [time = LLDate::now().asString(), event = std::string(event), details = std::string(details)](const LLUUID& id, const LLAvatarName& av_name)
+            {
+                writeGreetingLine(time, event, id, av_name.getCompleteName(), details);
+            });
     }
 
     std::string joinWords(const std::vector<LLWString>& words)
@@ -327,7 +342,7 @@ void FSRadar::updateRadarList()
         logGreeting("I arrived", LLUUID::null, {}, llformat("%s; %d already within chat range", place.c_str(), (S32)mAlreadyHere.size()));
         for (const LLUUID& id : mAlreadyHere)
         {
-            logGreeting("already here", id, greetingName(id));
+            logGreetingAbout("already here", id);
         }
     }
 
@@ -899,7 +914,7 @@ void FSRadar::updateRadarList()
     {
         if (needsGreeting(prevId) && !mEntryList.contains(prevId))
         {
-            logGreeting("left before greeting", prevId, greetingName(prevId));
+            logGreetingAbout("left before greeting", prevId);
         }
     }
 
@@ -973,7 +988,7 @@ void FSRadar::setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand)
     }
     if (by_hand)
     {
-        logGreeting(greeted ? "ticked by hand" : "unticked by hand", avatar_id, greetingName(avatar_id));
+        logGreetingAbout(greeted ? "ticked by hand" : "unticked by hand", avatar_id);
     }
     refreshSoon();
 }
@@ -1083,42 +1098,37 @@ void FSRadar::onOwnNearbyChat(std::string_view text)
         pending.push_back(std::move(entry));
     }
 
-    // Someone matched by one word is left out when the other words are looked
-    // at, so in "Welcome KT and Bel" Bel is Bella Lark once KT is ticked,
-    // even though K T's display name reads "Belmont". Repeat until nothing
-    // more can be settled.
+    // A word that fits someone already matched by another word of the line is
+    // taken as more of that person's name: "Juniper Fox", or "Clover, another
+    // Ashdown", where Ashdown must not tick the other Ashdown nearby. Repeat until
+    // nothing more can be settled, so the order of the words doesn't matter.
     std::unordered_set<LLUUID> ticked_now;
     for (bool progress = true; progress; )
     {
         progress = false;
         for (auto it = pending.begin(); it != pending.end(); )
         {
-            std::vector<const Match*> open;
-            for (const Match& match : it->mMatches)
+            const bool fits_someone_matched = std::any_of(it->mMatches.begin(), it->mMatches.end(),
+                [&](const Match& match) { return ticked_now.contains(match.mCandidate->mID); });
+            if (fits_someone_matched)
             {
-                if (!ticked_now.contains(match.mCandidate->mID))
-                {
-                    open.push_back(&match);
-                }
-            }
-            if (open.empty() && !it->mMatches.empty())
-            {
-                it = pending.erase(it); // another word of a name already matched: "Welcome Juniper Fox"
+                it = pending.erase(it);
                 continue;
             }
-            if (open.size() != 1)
+            if (it->mMatches.size() != 1)
             {
                 ++it;
                 continue;
             }
 
-            const Candidate& match = *open.front()->mCandidate;
-            const std::string how = it->mWhole ? std::string("whole word") : "start of \"" + wstring_to_utf8str(open.front()->mKey) + "\"";
-            const bool was_greeted = isGreeted(match.mID);
-            ticked_now.insert(match.mID);
-            setGreeted(match.mID, true, false);
-            logGreeting(was_greeted ? "welcomed again, already ticked" : "ticked by welcome", match.mID, match.mName,
-                llformat("\"%s\" matched by %s%s", it->mText.c_str(), how.c_str(), it->mMatches.size() > 1 ? ", after the others were matched by other words" : ""));
+            const Match& match = it->mMatches.front();
+            const LLUUID id = match.mCandidate->mID;
+            const std::string how = it->mWhole ? std::string("whole word") : "start of \"" + wstring_to_utf8str(match.mKey) + "\"";
+            const bool was_greeted = isGreeted(id);
+            ticked_now.insert(id);
+            setGreeted(id, true, false);
+            logGreeting(was_greeted ? "welcomed again, already ticked" : "ticked by welcome", id, match.mCandidate->mName,
+                llformat("\"%s\" matched by %s", it->mText.c_str(), how.c_str()));
             it = pending.erase(it);
             progress = true;
         }
@@ -1134,10 +1144,7 @@ void FSRadar::onOwnNearbyChat(std::string_view text)
         std::string names;
         for (const Match& match : word.mMatches)
         {
-            if (!ticked_now.contains(match.mCandidate->mID))
-            {
-                names += (names.empty() ? "" : ", ") + match.mCandidate->mName;
-            }
+            names += (names.empty() ? "" : ", ") + match.mCandidate->mName;
         }
         logGreeting("more than one matched, none ticked", LLUUID::null, {}, llformat("\"%s\": %s", word.mText.c_str(), names.c_str()));
     }
@@ -1158,8 +1165,8 @@ void FSRadar::updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range,
     {
         return;
     }
-    logGreeting(isGreeted(avatar_id) ? "came into chat range, already ticked" : "came into chat range", avatar_id,
-        greetingName(avatar_id), llformat("%.1f m", range));
+    logGreetingAbout(isGreeted(avatar_id) ? "came into chat range, already ticked" : "came into chat range", avatar_id,
+        llformat("%.1f m", range));
 }
 
 // The list is rebuilt about once a second. After a tick it is rebuilt at once,
@@ -1180,19 +1187,6 @@ void FSRadar::refreshSoon()
             radar->updateRadarList();
         }
     });
-}
-
-std::string FSRadar::greetingName(const LLUUID& avatar_id) const
-{
-    if (LLAvatarName av_name; LLAvatarNameCache::get(avatar_id, &av_name))
-    {
-        return av_name.getCompleteName();
-    }
-    if (auto it = mEntryList.find(avatar_id); it != mEntryList.end())
-    {
-        return it->second->mName;
-    }
-    return {};
 }
 
 void FSRadar::teleportToAvatar(const LLUUID& targetAv)
