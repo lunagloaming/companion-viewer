@@ -87,7 +87,14 @@ public:
     // kept apart from the radar entries so leaving range and coming back
     // keeps the mark, and they are never saved.
     bool isGreeted(const LLUUID& avatar_id) const { return mGreetedAvatars.contains(avatar_id); }
-    void setGreeted(const LLUUID& avatar_id, bool greeted);
+    void setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand = true);
+
+    // Someone who came within chat range after we arrived and isn't ticked yet.
+    // They are shown in their own colour at the top of the list.
+    bool needsGreeting(const LLUUID& avatar_id) const { return mArrivedAvatars.contains(avatar_id) && !isGreeted(avatar_id); }
+
+    // Ticks the people a "welcome" in our own nearby chat names.
+    void onOwnNearbyChat(std::string_view text);
 
     // internals
     class Updater
@@ -127,6 +134,10 @@ private:
 
     void onRegionChanged();
 
+    void updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range, time_t now);
+    void refreshSoon();
+    std::string greetingName(const LLUUID& avatar_id) const;
+
     std::unique_ptr<Updater> mRadarListUpdater;
 
     struct RadarFields
@@ -152,6 +163,12 @@ private:
 
     LLUUID                  mTrackedAvatarId;
     std::unordered_set<LLUUID> mGreetedAvatars;
+    std::unordered_set<LLUUID> mArrivedAvatars;     // came within chat range after we arrived
+    std::unordered_set<LLUUID> mAlreadyHere;        // within chat range when we arrived
+    LLUUID                  mArrivalRegion;
+    time_t                  mArrivalTime{ 0 };
+    bool                    mArrivalLogged{ true };
+    bool                    mRefreshQueued{ false };
     LLSD                    mAvatarStats;
 
     radar_update_callback_t mUpdateSignal;
