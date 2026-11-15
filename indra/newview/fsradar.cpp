@@ -31,13 +31,19 @@
 // libs
 #include "llavatarnamecache.h"
 #include "llanimationstates.h"
+#include "llcallbacklist.h"
 #include "llcommonutils.h"
+#include "lldate.h"
+#include "lldir.h"
+#include "llfile.h"
 #include "llnotificationsutil.h"
 #include "lleventtimer.h"
+#include "llparcel.h"
 
 // newview
 #include "fsassetblacklist.h"
 #include "fscommon.h"
+#include "fsgreetingnames.h"
 #include "fskeywords.h"
 #include "fslslbridge.h"
 #include "fslslbridgerequest.h"
@@ -58,6 +64,76 @@
 #include "llviewerregion.h"
 #include "rlvactions.h"
 #include "rlvhandler.h"
+#include "llversioninfo.h"
+
+namespace
+{
+    // People within chat range this soon after we arrive were already there
+    // and are not shown as needing a greeting.
+    constexpr F64 ARRIVAL_SETTLE_SECONDS = 30.0;
+
+    std::string cleanField(std::string_view text)
+    {
+        std::string clean(text);
+        for (char& c : clean)
+        {
+            if (c == '\t' || c == '\n' || c == '\r')
+            {
+                c = ' ';
+            }
+        }
+        return clean;
+    }
+
+    // Appends a line to greetings_log.txt in the account's folder. Everything
+    // the greeting marks do is written there, so a session can be gone
+    // through afterwards.
+    void logGreeting(std::string_view event, const LLUUID& avatar_id = LLUUID::null, std::string_view name = {}, std::string_view details = {})
+    {
+        if (gDirUtilp->getLindenUserDir().empty())
+        {
+            return;
+        }
+        static bool session_started = false;
+
+        const std::string file = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, "greetings_log.txt");
+        const bool is_new = !LLFile::isfile(file);
+        llofstream out(file.c_str(), std::ios_base::app);
+        if (!out.is_open())
+        {
+            LL_WARNS("FSRadar") << "Cannot open " << file << LL_ENDL;
+            return;
+        }
+
+        const std::string now = LLDate::now().asString();
+        if (is_new)
+        {
+            out << "# What the Greeted marks on the nearby people list did, written by the viewer. Tab-separated:\n"
+                << "# time (UTC)\tevent\tname\tkey\tdetails\n";
+        }
+        if (!session_started)
+        {
+            session_started = true;
+            out << now << "\tsession started\t\t\t" << cleanField(LLVersionInfo::instance().getChannelAndVersion()) << '\n';
+        }
+        out << now << '\t' << event << '\t' << cleanField(name) << '\t'
+            << (avatar_id.notNull() ? avatar_id.asString() : std::string()) << '\t' << cleanField(details) << '\n';
+    }
+
+    std::string joinWords(const std::vector<LLWString>& words)
+    {
+        std::string joined;
+        for (const auto& word : words)
+        {
+            if (!joined.empty())
+            {
+                joined += ' ';
+            }
+            joined += wstring_to_utf8str(word);
+        }
+        return joined;
+    }
+}
 
 /**
  * Periodically updates the nearby people list while the Nearby tab is active.
@@ -231,6 +307,30 @@ void FSRadar::updateRadarList()
     bool alertScripts = mRadarAlertRequest; // save the current value, so it doesn't get changed out from under us by another thread
     time_t now = time(nullptr);
 
+    // We arrive somewhere when we log in, change region or teleport. Until things
+    // settle, whoever is within chat range was already there.
+    if (regionSelf.notNull() && (regionSelf != mArrivalRegion || gAgent.getTeleportState() != LLAgent::TELEPORT_NONE))
+    {
+        mArrivalRegion = regionSelf;
+        mArrivalTime = now;
+        mAlreadyHere.clear();
+        mArrivalLogged = false;
+    }
+    else if (!mArrivalLogged && regionSelf.notNull() && difftime(now, mArrivalTime) > ARRIVAL_SETTLE_SECONDS)
+    {
+        mArrivalLogged = true;
+        std::string place = gAgent.getRegion()->getName();
+        if (LLParcel* parcel = parcelmgr.getAgentParcel(); parcel && !parcel->getName().empty())
+        {
+            place += " / " + parcel->getName();
+        }
+        logGreeting("I arrived", LLUUID::null, {}, llformat("%s; %d already within chat range", place.c_str(), (S32)mAlreadyHere.size()));
+        for (const LLUUID& id : mAlreadyHere)
+        {
+            logGreeting("already here", id, greetingName(id));
+        }
+    }
+
     //STEP 0: Clear model data
     mRadarEnterAlerts.clear();
     mRadarLeaveAlerts.clear();
@@ -392,6 +492,8 @@ void FSRadar::updateRadarList()
         {
             continue;
         }
+
+        updateArrivals(avId, avRange, chat_range_say, now);
 
         //
         //2b. Process newly detected avatars
@@ -620,6 +722,11 @@ void FSRadar::updateRadarList()
 
         contactsets->hasFriendColorThatShouldShow(avId, ContactSetType::RADAR, name_color);
 
+        if (needsGreeting(avId))
+        {
+            name_color = colortable.getColor("RadarNeedsGreetingColor", LLColor4::cyan).get();
+        }
+
         entry_options["name_color"] = name_color.getValue();
 
         // Voice power level indicator
@@ -800,6 +907,14 @@ void FSRadar::updateRadarList()
     //STEP 4: Cache our current model data, so we can compare it with the next fresh group of model data for fast change detection.
     //
 
+    for (const auto& [prevId, rf] : mLastRadarSweep)
+    {
+        if (needsGreeting(prevId) && !mEntryList.contains(prevId))
+        {
+            logGreeting("left before greeting", prevId, greetingName(prevId));
+        }
+    }
+
     mLastRadarSweep.clear();
     for (const auto& [avid, entry] : mEntryList)
     {
@@ -861,16 +976,235 @@ std::shared_ptr<FSRadarEntry> FSRadar::getEntry(const LLUUID& avatar_id)
     return nullptr;
 }
 
-void FSRadar::setGreeted(const LLUUID& avatar_id, bool greeted)
+void FSRadar::setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand)
 {
-    if (greeted)
+    const bool changed = greeted ? mGreetedAvatars.insert(avatar_id).second : mGreetedAvatars.erase(avatar_id) > 0;
+    if (!changed)
     {
-        mGreetedAvatars.insert(avatar_id);
+        return;
     }
-    else
+    if (by_hand)
     {
-        mGreetedAvatars.erase(avatar_id);
+        logGreeting(greeted ? "ticked by hand" : "unticked by hand", avatar_id, greetingName(avatar_id));
     }
+    refreshSoon();
+}
+
+void FSRadar::onOwnNearbyChat(std::string_view text)
+{
+    const std::vector<LLWString> words = FSGreetingNames::chatWords(text);
+    if (!FSGreetingNames::isWelcome(words))
+    {
+        return;
+    }
+
+    static LLCachedControl<bool> sTickWelcomed(gSavedSettings, "FSRadarTickWelcomed");
+    if (!sTickWelcomed)
+    {
+        logGreeting("said welcome, ticking is off", LLUUID::null, {}, text);
+        return;
+    }
+
+    // Words of the region and parcel names are not names of people:
+    // "Welcome to Bluebell Bay" must not tick an avatar called BluebellBay.
+    std::vector<LLWString> place_words;
+    if (LLViewerRegion* region = gAgent.getRegion())
+    {
+        place_words = FSGreetingNames::chatWords(region->getName());
+    }
+    if (LLParcel* parcel = LLViewerParcelMgr::getInstance()->getAgentParcel())
+    {
+        auto parcel_words = FSGreetingNames::chatWords(parcel->getName());
+        place_words.insert(place_words.end(), parcel_words.begin(), parcel_words.end());
+    }
+
+    // Whoever is within chat range can be greeted, and so can anyone still
+    // waiting for a greeting who has wandered a little further away.
+    struct Candidate
+    {
+        LLUUID mID;
+        std::string mName;
+        std::vector<LLWString> mKeys;
+    };
+    std::vector<Candidate> candidates;
+    const F32 chat_range = (F32)LFSimFeatureHandler::instance().sayRange();
+    for (const auto& [id, entry] : mEntryList)
+    {
+        const bool in_chat_range = entry->mRange > AVATAR_UNKNOWN_RANGE && entry->mRange <= chat_range;
+        if (!in_chat_range && !needsGreeting(id))
+        {
+            continue;
+        }
+        LLAvatarName av_name;
+        if (!LLAvatarNameCache::get(id, &av_name))
+        {
+            continue;
+        }
+        candidates.push_back({ id, av_name.getCompleteName(), FSGreetingNames::nameKeys(av_name.getDisplayName(true), av_name.getAccountName()) });
+    }
+
+    logGreeting("said welcome", LLUUID::null, {}, llformat("\"%s\"; read as: %s; %d people to match",
+        std::string(text).c_str(), joinWords(words).c_str(), (S32)candidates.size()));
+
+    // A whole word of a name wins over the start of one, so "Max" is Max
+    // and not Maxine. The start of a name needs at least three letters.
+    struct Match
+    {
+        const Candidate* mCandidate;
+        LLWString mKey;     // the part of the name the word matched
+    };
+    struct Word
+    {
+        std::string mText;
+        bool mWhole = false;
+        std::vector<Match> mMatches;
+    };
+    std::vector<Word> pending;
+    for (const LLWString& word : words)
+    {
+        if (FSGreetingNames::isFillerWord(word) || std::find(place_words.begin(), place_words.end(), word) != place_words.end())
+        {
+            continue;
+        }
+        Word entry{ wstring_to_utf8str(word) };
+        std::vector<Match> start;
+        for (const Candidate& candidate : candidates)
+        {
+            if (std::find(candidate.mKeys.begin(), candidate.mKeys.end(), word) != candidate.mKeys.end())
+            {
+                entry.mMatches.push_back({ &candidate, word });
+                continue;
+            }
+            if (word.size() >= 3)
+            {
+                for (const LLWString& key : candidate.mKeys)
+                {
+                    if (key.starts_with(word))
+                    {
+                        start.push_back({ &candidate, key });
+                        break;
+                    }
+                }
+            }
+        }
+        entry.mWhole = !entry.mMatches.empty();
+        if (!entry.mWhole)
+        {
+            entry.mMatches = std::move(start);
+        }
+        pending.push_back(std::move(entry));
+    }
+
+    // Someone matched by one word is left out when the other words are looked
+    // at, so in "Welcome KT and Bel" Bel is Bella Lark once KT is ticked,
+    // even though K T's display name reads "Belmont". Repeat until nothing
+    // more can be settled.
+    std::unordered_set<LLUUID> ticked_now;
+    for (bool progress = true; progress; )
+    {
+        progress = false;
+        for (auto it = pending.begin(); it != pending.end(); )
+        {
+            std::vector<const Match*> open;
+            for (const Match& match : it->mMatches)
+            {
+                if (!ticked_now.contains(match.mCandidate->mID))
+                {
+                    open.push_back(&match);
+                }
+            }
+            if (open.empty() && !it->mMatches.empty())
+            {
+                it = pending.erase(it); // another word of a name already matched: "Welcome Juniper Fox"
+                continue;
+            }
+            if (open.size() != 1)
+            {
+                ++it;
+                continue;
+            }
+
+            const Candidate& match = *open.front()->mCandidate;
+            const std::string how = it->mWhole ? std::string("whole word") : "start of \"" + wstring_to_utf8str(open.front()->mKey) + "\"";
+            const bool was_greeted = isGreeted(match.mID);
+            ticked_now.insert(match.mID);
+            setGreeted(match.mID, true, false);
+            logGreeting(was_greeted ? "welcomed again, already ticked" : "ticked by welcome", match.mID, match.mName,
+                llformat("\"%s\" matched by %s%s", it->mText.c_str(), how.c_str(), it->mMatches.size() > 1 ? ", after the others were matched by other words" : ""));
+            it = pending.erase(it);
+            progress = true;
+        }
+    }
+
+    for (const Word& word : pending)
+    {
+        if (word.mMatches.empty())
+        {
+            logGreeting("no one matched", LLUUID::null, {}, llformat("\"%s\"", word.mText.c_str()));
+            continue;
+        }
+        std::string names;
+        for (const Match& match : word.mMatches)
+        {
+            if (!ticked_now.contains(match.mCandidate->mID))
+            {
+                names += (names.empty() ? "" : ", ") + match.mCandidate->mName;
+            }
+        }
+        logGreeting("more than one matched, none ticked", LLUUID::null, {}, llformat("\"%s\": %s", word.mText.c_str(), names.c_str()));
+    }
+}
+
+void FSRadar::updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range, time_t now)
+{
+    if (range <= AVATAR_UNKNOWN_RANGE || range > chat_range)
+    {
+        return;
+    }
+    if (difftime(now, mArrivalTime) <= ARRIVAL_SETTLE_SECONDS)
+    {
+        mAlreadyHere.insert(avatar_id);
+        return;
+    }
+    if (mAlreadyHere.contains(avatar_id) || !mArrivedAvatars.insert(avatar_id).second)
+    {
+        return;
+    }
+    logGreeting(isGreeted(avatar_id) ? "came into chat range, already ticked" : "came into chat range", avatar_id,
+        greetingName(avatar_id), llformat("%.1f m", range));
+}
+
+// The list is rebuilt about once a second. After a tick it is rebuilt at once,
+// so the colour and the place in the list change straight away.
+void FSRadar::refreshSoon()
+{
+    if (mRefreshQueued)
+    {
+        return;
+    }
+    mRefreshQueued = true;
+    doOnIdleOneTime([]()
+    {
+        if (FSRadar::instanceExists())
+        {
+            FSRadar* radar = FSRadar::getInstance();
+            radar->mRefreshQueued = false;
+            radar->updateRadarList();
+        }
+    });
+}
+
+std::string FSRadar::greetingName(const LLUUID& avatar_id) const
+{
+    if (LLAvatarName av_name; LLAvatarNameCache::get(avatar_id, &av_name))
+    {
+        return av_name.getCompleteName();
+    }
+    if (auto it = mEntryList.find(avatar_id); it != mEntryList.end())
+    {
+        return it->second->mName;
+    }
+    return {};
 }
 
 void FSRadar::teleportToAvatar(const LLUUID& targetAv)

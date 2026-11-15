@@ -181,6 +181,15 @@
 		 function="ToggleControl"
 		 parameter="FSRadarColorNamesByDistance"/>
 	</menu_item_check>
+	<menu_item_check
+	 label="Tick people I welcome in chat"
+	 name="radarTickWelcomed">
+		<menu_item_check.on_check
+		 control="FSRadarTickWelcomed"/>
+		<menu_item_check.on_click
+		 function="ToggleControl"
+		 parameter="FSRadarTickWelcomed"/>
+	</menu_item_check>
 	<menu_item_separator layout="topleft"/>
 	<context_menu
 	 label="Report To"

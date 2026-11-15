@@ -441,6 +441,9 @@
      name="AvatarListItemAgeAlert"
      reference="Red" />
     <color
+     name="RadarNeedsGreetingColor"
+     value="0 1 1 1" />
+    <color
      name="BackgroundChatColor"
      reference="DkGray" />
     <color
