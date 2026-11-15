@@ -126,6 +126,22 @@ bool FSPanelRadar::postBuild()
 {
     mRadarList = getChild<FSRadarListCtrl>("radar_list");
     mRadarList->setFilterColumn(mRadarList->getColumn("name")->mIndex);
+
+    // People waiting for a greeting stay at the top whatever column the list
+    // is sorted by, in either direction; within each group the column decides.
+    mRadarList->setSortCallback([list = mRadarList](S32 column, const LLScrollListItem* item1, const LLScrollListItem* item2) -> S32
+    {
+        FSRadar* radar = FSRadar::getInstance();
+        const S32 group1 = radar->needsGreeting(item1->getUUID()) ? 0 : 1;
+        const S32 group2 = radar->needsGreeting(item2->getUUID()) ? 0 : 1;
+        if (group1 != group2)
+        {
+            // The list multiplies the result by -1 for a descending sort.
+            return list->getSortAscending() ? group1 - group2 : group2 - group1;
+        }
+        return LLStringUtil::compareDict(item1->getColumn(column)->getValue().asString(), item2->getColumn(column)->getValue().asString());
+    });
+
     mRadarList->setContextMenu(&FSFloaterRadarMenu::gFSRadarMenu);
     mRadarList->setDoubleClickCallback(boost::bind(&FSPanelRadar::onRadarListDoubleClicked, this));
     mRadarList->setCommitCallback(boost::bind(&FSPanelRadar::onRadarListCommitted, this));

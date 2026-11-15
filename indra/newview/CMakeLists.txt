@@ -149,6 +149,7 @@ set(viewer_SOURCE_FILES
     fsfloaterwearablefavorites.cpp
     fsfloaterwhitelisthelper.cpp
     fsjointpose.cpp
+    fsgreetingnames.cpp # <FS:Luna Witch/>
     fskeywords.cpp
     fslslbridge.cpp
     fslslbridgerequest.cpp
@@ -1017,6 +1018,7 @@ set(viewer_HEADER_FILES
     fsfloaterwearablefavorites.h
     fsfloaterwhitelisthelper.h
     fsjointpose.h
+    fsgreetingnames.h # <FS:Luna Witch/>
     fsgridhandler.h
     fskeywords.h
     fslslbridge.h

@@ -3376,6 +3376,14 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
         }
         // </FS:PP>
 
+        // <FS:Luna Witch> Tick the people we welcome in nearby chat on the nearby people list
+        if (chat.mSourceType == CHAT_SOURCE_AGENT && chat.mFromID == gAgentID &&
+            (chat.mChatType == CHAT_TYPE_NORMAL || chat.mChatType == CHAT_TYPE_SHOUT || chat.mChatType == CHAT_TYPE_WHISPER))
+        {
+            FSRadar::getInstance()->onOwnNearbyChat(mesg);
+        }
+        // </FS:Luna Witch>
+
         LLTranslate::instance().logCharsSeen(mesg.size());
         // <FS:PP> gSavedSettings to LLCachedControl
         // if (gSavedSettings.getBOOL("TranslateChat") && chat.mSourceType != CHAT_SOURCE_SYSTEM)
