@@ -29,6 +29,8 @@
 #include "llimageworker.h"
 #include "llimagedxt.h"
 #include "threadpool.h"
+#include "fsimagebc7.h" // <FS:Luna Witch/>
+#include <chrono> // <FS:Luna Witch/>
 
 /*--------------------------------------------------------------------------*/
 class ImageRequest
@@ -38,7 +40,8 @@ public:
                  S32 discard,
                  bool needs_aux,
                  const LLPointer<LLImageDecodeThread::Responder>& responder,
-                 U32 request_id);
+                 U32 request_id,
+                 bool compress_bc7); // <FS:Luna Witch/>
     virtual ~ImageRequest();
 
     /*virtual*/ bool processRequest();
@@ -52,6 +55,7 @@ private:
     S32 mDiscardLevel;
     U32 mRequestId;
     bool mNeedsAux;
+    bool mCompressBC7; // <FS:Luna Witch/>
     // output
     LLPointer<LLImageRaw> mDecodedImageRaw;
     LLPointer<LLImageRaw> mDecodedImageAux;
@@ -92,7 +96,8 @@ LLImageDecodeThread::handle_t LLImageDecodeThread::decodeImage(
     const LLPointer<LLImageFormatted>& image,
     S32 discard,
     bool needs_aux,
-    const LLPointer<LLImageDecodeThread::Responder>& responder)
+    const LLPointer<LLImageDecodeThread::Responder>& responder,
+    bool compress_bc7) // <FS:Luna Witch/>
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_TEXTURE;
 
@@ -102,7 +107,7 @@ LLImageDecodeThread::handle_t LLImageDecodeThread::decodeImage(
 
     // Instantiate the ImageRequest right in the lambda, why not?
     bool posted = mThreadPool->getQueue().post(
-        [req = ImageRequest(image, discard, needs_aux, responder, decode_id)]
+        [req = ImageRequest(image, discard, needs_aux, responder, decode_id, compress_bc7)] // <FS:Luna Witch/>
         () mutable
         {
             auto done = req.processRequest();
@@ -132,10 +137,12 @@ ImageRequest::ImageRequest(const LLPointer<LLImageFormatted>& image,
                            S32 discard,
                            bool needs_aux,
                            const LLPointer<LLImageDecodeThread::Responder>& responder,
-                           U32 request_id)
+                           U32 request_id,
+                           bool compress_bc7) // <FS:Luna Witch/>
     : mFormattedImage(image),
       mDiscardLevel(discard),
       mNeedsAux(needs_aux),
+      mCompressBC7(compress_bc7), // <FS:Luna Witch/>
       mDecodedRaw(false),
       mDecodedAux(false),
       mResponder(responder),
@@ -193,8 +200,17 @@ bool ImageRequest::processRequest()
 
         // <FS:ND> Probably out of memory crash
         // done = mFormattedImage->decode(mDecodedImageRaw, decode_time_slice);
+        // <FS:Luna Witch> timed, to compare with BC7 compression (fsimagebc7.h)
+        //if( mDecodedImageRaw->getData() )
+        //    done = mFormattedImage->decode(mDecodedImageRaw, decode_time_slice);
         if( mDecodedImageRaw->getData() )
+        {
+            const auto decode_start = std::chrono::steady_clock::now();
             done = mFormattedImage->decode(mDecodedImageRaw, decode_time_slice);
+            FSImageBC7::addDecodeTime((U64)std::chrono::duration_cast<std::chrono::microseconds>(
+                std::chrono::steady_clock::now() - decode_start).count());
+        }
+        // </FS:Luna Witch>
         else
         {
             LL_WARNS() << "No memory for LLImageRaw of size " << (U32)mFormattedImage->getWidth() << "x" << (U32)mFormattedImage->getHeight() << "x"
@@ -205,6 +221,13 @@ bool ImageRequest::processRequest()
 
         // some decoders are removing data when task is complete and there were errors
         mDecodedRaw = done && mDecodedImageRaw->getData();
+
+        // <FS:Luna Witch> Compress here, on the decode thread, never on the main thread
+        if (mDecodedRaw && mCompressBC7)
+        {
+            mDecodedImageRaw->mBC7 = FSImageBC7::compress(mDecodedImageRaw);
+        }
+        // </FS:Luna Witch>
 
         // Pick up errors from decoding
         mErrorString = LLImage::getLastThreadError();

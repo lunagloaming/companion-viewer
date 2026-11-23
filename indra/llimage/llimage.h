@@ -32,6 +32,7 @@
 #include "llstring.h"
 #include "lltrace.h"
 #include "lluuid.h"
+#include "fsimagebc7.h" // <FS:Luna Witch/>
 
 #include <atomic> // <FS:Beq/> [FIRE-36494] Small memory allocation fail bugsplat reporting improvement
 
@@ -251,6 +252,11 @@ public:
     // so that deletion of this LLImageRaw will not free the memory at the "data" parameter
     // provided to "no_copy" constructor
     void releaseData();
+
+    // <FS:Luna Witch> The image and its mipmaps compressed to BC7 by the decode thread (fsimagebc7.h), or null.
+    // Only valid while its size matches the image's: LLImageGL checks before using it.
+    LLPointer<FSImageBC7> mBC7;
+    // </FS:Luna Witch>
 
 
     bool resize(U16 width, U16 height, S8 components);

@@ -48,9 +48,15 @@ public:
 
     // meant to resemble LLQueuedThread::handle_t
     typedef U32 handle_t;
+    // <FS:Luna Witch> compress_bc7: also compress the result to BC7 (fsimagebc7.h), into raw->mBC7
+    //handle_t decodeImage(const LLPointer<LLImageFormatted>& image,
+    //                     S32 discard, bool needs_aux,
+    //                     const LLPointer<Responder>& responder);
     handle_t decodeImage(const LLPointer<LLImageFormatted>& image,
                          S32 discard, bool needs_aux,
-                         const LLPointer<Responder>& responder);
+                         const LLPointer<Responder>& responder,
+                         bool compress_bc7 = false);
+    // </FS:Luna Witch>
     size_t getPending();
     size_t update(F32 max_time_ms);
     S32 getTotalDecodeCount() { return mDecodeCount; }
