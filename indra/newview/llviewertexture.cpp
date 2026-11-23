@@ -662,6 +662,29 @@ void LLViewerTexture::updateClass()
         }
     }
 
+    // System memory limits the budget the same way. On Linux (seen with NVIDIA) what textures and vertex
+    // buffers use shows up about one for one in the viewer's own memory, so a budget taken from a 24 GB card
+    // alone let one viewer and a browser bring 32 GB of RAM down to 2 GB available, and the low-memory cap
+    // below never fired. What this viewer uses plus what the system has available stays about the same while
+    // its textures grow or shrink, so the limit holds steady, and several viewers share the memory as they
+    // share the card. A budget set by hand is left alone.
+    F32 system_limit = 0.f;
+#if LL_LINUX
+    static LLCachedControl<U32> ram_reserve(gSavedSettings, "FSTextureSystemMemoryReserve", 0);
+    if (!max_vram_budget_enabled)
+    {
+        const F32 available_mb = (F32)getFreeSystemMemory().value(); // refreshes the total too
+        const F32 total_mb = (F32)LLMemory::getMaxMemKB().value() / 1024.f;
+        if (total_mb > 0.f && available_mb < total_mb)
+        {
+            // Left for the system and other programs: an eighth of the memory, at least 2 GB, unless set
+            const F32 reserve = ram_reserve() > 0 ? (F32)ram_reserve() : llmax(2048.f, total_mb / 8.f);
+            system_limit = llmax(used + available_mb - reserve, MIN_VRAM_BUDGET);
+            target = llmin(target, system_limit);
+        }
+    }
+#endif
+
     // The card is overcommitted when the NVIDIA driver moves video memory out to system memory, or when an
     // allocation fails outright. Either holds textures below what they use for a while.
     constexpr F32 VRAM_SHORT_HOLD_SECS = 30.f;
@@ -827,6 +850,7 @@ void LLViewerTexture::updateClass()
         inputs.card_free_mb = card_free_mb;
         inputs.evictions = evictions;
         inputs.system_cap_mb = system_cap;
+        inputs.system_limit_mb = system_limit;
         sDesiredDiscardBias = FSTextureBudget::chooseBias(sDesiredDiscardBias, inputs);
     }
     // </FS:Luna Witch>
