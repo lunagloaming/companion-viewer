@@ -919,7 +919,6 @@ public:
         }
         else if ((mSourceType == CHAT_SOURCE_AGENT || (mSourceType == CHAT_SOURCE_SYSTEM && mType == CHAT_TYPE_RADAR))
                  && !mAvatarID.isNull()
-                 && chat.mChatStyle != CHAT_STYLE_SERVER_HISTORY
                  && chat.mChatStyle != CHAT_STYLE_HISTORY)
         {
             // ...from a normal user, lookup the name and fill in later.
@@ -948,7 +947,6 @@ public:
 // [/RLVa:KB]
         }
         else if (chat.mChatStyle == CHAT_STYLE_HISTORY ||
-                 chat.mChatStyle == CHAT_STYLE_SERVER_HISTORY ||
                  (mSourceType == CHAT_SOURCE_AGENT || (mSourceType == CHAT_SOURCE_SYSTEM && mType == CHAT_TYPE_RADAR)))
         {
             //if it's an avatar name with a username add formatting
@@ -1515,6 +1513,16 @@ LLView* FSChatHistory::getHeader(const LLChat& chat,const LLStyle::Params& style
 void FSChatHistory::clear()
 {
     mLastFromName.clear();
+
+    // Inline views die on the mortician pass. Detach this transcript's current
+    // views now so a synchronous replay cannot draw old and replacement panels together.
+    const LLView* document_view = getDocumentView();
+    const LLView::child_list_t document_children = *document_view->getChildList();
+    for (LLView* child : document_children)
+    {
+        removeDocumentChild(child);
+    }
+
     // workaround: Setting the text to an empty line before clear() gets rid of
     // the scrollbar, if present, which otherwise would get stuck until the next
     // line was appended. -Zi
@@ -1580,6 +1588,7 @@ void FSChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
     bool use_plain_text_chat_history = args["use_plain_text_chat_history"].asBoolean();
     bool square_brackets = false; // square brackets necessary for a system messages
     bool is_p2p = args.has("is_p2p") && args["is_p2p"].asBoolean();
+    bool is_group_history = args.has("is_group_history") && args["is_group_history"].asBoolean();
     bool is_conversation_log = args.has("conversation_log") && args["conversation_log"].asBoolean();    // <FS:CR> Don't dim chat in conversation log
     bool is_local = args.has("is_local") && args["is_local"].asBoolean();
 
@@ -1672,19 +1681,12 @@ void FSChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
         delimiter_style = "BOLD";
     }
 
-    bool message_from_log = (chat.mChatStyle == CHAT_STYLE_HISTORY || chat.mChatStyle == CHAT_STYLE_SERVER_HISTORY);
+    bool message_from_log = chat.mChatStyle == CHAT_STYLE_HISTORY;
     bool teleport_separator = chat.mSourceType == CHAT_SOURCE_TELEPORT;
     // We graying out chat history by graying out messages that contains full date in a time string
     if (message_from_log && !is_conversation_log)
     {
-        if (chat.mChatStyle == CHAT_STYLE_HISTORY)
-        {
-            txt_color = LLUIColorTable::instance().getColor("ChatHistoryMessageFromLog");
-        }
-        else if (chat.mChatStyle == CHAT_STYLE_SERVER_HISTORY)
-        {
-            txt_color = LLUIColorTable::instance().getColor("ChatHistoryMessageFromServerLog");
-        }
+        txt_color = LLUIColorTable::instance().getColor(is_group_history ? "ChatHistoryMessageFromServerLog" : "ChatHistoryMessageFromLog");
         body_message_params.color(txt_color);
         body_message_params.readonly_color(txt_color);
         name_params.color(txt_color);
@@ -1958,15 +1960,19 @@ void FSChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
             bool create_toast = true;
             if (notification->getName() == "OfferFriendship")
             {
-                // We don't want multiple friendship offers to appear, this code checks if there are previous offers
-                // by iterating though all panels.
-                // Note: it might be better to simply add a "pending offer" flag somewhere
-                for (auto& ti : LLToastNotifyPanel::instance_snapshot())
+                // Keep one actionable offer per sender without hiding requests from other residents.
+                const LLUUID from_id = notification->getPayload()["from_id"].asUUID();
+                for (auto& panel : LLToastNotifyPanel::instance_snapshot())
                 {
-                    LLIMToastNotifyPanel * imtoastp = dynamic_cast<LLIMToastNotifyPanel *>(&ti);
-                    const std::string& notification_name = ti.getNotificationName();
-                    if (notification_name == "OfferFriendship"
-                        && ti.isControlPanelEnabled()
+                    LLIMToastNotifyPanel * imtoastp = dynamic_cast<LLIMToastNotifyPanel *>(&panel);
+                    const std::string& notification_name = panel.getNotificationName();
+                    LLNotificationPtr panel_notification = LLNotificationsUtil::find(panel.getID());
+                    // A synchronous transcript replay replaces panels already queued for deletion.
+                    if (!panel.isDead()
+                        && notification_name == "OfferFriendship"
+                        && panel_notification
+                        && panel_notification->getPayload()["from_id"].asUUID() == from_id
+                        && panel.isControlPanelEnabled()
                         && imtoastp)
                     {
                         create_toast = false;

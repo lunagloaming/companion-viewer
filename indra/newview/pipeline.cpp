@@ -4993,6 +4993,9 @@ void LLPipeline::renderFocusPoint()
         gGL.flush();
         gDebugProgram.unbind();
     }
+
+    // renderDoF() sets this again on frames where DoF runs, so the crosshair isn't left behind when DoF is skipped
+    sDoFEnabled = false;
 }
 // </FS:Beq>
 
@@ -8769,7 +8772,7 @@ void LLPipeline::renderDoF(LLRenderTarget* src, LLRenderTarget* dst)
 
             if (focus_point.isExactlyZero())
             {
-                if (LLViewerJoystick::getInstance()->getOverrideCamera() || LLPipeline::FSFocusPointFollowsPointer) // <FS:Beq/> FIRE-16728 Add free aim mouse and focus lock
+                if (gAgent.isCameraExternallyDriven() || LLPipeline::FSFocusPointFollowsPointer) // <FS:Beq/> FIRE-16728 Add free aim mouse and focus lock
                 { // focus on point under cursor
                     focus_point.set(gDebugRaycastIntersection.getF32ptr());
                 }
@@ -9029,7 +9032,7 @@ void LLPipeline::renderFinalize()
 
     // <FS:Beq> Restore shader post proc for Vignette
     LLRenderTarget* auxActiveBuffer = sourceBuffer;
-    LLRenderTarget* auxTargetBuffer = RenderFSAAType ? &mRT->screen : &mPostPingMap;
+    LLRenderTarget* auxTargetBuffer = targetBuffer;
 // [RLVa:KB] - @setsphere
     if (RlvActions::hasBehaviour(RLV_BHVR_SETSPHERE))
     {
