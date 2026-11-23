@@ -664,8 +664,11 @@ void LLViewerTexture::updateClass()
     }
     last_evictions = evictions;
 
-    // Low system memory caps the budget below what is used, and again if it stays low. The cap is lifted
-    // once memory has recovered for a while; the 90% rule then decides when textures sharpen again.
+    // Low system memory caps the budget below what is used. It is tightened again only if memory stays low
+    // while textures still use more than the cap: memory pressure figures lag (Linux "some avg60" stayed high
+    // for 45 s after the pressure had gone), and tightening on them alone shrank everything to the minimum.
+    // The cap is lifted once memory has recovered for a while; the 90% rule then decides when textures
+    // sharpen again.
     constexpr F32 SYSTEM_CAP_SHARE = 0.8f;
     constexpr F32 SYSTEM_CAP_TIGHTEN_SECS = 10.f;
     constexpr F32 SYSTEM_CAP_LIFT_SECS = 30.f;
@@ -686,9 +689,10 @@ void LLViewerTexture::updateClass()
                 gTextureList.updateImageDecodePriority(image, false /*will modify gTextureList otherwise!*/);
             }
         }
-        else if (system_cap_timer.getElapsedTimeF32() > SYSTEM_CAP_TIGHTEN_SECS && system_cap > MIN_VRAM_BUDGET)
+        else if (system_cap_timer.getElapsedTimeF32() > SYSTEM_CAP_TIGHTEN_SECS && system_cap > MIN_VRAM_BUDGET
+                 && used > system_cap)
         {
-            system_cap = llmax(llmin(system_cap, used) * SYSTEM_CAP_SHARE, MIN_VRAM_BUDGET);
+            system_cap = llmax(system_cap * SYSTEM_CAP_SHARE, MIN_VRAM_BUDGET);
             system_cap_timer.reset();
             LL_INFOS("TextureMemory") << "System memory still low: textures held to " << (S32)system_cap << " MB" << LL_ENDL;
         }

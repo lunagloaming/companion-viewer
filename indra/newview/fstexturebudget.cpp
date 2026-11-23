@@ -41,6 +41,10 @@ namespace
     constexpr F32 MEASURED_OVER_SHARE = 1.05f;
     constexpr F32 MEASURED_OVER_SECS = 5.f;
     constexpr F32 SUMMARY_SECS = 60.f;
+    // No fall this soon after a rise. Right after textures shrink, what they would need at a lower bias reads
+    // low (sizes they asked for before the rise are forgotten), and the bias swung 1, 2.5, 1, 2, 2.5 within
+    // seconds.
+    constexpr F32 FALL_HOLD_SECS = 10.f;
 
     U64 sPredictedKB[FSTextureBudget::BIAS_COUNT] = {};
     U64 sCurrentKB = 0;
@@ -132,10 +136,12 @@ F32 FSTextureBudget::chooseBias(F32 current_bias, const Inputs& in)
     }
 
     // What is measured wins over what is predicted: never fall while over the target, and step up
-    // when it stays over.
+    // when it stays over. Never fall soon after a rise either.
     static LLFrameTimer over_timer;
+    static LLFrameTimer rise_timer;
+    static bool risen = false;
     const bool over = in.used_mb > in.target_mb;
-    if (over)
+    if (over || (risen && rise_timer.getElapsedTimeF32() < FALL_HOLD_SECS))
     {
         chosen = llmax(chosen, current);
     }
@@ -154,6 +160,12 @@ F32 FSTextureBudget::chooseBias(F32 current_bias, const Inputs& in)
         over_timer.reset();
     }
     sOverBudget = over;
+
+    if (chosen > current)
+    {
+        risen = true;
+        rise_timer.reset();
+    }
 
     if (chosen != current)
     {
