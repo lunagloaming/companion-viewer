@@ -13,6 +13,9 @@ include(bugsplat)
 include(Tut)
 
 set(llimage_SOURCE_FILES
+    fsimagebc7.cpp
+    bc7enc/bc7enc.cpp
+    bc7enc/bc7decomp.cpp
     llimagebmp.cpp
     llimage.cpp
     llimagedimensionsinfo.cpp
@@ -29,6 +32,9 @@ set(llimage_SOURCE_FILES
 set(llimage_HEADER_FILES
     CMakeLists.txt
 
+    fsimagebc7.h
+    bc7enc/bc7enc.h
+    bc7enc/bc7decomp.h
     llimage.h
     llimagebmp.h
     llimagedimensionsinfo.h
@@ -44,6 +50,12 @@ set(llimage_HEADER_FILES
     )
 
 list(APPEND llimage_SOURCE_FILES ${llimage_HEADER_FILES})
+
+# <FS:Luna Witch> Vendored BC7 encoder (bc7enc/README.md): built as it is, without our warnings as errors
+if (NOT WINDOWS)
+    set_source_files_properties(bc7enc/bc7enc.cpp bc7enc/bc7decomp.cpp PROPERTIES COMPILE_OPTIONS "-w")
+endif ()
+# </FS:Luna Witch>
 
 add_library (llimage ${llimage_SOURCE_FILES})
 target_include_directories( llimage  INTERFACE   ${CMAKE_CURRENT_SOURCE_DIR})

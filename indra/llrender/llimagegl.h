@@ -253,6 +253,20 @@ private:
     bool mHasExplicitFormat; // If false (default), GL format is f(mComponents)
     bool mAutoGenMips = false;
 
+    // <FS:Luna Witch> BC7 textures (fsimagebc7.h)
+public:
+    // The GPU takes BC7 (BPTC) textures and can copy them level by level (OpenGL 4.3)
+    static bool bc7Supported();
+    bool isBC7() const { return mIsBC7; }
+private:
+    bool setImageBC7(const FSImageBC7& bc7, const U8* raw_data);
+    bool scaleDownBC7(S32 desired_discard);
+    LLPointer<FSImageBC7> mPendingBC7; // handed over by createGLTexture for the next setImage
+    bool mIsBC7 = false;
+    U32 mBC7Format = 0;
+private:
+    // </FS:Luna Witch>
+
     bool mIsMask;
     bool mNeedsAlphaAndPickMask;
     S8   mAlphaStride ;

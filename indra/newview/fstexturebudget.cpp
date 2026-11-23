@@ -30,6 +30,7 @@
 #include "fstexturebudget.h"
 
 #include "llframetimer.h"
+#include "fsimagebc7.h"
 #include "llviewertexture.h"
 
 namespace
@@ -188,6 +189,15 @@ F32 FSTextureBudget::chooseBias(F32 current_bias, const Inputs& in)
                                   << "; system memory cap " << (S32)in.system_cap_mb << " MB; last minute: "
                                   << sBiasChanges << " bias changes, " << sShrunkInView
                                   << " textures shrunk while on screen" << LL_ENDL;
+        const FSImageBC7::Stats bc7 = FSImageBC7::takeStats();
+        if (bc7.compressed || bc7.rejected)
+        {
+            LL_INFOS("TextureMemory") << "BC7 last minute: " << bc7.compressed << " textures compressed, " << bc7.rejected
+                                      << " left uncompressed (" << bc7.rejected_alpha << " for their alpha), "
+                                      << (S32)(bc7.bytes_saved >> 20) << " MB saved; compressing took "
+                                      << (S32)(bc7.microseconds / 1000) << " ms of decode thread time, decoding "
+                                      << (S32)(bc7.decode_microseconds / 1000) << " ms" << LL_ENDL;
+        }
         sBiasChanges = 0;
         sShrunkInView = 0;
     }
