@@ -3039,7 +3039,7 @@
     <key>FSLinuxMemPressureThreshold</key>
     <map>
       <key>Comment</key>
-      <string>Linux only: treat system memory as low when /proc/pressure/memory "some avg10" exceeds this percentage, even if free memory looks sufficient (e.g. with zram swap). Fast zram swap keeps this figure low even under heavy swapping, so the default is small. 0 disables.</string>
+      <string>Linux only: treat system memory as low when /proc/pressure/memory "some avg60" (the one-minute average) exceeds this percentage, even if free memory looks sufficient (e.g. with zram swap); it counts as low until it falls below half of it. Fast zram swap keeps this figure low even under heavy swapping, so the default is small. 0 disables.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
