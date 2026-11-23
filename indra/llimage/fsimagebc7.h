@@ -39,7 +39,8 @@ class LLImageRaw;
 // A decoded texture and its mipmaps compressed to BC7: 4x4 texels in 16 bytes, a quarter of RGBA8.
 // Made on the decode threads; LLImageGL uploads the levels as they are. A texture BC7 would visibly
 // harm (fine-grained normal maps, thin alpha lattices) is left uncompressed: every block is decoded
-// back and compared with its source.
+// back and compared with its source. A fully opaque texture may decode with alpha 254 here and there,
+// so LLImageGL samples its alpha as exactly 1 (isOpaque).
 class FSImageBC7 : public LLThreadSafeRefCount
 {
 public:
@@ -58,11 +59,12 @@ public:
     U32 getWidth() const { return mLevels.empty() ? 0 : mLevels[0].width; }
     U32 getHeight() const { return mLevels.empty() ? 0 : mLevels[0].height; }
     S32 getSourceComponents() const { return mSourceComponents; }
+    bool isOpaque() const { return mOpaque; } // every source texel had alpha 255 (or the source had none)
     U64 getBytes() const;
 
-    // Counted since the last call: textures compressed and left alone (and of those, how many for their
-    // alpha ends), microseconds spent on both (encoding and checking), and bytes saved against RGBA8 or
-    // RGB8 with mipmaps.
+    // Counted since the last call: textures compressed and left alone (and of those, how many because a
+    // fully transparent or fully opaque texel moved too far, which would show as holes or specks),
+    // microseconds spent on both (encoding and checking), and bytes saved against RGBA8 or RGB8 with mipmaps.
     struct Stats
     {
         U32 compressed = 0;
@@ -78,6 +80,7 @@ public:
 private:
     std::vector<Level> mLevels;
     S32 mSourceComponents = 0;
+    bool mOpaque = false;
 };
 
 #endif // FS_IMAGEBC7_H

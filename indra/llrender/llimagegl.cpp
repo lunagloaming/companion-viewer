@@ -862,6 +862,11 @@ bool LLImageGL::setImage(const U8* data_in, bool data_hasmips /* = false */, S32
 
     // <FS:Luna Witch> The BC7 copy the decode thread made, when createGLTexture handed one over
     mIsBC7 = false;
+    if (mBC7AlphaIsOne)
+    {
+        glTexParameteri(mTarget, GL_TEXTURE_SWIZZLE_A, GL_ALPHA); // this texture name held an opaque BC7 image
+        mBC7AlphaIsOne = false;
+    }
     if (mPendingBC7.notNull())
     {
         LLPointer<FSImageBC7> bc7 = mPendingBC7;
@@ -2110,6 +2115,7 @@ void LLImageGL::destroyGLTexture()
         mTexName = 0;
         mGLTextureCreated = false ;
         mIsBC7 = false; // <FS:Luna Witch/>
+        mBC7AlphaIsOne = false; // <FS:Luna Witch/>
     }
 }
 
@@ -2663,6 +2669,12 @@ bool LLImageGL::setImageBC7(const FSImageBC7& bc7, const U8* raw_data)
         return false; // setImage uploads the image uncompressed instead, redefining every level
     }
     glTexParameteri(mTarget, GL_TEXTURE_MAX_LEVEL, count - 1);
+    // BC7 can only give an opaque texture alpha 254 in places; sample exactly what the source had
+    if (bc7.isOpaque())
+    {
+        glTexParameteri(mTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+        mBC7AlphaIsOne = true;
+    }
 
     const S32 w = levels[0].width;
     const S32 h = levels[0].height;
@@ -2717,6 +2729,10 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
     }
     glTexParameteri(mTarget, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(mTarget, GL_TEXTURE_MAX_LEVEL, count - 1);
+    if (mBC7AlphaIsOne)
+    {
+        glTexParameteri(mTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+    }
     gGL.getTexUnit(0)->unbind(mBindTarget);
 
     if (glGetError() != GL_NO_ERROR)
