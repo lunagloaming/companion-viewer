@@ -654,15 +654,58 @@ void LLViewerTexture::updateClass()
         }
     }
 
-    // The NVIDIA driver moving video memory out to system memory means the card is overcommitted
+    // The card is overcommitted when the NVIDIA driver moves video memory out to system memory, or when an
+    // allocation fails outright. Either holds textures below what they use for a while.
+    constexpr F32 VRAM_SHORT_HOLD_SECS = 30.f;
+    static F32 vram_short_cap = 0.f;
+    static LLFrameTimer vram_short_timer;
+    auto hold_textures = [&](const char* why)
+    {
+        vram_short_cap = llmax(used * 0.9f, MIN_VRAM_BUDGET);
+        vram_short_timer.reset();
+        LL_WARNS("TextureMemory") << why << ": textures held to " << (S32)vram_short_cap << " MB for "
+                                  << (S32)VRAM_SHORT_HOLD_SECS << " s" << LL_ENDL;
+    };
+
     static S32 last_evictions = -1;
     if (evictions > last_evictions && last_evictions >= 0)
     {
-        LL_INFOS("TextureMemory") << "The driver moved video memory out to system memory (" << (evictions - last_evictions)
-                                  << " evictions): textures held to " << (S32)(used * 0.9f) << " MB" << LL_ENDL;
-        target = llmin(target, llmax(used * 0.9f, MIN_VRAM_BUDGET));
+        hold_textures("The driver moved video memory out to system memory");
     }
     last_evictions = evictions;
+
+    // A video memory allocation that failed outright (GL_OUT_OF_MEMORY) leaves a texture or buffer without
+    // storage. Release builds never read GL errors, so look once a second, and give memory back the same way.
+    static LLFrameTimer gl_error_timer;
+    if (gl_error_timer.getElapsedTimeF32() > MEMORY_CHECK_WAIT_TIME)
+    {
+        gl_error_timer.reset();
+        bool out_of_memory = false;
+        for (S32 i = 0; i < 8; ++i) // each kind of error is reported once; stop at no error
+        {
+            const GLenum error = glGetError();
+            if (error == GL_NO_ERROR)
+            {
+                break;
+            }
+            out_of_memory |= error == GL_OUT_OF_MEMORY;
+        }
+        if (out_of_memory)
+        {
+            hold_textures("A video memory allocation failed (GL_OUT_OF_MEMORY)");
+        }
+    }
+    if (vram_short_cap > 0.f)
+    {
+        if (vram_short_timer.getElapsedTimeF32() < VRAM_SHORT_HOLD_SECS)
+        {
+            target = llmin(target, vram_short_cap);
+        }
+        else
+        {
+            vram_short_cap = 0.f;
+        }
+    }
 
     // Low system memory caps the budget below what is used. It is tightened again only if memory stays low
     // while textures still use more than the cap: memory pressure figures lag (Linux "some avg60" stayed high
