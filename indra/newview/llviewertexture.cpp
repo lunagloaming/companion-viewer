@@ -1498,6 +1498,18 @@ LLViewerFetchedTexture::~LLViewerFetchedTexture()
     cleanup();
 }
 
+// <FS:Luna Witch> BC7 compression (fsimagebc7.h): world textures only. UI, HUD, sculpt maps, terrain and selected
+// objects (boosts from BOOST_TERRAIN up) are left alone, as are textures that keep their raw image or need the
+// aux channel.
+bool LLViewerFetchedTexture::wantsBC7() const
+{
+    static LLCachedControl<bool> compress_bc7(gSavedSettings, "FSTextureCompressBC7", true);
+    return compress_bc7 && LLImageGL::bc7Supported() && getType() == LLViewerTexture::LOD_TEXTURE && mUseMipMaps
+        && !mDontDiscard && mBoostLevel < LLGLTexture::BOOST_TERRAIN && !mForceToSaveRawImage && !mSaveRawImage
+        && !mNeedsAux;
+}
+// </FS:Luna Witch>
+
 // <FS:Luna Witch> Texture memory budget (fstexturebudget.h)
 U64 LLViewerFetchedTexture::currentGPUBytes() const
 {
@@ -2512,8 +2524,12 @@ bool LLViewerFetchedTexture::updateFetch()
         // bypass texturefetch directly by pulling from LLTextureCache
         S32 fetch_request_response = -1;
         S32 worker_discard = -1;
+        // <FS:Luna Witch> Compress world textures to BC7 on the decode thread (fsimagebc7.h)
+        //fetch_request_response = LLAppViewer::getTextureFetch()->createRequest(mFTType, mUrl, getID(), getTargetHost(), decode_priority,
+        //    w, h, c, desired_discard, needsAux(), mCanUseHTTP);
         fetch_request_response = LLAppViewer::getTextureFetch()->createRequest(mFTType, mUrl, getID(), getTargetHost(), decode_priority,
-            w, h, c, desired_discard, needsAux(), mCanUseHTTP);
+            w, h, c, desired_discard, needsAux(), mCanUseHTTP, wantsBC7());
+        // </FS:Luna Witch>
 
         if (fetch_request_response >= 0) // positive values and 0 are discard values
         {

@@ -446,6 +446,8 @@ public:
     bool mInBudgetTotals = false;
     // Bytes this texture takes on the GPU now, mipmaps included
     U64 currentGPUBytes() const;
+    // Compress it to BC7 on the decode thread (fsimagebc7.h)
+    bool wantsBC7() const;
     // Bytes it would take at each of count discard biases, mipmaps included. Fetched textures that are not
     // LOD textures keep their size.
     virtual void predictGPUBytes(const F32* biases, S32 count, U64* bytes) const;
