@@ -31,7 +31,15 @@
 #include "llgl.h"
 
 LLRenderTarget* LLRenderTarget::sBoundTarget = NULL;
-U32 LLRenderTarget::sBytesAllocated = 0;
+// <FS:Luna Witch> Count each color attachment at its format's size (was 4 bytes per pixel for all of them)
+//U32 LLRenderTarget::sBytesAllocated = 0;
+U64 LLRenderTarget::sBytesAllocated = 0;
+
+static U64 color_bytes(U32 color_fmt, U32 width, U32 height)
+{
+    return (U64)LLImageGL::dataFormatBytes(color_fmt, width, height);
+}
+// </FS:Luna Witch>
 
 void check_framebuffer_status()
 {
@@ -78,6 +86,8 @@ void LLRenderTarget::resize(U32 resx, U32 resy)
 {
     //for accounting, get the number of pixels added/subtracted
     S32 pix_diff = (resx*resy)-(mResX*mResY);
+    const U32 old_x = mResX; // <FS:Luna Witch/>
+    const U32 old_y = mResY; // <FS:Luna Witch/>
 
     mResX = resx;
     mResY = resy;
@@ -88,7 +98,11 @@ void LLRenderTarget::resize(U32 resx, U32 resy)
     { //resize color attachments
         gGL.getTexUnit(0)->bindManual(mUsage, mTex[i]);
         LLImageGL::setManualImage(LLTexUnit::getInternalType(mUsage), 0, mInternalFormat[i], mResX, mResY, GL_RGBA, GL_UNSIGNED_BYTE, NULL, false);
-        sBytesAllocated += pix_diff*4;
+        // <FS:Luna Witch>
+        //sBytesAllocated += pix_diff*4;
+        sBytesAllocated += color_bytes(mInternalFormat[i], mResX, mResY);
+        sBytesAllocated -= color_bytes(mInternalFormat[i], old_x, old_y);
+        // </FS:Luna Witch>
     }
 
     if (mDepth)
@@ -243,7 +257,10 @@ bool LLRenderTarget::addColorAttachment(U32 color_fmt)
         }
     }
 
-    sBytesAllocated += mResX*mResY*4;
+    // <FS:Luna Witch>
+    //sBytesAllocated += mResX*mResY*4;
+    sBytesAllocated += color_bytes(color_fmt, mResX, mResY);
+    // </FS:Luna Witch>
 
     stop_glerror();
 
@@ -386,7 +403,10 @@ void LLRenderTarget::release()
         size_t z;
         for (z = mTex.size() - 1; z >= 1; z--)
         {
-            sBytesAllocated -= mResX*mResY*4;
+            // <FS:Luna Witch>
+            //sBytesAllocated -= mResX*mResY*4;
+            sBytesAllocated -= color_bytes(mInternalFormat[z], mResX, mResY);
+            // </FS:Luna Witch>
             glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<GLenum>(GL_COLOR_ATTACHMENT0+z), LLTexUnit::getInternalType(mUsage), 0, 0);
             LLImageGL::deleteTextures(1, &mTex[z]);
         }
@@ -407,7 +427,10 @@ void LLRenderTarget::release()
 
     if (mTex.size() > 0)
     {
-        sBytesAllocated -= mResX*mResY*4;
+        // <FS:Luna Witch>
+        //sBytesAllocated -= mResX*mResY*4;
+        sBytesAllocated -= color_bytes(mInternalFormat[0], mResX, mResY);
+        // </FS:Luna Witch>
         LLImageGL::deleteTextures(1, &mTex[0]);
     }
 
@@ -513,6 +536,7 @@ void LLRenderTarget::flush()
         LL_PROFILE_GPU_ZONE("rt generate mipmaps");
         bindTexture(0, 0, LLTexUnit::TFO_TRILINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
+        LLImageGLMemory::count_generated_mips(); // <FS:Luna Witch/> counted once, though generated every flush
     }
 
     if (mPreviousRT)

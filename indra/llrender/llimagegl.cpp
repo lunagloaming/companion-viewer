@@ -63,31 +63,113 @@ U32 LLImageGL::sFrameCount = 0;
 
 // texture memory accounting (for macOS)
 static LLMutex sTexMemMutex;
-static std::unordered_map<U32, U64> sTextureAllocs;
+// <FS:Luna Witch> Per texture: bytes counted, level 0 size, and whether mipmap levels are already included.
+// Before, each glTexImage call replaced the texture's count, so mipmaps made by glGenerateMipmap were never
+// counted, a texture given its mipmaps one level at a time was counted at its smallest level, and only the
+// last cube map face counted.
+//static std::unordered_map<U32, U64> sTextureAllocs;
+struct TextureAlloc
+{
+    U64 bytes = 0;
+    U32 width = 0;
+    U32 height = 0;
+    bool has_mips = false;
+};
+static std::unordered_map<U32, TextureAlloc> sTextureAllocs;
+// </FS:Luna Witch>
 static U64 sTextureBytes = 0;
+
+// <FS:Luna Witch>
+static U32 bound_tex_name()
+{
+    U32 texUnit = gGL.getCurrentTexUnitIndex();
+    llassert(texUnit == 0); // allocations should always be done on tex unit 0
+    return gGL.getTexUnit(texUnit)->getCurrTexture();
+}
+
+// Replaces texName's count with a level 0 of this many bytes.
+static void set_tex_bytes(U32 texName, U64 size, U32 width, U32 height)
+{
+    LLMutexLock lock(&sTexMemMutex);
+    TextureAlloc& alloc = sTextureAllocs[texName];
+    llassert(alloc.bytes <= sTextureBytes);
+    sTextureBytes -= alloc.bytes;
+    alloc = { size, width, height, false };
+    sTextureBytes += size;
+}
+
+// Adds a mipmap level or cube map face to texName's count.
+static void add_tex_bytes_to(U32 texName, U64 size, bool is_mip)
+{
+    LLMutexLock lock(&sTexMemMutex);
+    TextureAlloc& alloc = sTextureAllocs[texName];
+    alloc.bytes += size;
+    alloc.has_mips |= is_mip;
+    sTextureBytes += size;
+}
+// </FS:Luna Witch>
 
 // track a texture alloc on the currently bound texture.
 // asserts that no currently tracked alloc exists
 void LLImageGLMemory::alloc_tex_image(U32 width, U32 height, U32 intformat, U32 count)
 {
-    U32 texUnit = gGL.getCurrentTexUnitIndex();
-    llassert(texUnit == 0); // allocations should always be done on tex unit 0
-    U32 texName = gGL.getTexUnit(texUnit)->getCurrTexture();
+    // <FS:Luna Witch> Replace whatever was counted for this texture before
     U64 size = LLImageGL::dataFormatBytes(intformat, width, height);
     size *= count;
-
-    llassert(size >= 0);
-
-    sTexMemMutex.lock();
-
-    // it is a precondition that no existing allocation exists for this texture
-    llassert(sTextureAllocs.find(texName) == sTextureAllocs.end());
-
-    sTextureAllocs[texName] = size;
-    sTextureBytes += size;
-
-    sTexMemMutex.unlock();
+    set_tex_bytes(bound_tex_name(), size, width, height);
+    // </FS:Luna Witch>
 }
+
+// <FS:Luna Witch>
+void LLImageGLMemory::add_tex_image(U32 width, U32 height, U32 intformat, U32 count)
+{
+    U64 size = LLImageGL::dataFormatBytes(intformat, width, height);
+    size *= count;
+    add_tex_bytes_to(bound_tex_name(), size, true);
+}
+
+void LLImageGLMemory::alloc_tex_bytes(U64 bytes, U32 width, U32 height)
+{
+    set_tex_bytes(bound_tex_name(), bytes, width, height);
+}
+
+void LLImageGLMemory::add_tex_bytes(U64 bytes)
+{
+    add_tex_bytes_to(bound_tex_name(), bytes, true);
+}
+
+void LLImageGLMemory::count_generated_mips(U32 texName)
+{
+    if (texName == 0)
+    {
+        texName = bound_tex_name();
+    }
+
+    LLMutexLock lock(&sTexMemMutex);
+    auto iter = sTextureAllocs.find(texName);
+    if (iter == sTextureAllocs.end() || iter->second.has_mips || !iter->second.width || !iter->second.height)
+    {
+        return; // not counted, or its mipmaps already are
+    }
+
+    TextureAlloc& alloc = iter->second;
+    const U64 base_texels = (U64)alloc.width * alloc.height;
+    U64 chain_texels = 0;
+    for (U32 w = alloc.width, h = alloc.height;; w = llmax(w / 2, 1U), h = llmax(h / 2, 1U))
+    {
+        chain_texels += (U64)w * h;
+        if (w == 1 && h == 1)
+        {
+            break;
+        }
+    }
+
+    const U64 with_mips = alloc.bytes * chain_texels / base_texels;
+    sTextureBytes += with_mips - alloc.bytes;
+    alloc.bytes = with_mips;
+    alloc.has_mips = true;
+}
+// </FS:Luna Witch>
 
 // track texture free on given texName
 void LLImageGLMemory::free_tex_image(U32 texName)
@@ -96,9 +178,14 @@ void LLImageGLMemory::free_tex_image(U32 texName)
     auto iter = sTextureAllocs.find(texName);
     if (iter != sTextureAllocs.end()) // sometimes a texName will be "freed" before allocated (e.g. first call to setManualImage for a given texName)
     {
-        llassert(iter->second <= sTextureBytes); // sTextureBytes MUST NOT go below zero
+        // <FS:Luna Witch>
+        //llassert(iter->second <= sTextureBytes); // sTextureBytes MUST NOT go below zero
+        //
+        //sTextureBytes -= iter->second;
+        llassert(iter->second.bytes <= sTextureBytes); // sTextureBytes MUST NOT go below zero
 
-        sTextureBytes -= iter->second;
+        sTextureBytes -= iter->second.bytes;
+        // </FS:Luna Witch>
 
         sTextureAllocs.erase(iter);
     }
@@ -798,6 +885,16 @@ bool LLImageGL::setImage(const U8* data_in, bool data_hasmips /* = false */, S32
                     GLsizei tex_size = (GLsizei)dataFormatBytes(mFormatPrimary, w, h);
                     glCompressedTexImage2D(mTarget, gl_level, mFormatPrimary, w, h, 0, tex_size, (GLvoid *)data_in);
                     stop_glerror();
+                    // <FS:Luna Witch> count compressed uploads too
+                    if (gl_level == 0)
+                    {
+                        alloc_tex_bytes(tex_size, w, h);
+                    }
+                    else
+                    {
+                        add_tex_bytes(tex_size);
+                    }
+                    // </FS:Luna Witch>
                 }
                 else
                 {
@@ -870,6 +967,7 @@ bool LLImageGL::setImage(const U8* data_in, bool data_hasmips /* = false */, S32
                         LL_PROFILE_GPU_ZONE("generate mip map");
                         glGenerateMipmap(mTarget);
                     }
+                    count_generated_mips(); // <FS:Luna Witch/> also made by GL_GENERATE_MIPMAP without the core profile
                     stop_glerror();
                 }
             }
@@ -1001,6 +1099,7 @@ bool LLImageGL::setImage(const U8* data_in, bool data_hasmips /* = false */, S32
             GLsizei tex_size = (GLsizei)dataFormatBytes(mFormatPrimary, w, h);
             glCompressedTexImage2D(mTarget, 0, mFormatPrimary, w, h, 0, tex_size, (GLvoid *)data_in);
             stop_glerror();
+            alloc_tex_bytes(tex_size, w, h); // <FS:Luna Witch/> count compressed uploads too
         }
         else
         {
@@ -1466,7 +1565,15 @@ void LLImageGL::setManualImage(U32 target, S32 miplevel, S32 intformat, S32 widt
         LL_PROFILE_ZONE_NUM(width);
         LL_PROFILE_ZONE_NUM(height);
 
-        free_cur_tex_image();
+        // <FS:Luna Witch> Mipmap levels and cube map faces after the first add to the texture's count
+        //free_cur_tex_image();
+        const bool first_image = miplevel == 0 &&
+            !(target > GL_TEXTURE_CUBE_MAP_POSITIVE_X && target <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+        if (first_image)
+        {
+            free_cur_tex_image();
+        }
+        // </FS:Luna Witch>
         const bool use_sub_image = should_stagger_image_set(compress);
         if (!use_sub_image)
         {
@@ -1488,7 +1595,17 @@ void LLImageGL::setManualImage(U32 target, S32 miplevel, S32 intformat, S32 widt
                 sub_image_lines(target, miplevel, 0, 0, width, height, pixformat, pixtype, src, width);
             }
         }
-        alloc_tex_image(width, height, intformat, 1);
+        // <FS:Luna Witch>
+        //alloc_tex_image(width, height, intformat, 1);
+        if (first_image)
+        {
+            alloc_tex_image(width, height, intformat, 1);
+        }
+        else
+        {
+            add_tex_image(width, height, intformat, 1);
+        }
+        // </FS:Luna Witch>
     }
     stop_glerror();
 }
@@ -2515,6 +2632,7 @@ bool LLImageGL::scaleDown(S32 desired_discard)
                 LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("scaleDown - glGenerateMipmap");
                 gGL.getTexUnit(0)->bind(this);
                 glGenerateMipmap(mTarget);
+                count_generated_mips(); // <FS:Luna Witch/>
                 gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
             }
         }
@@ -2560,6 +2678,7 @@ bool LLImageGL::scaleDown(S32 desired_discard)
         {
             LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("scaleDown - glGenerateMipmap");
             glGenerateMipmap(mTarget);
+            count_generated_mips(); // <FS:Luna Witch/>
         }
 
         gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);

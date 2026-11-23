@@ -180,6 +180,12 @@ void LLCubeMapArray::allocate(U32 resolution, U32 components, U32 count, bool us
     }
 
     alloc_tex_image(resolution, resolution, format, count * 6);
+    // <FS:Luna Witch> every mipmap level above was allocated too
+    if (use_mips)
+    {
+        count_generated_mips();
+    }
+    // </FS:Luna Witch>
 
     mImage->setAddressMode(LLTexUnit::TAM_CLAMP);
 

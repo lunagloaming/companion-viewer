@@ -975,6 +975,7 @@ void LLBumpImageList::onSourceUpdated(LLViewerTexture* src, EBumpEffect bump_cod
         // generate mipmap
         gGL.getTexUnit(0)->bind(bump);
         glGenerateMipmap(GL_TEXTURE_2D);
+        LLImageGLMemory::count_generated_mips(); // <FS:Luna Witch/>
         gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
     }
 
