@@ -86,6 +86,7 @@ void load_exr(const std::string& filename)
         free(out); // release memory of image data
 
         glGenerateMipmap(GL_TEXTURE_2D);
+        LLImageGLMemory::count_generated_mips(); // <FS:Luna Witch/>
 
         gGL.getTexUnit(0)->unbind(LLTexUnit::TT_TEXTURE);
 

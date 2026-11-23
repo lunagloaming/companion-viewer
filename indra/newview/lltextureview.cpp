@@ -551,9 +551,14 @@ void LLGLTexMemBar::draw()
    F64 raw_image_bytes_MB = raw_image_bytes / (1024.0 * 1024.0);
    F64 saved_raw_image_bytes_MB = saved_raw_image_bytes / (1024.0 * 1024.0);
    F64 aux_raw_image_bytes_MB = aux_raw_image_bytes / (1024.0 * 1024.0);
-   F64 texture_bytes_alloc = LLImageGL::getTextureBytesAllocated() / 1024.0 / 512.0;
-   F64 vertex_bytes_alloc = LLVertexBuffer::getBytesAllocated() / 1024.0 / 512.0;
-   F64 render_bytes_alloc = LLRenderTarget::sBytesAllocated / 1024.0 / 512.0;
+   // <FS:Luna Witch> Real megabytes: these were doubled as a guess
+   //F64 texture_bytes_alloc = LLImageGL::getTextureBytesAllocated() / 1024.0 / 512.0;
+   //F64 vertex_bytes_alloc = LLVertexBuffer::getBytesAllocated() / 1024.0 / 512.0;
+   //F64 render_bytes_alloc = LLRenderTarget::sBytesAllocated / 1024.0 / 512.0;
+   F64 texture_bytes_alloc = LLImageGL::getTextureBytesAllocated() / (1024.0 * 1024.0);
+   F64 vertex_bytes_alloc = LLVertexBuffer::getBytesAllocated() / (1024.0 * 1024.0);
+   F64 render_bytes_alloc = LLRenderTarget::sBytesAllocated / (1024.0 * 1024.0);
+   // </FS:Luna Witch>
 
     //----------------------------------------------------------------------------
     LLGLSUIDefault gls_ui;
@@ -585,11 +590,19 @@ void LLGLTexMemBar::draw()
     gGL.color4f(0.f, 0.f, 0.f, 0.25f);
     gl_rect_2d(-10, getRect().getHeight() + line_height*2 + 1, getRect().getWidth()+2, getRect().getHeight()+2);
 
-    text = llformat("Est. Free: %d MB Sys Free: %d MB GL Tex: %d MB FBO: %d MB Probe#: %d Probe Mem: %d MB Bias: %.2f Cache: %.1f/%.1f MB",
-                    (S32)LLViewerTexture::sFreeVRAMMegabytes,
+    // <FS:Luna Witch> Budget, what is used of it, and what the card has free
+    //text = llformat("Est. Free: %d MB Sys Free: %d MB GL Tex: %d MB FBO: %d MB Probe#: %d Probe Mem: %d MB Bias: %.2f Cache: %.1f/%.1f MB",
+    //                (S32)LLViewerTexture::sFreeVRAMMegabytes,
+    const S32 card_free_mb = gGLManager.getFreeVRAMMB();
+    const S32 budget_used_mb = (S32)(texture_bytes_alloc + vertex_bytes_alloc);
+    text = llformat("Budget: %d MB Used: %d MB Card free: %s Sys Free: %d MB GL Tex: %d MB FBO: %d MB Probe#: %d Probe Mem: %d MB Bias: %.2f Cache: %.1f/%.1f MB",
+                    (S32)LLViewerTexture::sTargetVRAMMegabytes,
+                    budget_used_mb,
+                    card_free_mb >= 0 ? llformat("%d MB", card_free_mb).c_str() : "?",
+    // </FS:Luna Witch>
                     LLMemory::getAvailableMemKB()/1024,
-                    LLImageGL::getTextureBytesAllocated() / 1024 / 1024,
-                    LLRenderTarget::sBytesAllocated/(1024*1024),
+                    (S32)(LLImageGL::getTextureBytesAllocated() / 1024 / 1024),
+                    (S32)(LLRenderTarget::sBytesAllocated/(1024*1024)),
                     gPipeline.mReflectionMapManager.probeCount(),
                     gPipeline.mReflectionMapManager.probeMemory(),
                     discard_bias,
@@ -623,15 +636,35 @@ void LLGLTexMemBar::draw()
     gGL.color4f(0.5f, 0.5f, 0.5f, 0.75f);
     gl_rect_2d(left, top, right, bottom);
 
-    U32 gpu_used = gGLManager.mVRAM - (S32)LLViewerTexture::sFreeVRAMMegabytes;
-    color = (gpu_used < (U32)llfloor(gGLManager.mVRAM * 0.85f)) ? LLColor4::green :
-        (gpu_used < gGLManager.mVRAM) ? LLColor4::yellow : LLColor4::red;
+    // <FS:Luna Witch> What is used against the budget. "Est. Free" was measured against the budget, not the
+    // card, so "card size - Est. Free" showed memory nobody was using.
+    //U32 gpu_used = gGLManager.mVRAM - (S32)LLViewerTexture::sFreeVRAMMegabytes;
+    //color = (gpu_used < (U32)llfloor(gGLManager.mVRAM * 0.85f)) ? LLColor4::green :
+    //    (gpu_used < gGLManager.mVRAM) ? LLColor4::yellow : LLColor4::red;
+    //color[VALPHA] = .75f;
+    //
+    //bar_scale = (F32)bar_width / gGLManager.mVRAM;
+    //right = left + llfloor(gpu_used * bar_scale);
+    //
+    //gl_rect_2d(left, top, right, bottom, color);
+    const F32 budget_mb = llmax(LLViewerTexture::sTargetVRAMMegabytes, 1.f);
+    color = (budget_used_mb < budget_mb * 0.85f) ? LLColor4::green :
+        (budget_used_mb < budget_mb) ? LLColor4::yellow : LLColor4::red;
     color[VALPHA] = .75f;
 
-    bar_scale = (F32)bar_width / gGLManager.mVRAM;
-    right = left + llfloor(gpu_used * bar_scale);
+    bar_scale = (F32)bar_width / budget_mb;
+    right = left + llmin(llfloor(budget_used_mb * bar_scale), bar_width);
 
     gl_rect_2d(left, top, right, bottom, color);
+
+    // A white mark for what the whole card uses, scaled to the card
+    if (card_free_mb >= 0 && gGLManager.mVRAM > 0)
+    {
+        const S32 card_used_mb = llmax((S32)gGLManager.mVRAM - card_free_mb, 0);
+        const S32 mark = left + llmin(llfloor((F32)card_used_mb * bar_width / gGLManager.mVRAM), bar_width);
+        gl_rect_2d(mark - 1, top + 2, mark + 1, bottom - 2, LLColor4::white);
+    }
+    // </FS:Luna Witch>
     // </FS:Ansariel>
     // <FS:Beq> Texture cache bars
     bar_left = left + bar_width + bar_space;
