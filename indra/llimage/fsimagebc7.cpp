@@ -45,10 +45,17 @@ namespace
 {
     // A block is off when a channel of a texel is more than this far from its source...
     constexpr S32 MAX_CHANNEL_ERROR = 32;
-    // ...or when the block's squared error is above that of 8 levels on every channel of every texel.
+    // ...or when the block's squared error is above that of 8 levels on every channel of every texel...
     constexpr U32 MAX_BLOCK_SQUARED_ERROR = 8 * 8 * 16 * 4;
-    // A texture stays uncompressed when more than this share of its blocks (all levels) are off.
+    // ...or when a texel with alpha 0 or 255 moves further than this from it.
+    constexpr S32 MAX_ALPHA_END_ERROR = 4;
+    // A texture stays uncompressed when more than this share of its blocks (all levels) are off...
     constexpr F32 MAX_BAD_BLOCK_SHARE = 0.01f;
+    // ...or when any texel with alpha 0 or 255 moves further than this: past an alpha mask's cutoff it
+    // would be a hole or a speck, and in blending a visible haze where the texture is clear.
+    constexpr S32 MAX_ALPHA_END_SPECK = 32;
+    // Alpha weighs this much more than a colour channel in the encoder, for textures with alpha
+    constexpr U32 ALPHA_WEIGHT = 4;
 
     std::atomic<U32> sCompressed{ 0 };
     std::atomic<U32> sRejected{ 0 };
@@ -88,6 +95,49 @@ namespace
     U64 blocks_in(U32 width, U32 height)
     {
         return (U64)((width + 3) / 4) * ((height + 3) / 4);
+    }
+
+    struct BlockCheck
+    {
+        bool off = false;   // counts against MAX_BAD_BLOCK_SHARE
+        bool speck = false; // rejects the texture
+    };
+
+    // Compares a decoded block with its source texels; texels past the level's edge are padding.
+    // Colour where the source is fully transparent can't be seen and isn't compared; nor is alpha in
+    // an opaque texture, which is sampled as exactly 1.
+    BlockCheck check_block(const U8* block, const U8* source, U32 valid_x, U32 valid_y, bool opaque)
+    {
+        bc7decomp::color_rgba decoded[16];
+        bc7decomp::unpack_bc7(block, decoded);
+
+        BlockCheck check;
+        S32 max_error = 0;
+        U32 squared_error = 0;
+        for (U32 py = 0; py < valid_y; ++py)
+        {
+            for (U32 px = 0; px < valid_x; ++px)
+            {
+                const U32 i = py * 4 + px;
+                const U8 source_alpha = source[i * 4 + 3];
+                const S32 first = (!opaque && source_alpha == 0) ? 3 : 0;
+                const S32 last = opaque ? 3 : 4;
+                for (S32 c = first; c < last; ++c)
+                {
+                    const S32 error = std::abs((S32)decoded[i].m_comps[c] - (S32)source[i * 4 + c]);
+                    max_error = llmax(max_error, error);
+                    squared_error += (U32)(error * error);
+                }
+                if (!opaque && (source_alpha == 0 || source_alpha == 255))
+                {
+                    const S32 error = std::abs((S32)decoded[i].m_comps[3] - (S32)source_alpha);
+                    check.off |= error > MAX_ALPHA_END_ERROR;
+                    check.speck |= error > MAX_ALPHA_END_SPECK;
+                }
+            }
+        }
+        check.off |= max_error > MAX_CHANNEL_ERROR || squared_error > MAX_BLOCK_SQUARED_ERROR;
+        return check;
     }
 }
 
@@ -135,22 +185,32 @@ LLPointer<FSImageBC7> FSImageBC7::compress(const LLImageRaw* raw)
     std::call_once(sEncoderInit, bc7enc_compress_block_init);
     const auto start = std::chrono::steady_clock::now();
 
-    // Linear weights: these textures hold colours, normals and masks alike, and the check below
-    // measures each channel on its own.
-    bc7enc_compress_block_params params;
-    bc7enc_compress_block_params_init(&params);
-    bc7enc_compress_block_params_init_linear_weights(&params);
-
-    // Level 0 as RGBA8; RGB gets an opaque alpha, which the check then requires exactly.
+    // Level 0 as RGBA8; RGB gets an opaque alpha
     std::vector<U8> pixels((size_t)width * height * 4);
     const U8* src = raw->getData();
+    bool opaque = true;
     for (size_t i = 0, n = (size_t)width * height; i < n; ++i)
     {
         pixels[i * 4 + 0] = src[i * components + 0];
         pixels[i * 4 + 1] = src[i * components + 1];
         pixels[i * 4 + 2] = src[i * components + 2];
         pixels[i * 4 + 3] = components == 4 ? src[i * components + 3] : 255;
+        opaque &= pixels[i * 4 + 3] == 255;
     }
+
+    // Linear weights: these textures hold colours, normals and masks alike, and the check measures
+    // each channel on its own. Each block is first encoded quickly, with mode 6 (and mode 5 for alpha):
+    // most pass the check. Only blocks that don't are encoded again with every mode and partition.
+    bc7enc_compress_block_params full;
+    bc7enc_compress_block_params_init(&full);
+    bc7enc_compress_block_params_init_linear_weights(&full);
+    if (!opaque)
+    {
+        full.m_weights[3] = ALPHA_WEIGHT;
+    }
+    bc7enc_compress_block_params quick = full;
+    quick.m_mode_mask = (1 << 6) | (1 << 5);
+    quick.m_max_partitions = 0;
 
     U64 total_blocks = 0;
     for (U32 w = width, h = height;; w = llmax(w / 2, 1U), h = llmax(h / 2, 1U))
@@ -165,12 +225,13 @@ LLPointer<FSImageBC7> FSImageBC7::compress(const LLImageRaw* raw)
 
     LLPointer<FSImageBC7> image = new FSImageBC7;
     image->mSourceComponents = components;
+    image->mOpaque = opaque;
     U64 source_bytes = 0;
     U64 bad_blocks = 0;
-    bool alpha_harmed = false;
+    bool specks = false;
     std::vector<U8> next;
 
-    while (!alpha_harmed && bad_blocks <= allowed_bad_blocks)
+    while (!specks && bad_blocks <= allowed_bad_blocks)
     {
         Level level;
         level.width = width;
@@ -180,7 +241,7 @@ LLPointer<FSImageBC7> FSImageBC7::compress(const LLImageRaw* raw)
         level.blocks.resize((size_t)blocks_x * blocks_y * 16);
         source_bytes += (U64)width * height * components;
 
-        for (U32 by = 0; by < blocks_y && !alpha_harmed && bad_blocks <= allowed_bad_blocks; ++by)
+        for (U32 by = 0; by < blocks_y && !specks && bad_blocks <= allowed_bad_blocks; ++by)
         {
             for (U32 bx = 0; bx < blocks_x; ++bx)
             {
@@ -197,42 +258,22 @@ LLPointer<FSImageBC7> FSImageBC7::compress(const LLImageRaw* raw)
                 }
 
                 U8* block = &level.blocks[((size_t)by * blocks_x + bx) * 16];
-                bc7enc_compress_block(block, block_pixels, &params);
-
-                bc7decomp::color_rgba decoded[16];
-                bc7decomp::unpack_bc7(block, decoded);
-
-                S32 max_error = 0;
-                U32 squared_error = 0;
-                for (U32 py = 0; py < 4; ++py)
+                const U32 valid_x = llmin(width - bx * 4, 4U);
+                const U32 valid_y = llmin(height - by * 4, 4U);
+                bc7enc_compress_block(block, block_pixels, &quick);
+                BlockCheck check = check_block(block, block_pixels, valid_x, valid_y, opaque);
+                if (check.off)
                 {
-                    for (U32 px = 0; px < 4; ++px)
-                    {
-                        if (bx * 4 + px >= width || by * 4 + py >= height)
-                        {
-                            continue; // padding
-                        }
-                        const U32 i = py * 4 + px;
-                        for (S32 c = 0; c < 4; ++c)
-                        {
-                            const S32 error = std::abs((S32)decoded[i].m_comps[c] - (S32)block_pixels[i * 4 + c]);
-                            max_error = llmax(max_error, error);
-                            squared_error += (U32)(error * error);
-                        }
-                        // A mask cutoff turns the smallest error at an alpha end into holes or specks
-                        const U8 source_alpha = block_pixels[i * 4 + 3];
-                        if ((source_alpha == 0 || source_alpha == 255) && decoded[i].m_comps[3] != source_alpha)
-                        {
-                            alpha_harmed = true;
-                        }
-                    }
+                    bc7enc_compress_block(block, block_pixels, &full);
+                    check = check_block(block, block_pixels, valid_x, valid_y, opaque);
                 }
-                if (max_error > MAX_CHANNEL_ERROR || squared_error > MAX_BLOCK_SQUARED_ERROR)
+                if (check.off)
                 {
                     ++bad_blocks;
                 }
-                if (alpha_harmed)
+                if (check.speck)
                 {
+                    specks = true;
                     break;
                 }
             }
@@ -253,10 +294,10 @@ LLPointer<FSImageBC7> FSImageBC7::compress(const LLImageRaw* raw)
     const U64 microseconds = (U64)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - start).count();
     sMicroseconds += microseconds;
 
-    if (alpha_harmed || bad_blocks > allowed_bad_blocks)
+    if (specks || bad_blocks > allowed_bad_blocks)
     {
         ++sRejected;
-        if (alpha_harmed)
+        if (specks)
         {
             ++sRejectedAlpha;
         }

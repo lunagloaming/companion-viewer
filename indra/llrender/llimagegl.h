@@ -264,6 +264,7 @@ private:
     bool scaleDownBC7(S32 desired_discard);
     LLPointer<FSImageBC7> mPendingBC7; // handed over by createGLTexture for the next setImage
     bool mIsBC7 = false;
+    bool mBC7AlphaIsOne = false; // an opaque BC7 texture: its alpha is sampled as 1 (GL_TEXTURE_SWIZZLE_A)
     U32 mBC7Format = 0;
 private:
     // </FS:Luna Witch>
