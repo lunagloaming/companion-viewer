@@ -722,7 +722,9 @@ U32Megabytes getFreeCommitMemory()
 // <FS:Luna Witch> Linux memory pressure (PSI). With compressed swap such as zram, free memory can look
 // fine while the system is thrashing, so also look at how much time tasks are stalled waiting on memory.
 #if LL_LINUX
-// Returns the "some avg10" percentage from /proc/pressure/memory, or a negative value if unavailable.
+// Returns the "some avg60" percentage from /proc/pressure/memory, or a negative value if unavailable.
+// The one-minute average: "some avg10" hovered around the threshold (2.09%, 1.71%, 2.08% within seconds)
+// and every crossing blurred the textures in view.
 F32 get_linux_memory_pressure()
 {
     static LLFrameTimer timer;
@@ -741,9 +743,10 @@ F32 get_linux_memory_pressure()
     if (LLFILE* fp = LLFile::fopen("/proc/pressure/memory", "r"))
     {
         F32 avg10 = 0.f;
-        if (fscanf(fp, "some avg10=%f", &avg10) == 1)
+        F32 avg60 = 0.f;
+        if (fscanf(fp, "some avg10=%f avg60=%f", &avg10, &avg60) == 2)
         {
-            pressure_res = avg10;
+            pressure_res = avg60;
         }
         LLFile::close(fp);
     }
@@ -758,14 +761,16 @@ F32 get_linux_memory_pressure_threshold()
 
 bool is_linux_memory_pressure_high()
 {
+    // High above the threshold, and stays high until it falls below half of it
     static bool was_high = false;
     const F32 threshold = get_linux_memory_pressure_threshold();
     const F32 pressure = get_linux_memory_pressure();
-    const bool is_high = threshold > 0.f && pressure > threshold;
+    const bool is_high = threshold > 0.f && (was_high ? pressure >= threshold * 0.5f : pressure > threshold);
     if (is_high != was_high)
     {
-        LL_INFOS("TextureMemory") << "Linux memory pressure " << (is_high ? "high" : "back below threshold") << ": some avg10="
-                                  << pressure << "% (threshold " << threshold << "%)" << LL_ENDL;
+        LL_INFOS("TextureMemory") << "Linux memory pressure " << (is_high ? "high" : "back down") << ": some avg60="
+                                  << pressure << "% (high above " << threshold << "%, back down below "
+                                  << threshold * 0.5f << "%)" << LL_ENDL;
         was_high = is_high;
     }
     return is_high;
