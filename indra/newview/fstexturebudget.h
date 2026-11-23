@@ -59,6 +59,7 @@ namespace FSTextureBudget
         int card_free_mb = -1;        // free on the card as the driver says, -1 if unknown
         int evictions = -1;           // NVIDIA eviction count, -1 if unknown
         float system_cap_mb = 0.f;    // cap while system memory is low, 0 if none
+        float system_limit_mb = 0.f;  // what system memory allows (used + available - reserve), 0 if not checked
     };
 
     // Once a second from LLViewerTexture::updateClass: returns the bias to use. Logs changes, and a

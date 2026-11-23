@@ -175,7 +175,9 @@ F32 FSTextureBudget::chooseBias(F32 current_bias, const Inputs& in)
                                   << "): would need " << (S32)predicted_mb[current] << " MB at " << BIASES[current]
                                   << ", " << (S32)predicted_mb[chosen] << " MB at " << BIASES[chosen]
                                   << "; target " << (S32)in.target_mb << " MB, using " << (S32)in.used_mb << " MB"
-                                  << (in.system_cap_mb > 0.f ? " (capped for low system memory)" : "") << LL_ENDL;
+                                  << (in.system_cap_mb > 0.f ? " (capped for low system memory)"
+                                      : in.system_limit_mb > 0.f && in.target_mb >= in.system_limit_mb ? " (limited by system memory)"
+                                                                                                        : "") << LL_ENDL;
     }
 
     static LLFrameTimer summary_timer;
@@ -186,7 +188,8 @@ F32 FSTextureBudget::chooseBias(F32 current_bias, const Inputs& in)
                                   << "), vertex buffers " << (S32)in.vertex_mb << " MB; target " << (S32)in.target_mb
                                   << " MB; bias " << BIASES[chosen] << ", predicted " << (S32)predicted_mb[chosen]
                                   << " MB; card free " << in.card_free_mb << " MB, evictions " << in.evictions
-                                  << "; system memory cap " << (S32)in.system_cap_mb << " MB; last minute: "
+                                  << "; system memory allows " << (S32)in.system_limit_mb << " MB, low-memory cap "
+                                  << (S32)in.system_cap_mb << " MB; last minute: "
                                   << sBiasChanges << " bias changes, " << sShrunkInView
                                   << " textures shrunk while on screen" << LL_ENDL;
         const FSImageBC7::Stats bc7 = FSImageBC7::takeStats();
