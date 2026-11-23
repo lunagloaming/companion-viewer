@@ -240,6 +240,7 @@ public:
 
     // estimated free memory for textures, by bias calculation
     static F32 sFreeVRAMMegabytes;
+    static F32 sTargetVRAMMegabytes; // <FS:Luna Witch/> what textures and vertex buffers may use
 
     enum EDebugTexels
     {
@@ -431,6 +432,25 @@ public:
     std::map<std::string,std::string> mComment;
     // </FS:Techwolf Lupindo>
 
+    // <FS:Luna Witch> Texture memory budget (fstexturebudget.h)
+    // What the faces ask of this texture before the discard bias, as recorded by
+    // LLViewerTextureList::updateImageDecodePriority.
+    F32 mWantedOffScreen = 0.f;         // largest size asked by a face off screen
+    F32 mWantedOnScreen = 0.f;          // largest size asked by a face on screen of little importance to the camera
+    F32 mWantedOnScreenImportant = 0.f; // largest size asked by a face on screen of importance 0.2 or more
+    bool mWantedInView = false;         // any face on screen
+    bool mWantedFixed = true;           // not changed by the bias (boosted, or on too many faces to check)
+    // Bytes this texture would take at each candidate bias, and takes now, in KB, as last added to the budget's totals
+    U32 mBudgetPredictedKB[7] = {};
+    U32 mBudgetCurrentKB = 0;
+    bool mInBudgetTotals = false;
+    // Bytes this texture takes on the GPU now, mipmaps included
+    U64 currentGPUBytes() const;
+    // Bytes it would take at each of count discard biases, mipmaps included. Fetched textures that are not
+    // LOD textures keep their size.
+    virtual void predictGPUBytes(const F32* biases, S32 count, U64* bytes) const;
+    // </FS:Luna Witch>
+
 protected:
     S32 getCurrentDiscardLevelForFetching() ;
 public: // <FS:Ansariel> Needed for texture refresh
@@ -560,8 +580,17 @@ public:
 
     bool scaleDown() override;
 
+    void predictGPUBytes(const F32* biases, S32 count, U64* bytes) const override; // <FS:Luna Witch/>
+
 private:
     void init(bool firstinit) ;
+
+    // <FS:Luna Witch> Shared by processTextureStats and predictGPUBytes
+    F32 maxTextureResolution() const;
+    // The discard level wanted when the image has 4^levels texels for each one asked (levels = log4(texels / size))
+    S32 discardFromLevels(F32 levels, F32 max_tex_res) const;
+    U64 bytesAtDiscard(S32 discard) const;
+    // </FS:Luna Witch>
 };
 
 //

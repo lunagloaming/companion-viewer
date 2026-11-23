@@ -135,6 +135,12 @@ public:
     std::string mGLVersionString;
 
     U32 mVRAM; // VRAM in MB
+    // <FS:Luna Witch> What the driver says is free on the card right now, in MB, or -1 if it can't say
+    // (NVIDIA: GL_NVX_gpu_memory_info; Mesa: GL_ATI_meminfo). Asked at most once a second; GL thread only.
+    S32 getFreeVRAMMB();
+    // How many times the NVIDIA driver has moved video memory out to system memory, or -1 if unknown
+    S32 getVRAMEvictionCount();
+    // </FS:Luna Witch>
     S32 mVRAMDetected; // <FS:Beq/> The amount detected/reported by the OS/Drivers. If different to mVRAM there is an override in place.
     std::string getGLInfoString();
     void printGLInfoString();

@@ -44,6 +44,7 @@
 #include "m4math.h"
 #include "llstring.h"
 #include "llstacktrace.h"
+#include "lltimer.h" // <FS:Luna Witch/>
 
 #include "llglheaders.h"
 #include "llglslshader.h"
@@ -1447,6 +1448,57 @@ std::string LLGLManager::getGLInfoString()
 
     return info_str;
 }
+
+// <FS:Luna Witch> Free video memory as the driver reports it
+static void update_vram_info(S32& free_mb, S32& evictions)
+{
+    static LLTimer timer;
+    static bool first = true;
+    static S32 cached_free_mb = -1;
+    static S32 cached_evictions = -1;
+
+    if (first || timer.getElapsedTimeF32() >= 1.f)
+    {
+        first = false;
+        timer.reset();
+        cached_free_mb = -1;
+        cached_evictions = -1;
+        if (gGLManager.mHasNVXGpuMemoryInfo)
+        {
+            GLint available_kb = 0;
+            GLint eviction_count = 0;
+            glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &available_kb);
+            glGetIntegerv(GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX, &eviction_count);
+            cached_free_mb = available_kb / 1024;
+            cached_evictions = eviction_count;
+        }
+        else if (gGLManager.mHasATIMemInfo)
+        {
+            // free memory in KB, largest free block, then the same for auxiliary (system) memory
+            GLint meminfo[4] = { 0, 0, 0, 0 };
+            glGetIntegerv(GL_TEXTURE_FREE_MEMORY_ATI, meminfo);
+            cached_free_mb = meminfo[0] / 1024;
+        }
+    }
+
+    free_mb = cached_free_mb;
+    evictions = cached_evictions;
+}
+
+S32 LLGLManager::getFreeVRAMMB()
+{
+    S32 free_mb, evictions;
+    update_vram_info(free_mb, evictions);
+    return free_mb;
+}
+
+S32 LLGLManager::getVRAMEvictionCount()
+{
+    S32 free_mb, evictions;
+    update_vram_info(free_mb, evictions);
+    return evictions;
+}
+// </FS:Luna Witch>
 
 void LLGLManager::printGLInfoString()
 {

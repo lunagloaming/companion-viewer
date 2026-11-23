@@ -192,6 +192,7 @@ set(viewer_SOURCE_FILES
     fsscriptlibrary.cpp
     fsscrolllistctrl.cpp
     fsslurlcommand.cpp
+    fstexturebudget.cpp
     fsvirtualtrackpad.cpp
     fsworldmapmessage.cpp
     lggbeamcolormapfloater.cpp
@@ -1069,6 +1070,7 @@ set(viewer_HEADER_FILES
     fsscrolllistctrl.h
     fsslurl.h
     fsslurlcommand.h
+    fstexturebudget.h
     fsvirtualtrackpad.h
     fsworldmapmessage.h
     lggbeamcolormapfloater.h

@@ -64,6 +64,8 @@
 #include "llviewerwindow.h"
 #include "llwindow.h"
 #include "fsinstanceslots.h" // <FS:Luna Witch/>
+#include "fstexturebudget.h" // <FS:Luna Witch/>
+#include "llrendertarget.h" // <FS:Luna Witch/>
 ///////////////////////////////////////////////////////////////////////////////
 
 // statics
@@ -107,6 +109,7 @@ F32 LLViewerTexture::sCurrentTime = 0.0f;
 constexpr F32 MEMORY_CHECK_WAIT_TIME = 1.0f;
 //constexpr F32 MIN_VRAM_BUDGET = 768.f; // <FS:Ansariel> Expose max texture VRAM setting
 F32 LLViewerTexture::sFreeVRAMMegabytes = MIN_VRAM_BUDGET;
+F32 LLViewerTexture::sTargetVRAMMegabytes = MIN_VRAM_BUDGET; // <FS:Luna Witch/>
 
 LLViewerTexture::EDebugTexels LLViewerTexture::sDebugTexelsMode = LLViewerTexture::DEBUG_TEXELS_OFF;
 
@@ -520,6 +523,14 @@ void LLViewerTexture::updateClass()
     static LLCachedControl<U32> max_vram_budget(gSavedSettings, "RenderMaxVRAMBudget", 0);
     static LLCachedControl<bool> max_vram_budget_enabled(gSavedSettings, "FSLimitTextureVRAMUsage"); // <FS:Ansariel> Expose max texture VRAM setting
 
+    // <FS:Luna Witch> Texture memory budget (fstexturebudget.h). Replaced below:
+    // - used memory was doubled as a guess ("our metrics miss about half"); textures are now counted with
+    //   their mipmaps, cube map faces and compressed uploads, and nothing is doubled
+    // - the budget is taken from what the card has free, when the driver says
+    // - the bias was raised a little every frame while over budget and lowered while under, so it overshot
+    //   and kept swinging; it is now chosen once a second from what the textures in view would need
+    // - low system memory no longer slams the bias up: it caps the budget
+#if 0
     F64 texture_bytes_alloc = LLImageGL::getTextureBytesAllocated() / 1024.0 / 512.0;
     F64 vertex_bytes_alloc = LLVertexBuffer::getBytesAllocated() / 1024.0 / 512.0;
 
@@ -617,6 +628,101 @@ void LLViewerTexture::updateClass()
         }
     }
 
+#endif
+    static LLCachedControl<bool> budget_from_card(gSavedSettings, "FSTextureBudgetFromCard", true);
+    static LLCachedControl<U32> vram_reserve(gSavedSettings, "FSTextureVRAMReserve", 1024);
+
+    constexpr F64 BYTES_TO_MB = 1024.0 * 1024.0;
+    const F64 texture_mb = LLImageGL::getTextureBytesAllocated() / BYTES_TO_MB;
+    const F64 vertex_mb = LLVertexBuffer::getBytesAllocated() / BYTES_TO_MB;
+    const F32 used = (F32)(texture_mb + vertex_mb);
+
+    // Leave room for overshoot when the scene changes: 20%, or 512 MB of larger budgets
+    auto target_for = [](F32 budget) { return llmax(llmin(budget - 512.f, budget * 0.8f), MIN_VRAM_BUDGET); };
+
+    // A budget set by hand, or the whole card shared by the divisor
+    const F32 ceiling = !max_vram_budget_enabled ? llmax(1024.f, (F32)gGLManager.mVRAM / (tex_vram_divisor() > 0.f ? tex_vram_divisor() : 1.f))
+                                                 : (F32)max_vram_budget;
+    // An automatic budget is shared with the other running viewer instances (FSInstanceSlots)
+    const F32 instance_count = !max_vram_budget_enabled ? (F32)llmax(FSInstanceSlots::instance().getActiveInstanceCount(), 1) : 1.f;
+    F32 target = target_for(ceiling / instance_count);
+    S32 card_free_mb = -1;
+    S32 evictions = -1;
+    if (!max_vram_budget_enabled && budget_from_card)
+    {
+        card_free_mb = gGLManager.getFreeVRAMMB();
+        evictions = gGLManager.getVRAMEvictionCount();
+        if (card_free_mb >= 0)
+        {
+            // What this viewer uses plus what is free, less a reserve for the desktop, other programs and what
+            // isn't counted. Never less than an even share of the card, with other programs counted as one
+            // more viewer, so a viewer that has taken more gives memory back as another one grows.
+            const F32 live = used + (F32)card_free_mb - (F32)vram_reserve();
+            target = llclamp(live, target_for(ceiling / (instance_count + 1.f)), target_for(ceiling));
+        }
+    }
+
+    // The NVIDIA driver moving video memory out to system memory means the card is overcommitted
+    static S32 last_evictions = -1;
+    if (evictions > last_evictions && last_evictions >= 0)
+    {
+        LL_INFOS("TextureMemory") << "The driver moved video memory out to system memory (" << (evictions - last_evictions)
+                                  << " evictions): textures held to " << (S32)(used * 0.9f) << " MB" << LL_ENDL;
+        target = llmin(target, llmax(used * 0.9f, MIN_VRAM_BUDGET));
+    }
+    last_evictions = evictions;
+
+    // Low system memory caps the budget below what is used, and again if it stays low. The cap is lifted
+    // once memory has recovered for a while; the 90% rule then decides when textures sharpen again.
+    constexpr F32 SYSTEM_CAP_SHARE = 0.8f;
+    constexpr F32 SYSTEM_CAP_TIGHTEN_SECS = 10.f;
+    constexpr F32 SYSTEM_CAP_LIFT_SECS = 30.f;
+    static F32 system_cap = 0.f;
+    static LLFrameTimer system_cap_timer;
+    static LLFrameTimer system_recovered_timer;
+    const bool is_sys_low = isSystemMemoryLow();
+    if (is_sys_low)
+    {
+        if (system_cap <= 0.f)
+        {
+            system_cap = llmax(used * SYSTEM_CAP_SHARE, MIN_VRAM_BUDGET);
+            system_cap_timer.reset();
+            LL_WARNS() << "Low system memory detected, emergency downrezzing off screen textures" << LL_ENDL;
+            LL_INFOS("TextureMemory") << "Low system memory: textures held to " << (S32)system_cap << " MB" << LL_ENDL;
+            for (auto& image : gTextureList)
+            {
+                gTextureList.updateImageDecodePriority(image, false /*will modify gTextureList otherwise!*/);
+            }
+        }
+        else if (system_cap_timer.getElapsedTimeF32() > SYSTEM_CAP_TIGHTEN_SECS && system_cap > MIN_VRAM_BUDGET)
+        {
+            system_cap = llmax(llmin(system_cap, used) * SYSTEM_CAP_SHARE, MIN_VRAM_BUDGET);
+            system_cap_timer.reset();
+            LL_INFOS("TextureMemory") << "System memory still low: textures held to " << (S32)system_cap << " MB" << LL_ENDL;
+        }
+        system_recovered_timer.reset();
+    }
+    else if (system_cap > 0.f)
+    {
+        if (!isSystemMemoryRecovered())
+        {
+            system_recovered_timer.reset();
+        }
+        else if (system_recovered_timer.getElapsedTimeF32() > SYSTEM_CAP_LIFT_SECS)
+        {
+            LL_INFOS("TextureMemory") << "System memory recovered: texture cap lifted" << LL_ENDL;
+            system_cap = 0.f;
+        }
+    }
+    if (system_cap > 0.f)
+    {
+        target = llmin(target, system_cap);
+    }
+
+    sFreeVRAMMegabytes = llmax(target - used, 0.f);
+    sTargetVRAMMegabytes = target;
+    // </FS:Luna Witch>
+
     // set to max discard bias if the window has been backgrounded for a while
     static F32 last_desired_discard_bias = 1.f;
     static F32 last_texture_update_count_bias = 1.f;
@@ -625,8 +731,14 @@ void LLViewerTexture::updateClass()
     static LLCachedControl<F32> minimized_discard_time(gSavedSettings, "TextureDiscardMinimizedTime", 1.f);
     static LLCachedControl<F32> backgrounded_discard_time(gSavedSettings, "TextureDiscardBackgroundedTime", 60.f);
 
-    bool in_background = (gViewerWindow && !gViewerWindow->getWindow()->getVisible()) || !gFocusMgr.getAppHasFocus();
-    bool is_minimized  = gViewerWindow && gViewerWindow->getWindow()->getMinimized() && in_background;
+    // <FS:Luna Witch> Only a minimized or hidden viewer frees its textures. A visible window without focus did too,
+    // so watching one viewer while using another blurred every texture and sharpened them all again later.
+    // With the budget taken from the card, another viewer that needs the memory gets it anyway.
+    //bool in_background = (gViewerWindow && !gViewerWindow->getWindow()->getVisible()) || !gFocusMgr.getAppHasFocus();
+    //bool is_minimized  = gViewerWindow && gViewerWindow->getWindow()->getMinimized() && in_background;
+    bool is_minimized  = gViewerWindow && gViewerWindow->getWindow()->getMinimized();
+    bool in_background = (gViewerWindow && !gViewerWindow->getWindow()->getVisible()) || is_minimized;
+    // </FS:Luna Witch>
     if (in_background)
     {
         F32 discard_time = is_minimized ? minimized_discard_time : backgrounded_discard_time;
@@ -653,6 +765,24 @@ void LLViewerTexture::updateClass()
             sDesiredDiscardBias = last_desired_discard_bias;
         }
     }
+
+    // <FS:Luna Witch> Choose the bias from what the textures in view would need (fstexturebudget.h)
+    static LLFrameTimer budget_timer;
+    if (!was_backgrounded && budget_timer.getElapsedTimeF32() > MEMORY_CHECK_WAIT_TIME)
+    {
+        budget_timer.reset();
+        FSTextureBudget::Inputs inputs;
+        inputs.target_mb = target;
+        inputs.used_mb = used;
+        inputs.texture_mb = (F32)texture_mb;
+        inputs.vertex_mb = (F32)vertex_mb;
+        inputs.render_target_mb = (F32)(LLRenderTarget::sBytesAllocated / BYTES_TO_MB);
+        inputs.card_free_mb = card_free_mb;
+        inputs.evictions = evictions;
+        inputs.system_cap_mb = system_cap;
+        sDesiredDiscardBias = FSTextureBudget::chooseBias(sDesiredDiscardBias, inputs);
+    }
+    // </FS:Luna Witch>
 
     sDesiredDiscardBias = llclamp(sDesiredDiscardBias, 1.f, 4.f);
     if (last_texture_update_count_bias < sDesiredDiscardBias)
@@ -1399,8 +1529,30 @@ LLViewerFetchedTexture::~LLViewerFetchedTexture()
     {
         LLAppViewer::getTextureFetch()->deleteRequest(getID(), true);
     }
+    FSTextureBudget::forget(this); // <FS:Luna Witch/>
     cleanup();
 }
+
+// <FS:Luna Witch> Texture memory budget (fstexturebudget.h)
+U64 LLViewerFetchedTexture::currentGPUBytes() const
+{
+    LLImageGL* image = getGLTexture();
+    if (!image || !image->getHasGLTexture())
+    {
+        return 0;
+    }
+    return (U64)image->getMipBytes();
+}
+
+void LLViewerFetchedTexture::predictGPUBytes(const F32* biases, S32 count, U64* bytes) const
+{
+    const U64 current = currentGPUBytes();
+    for (S32 i = 0; i < count; ++i)
+    {
+        bytes[i] = current;
+    }
+}
+// </FS:Luna Witch>
 
 //virtual
 S8 LLViewerFetchedTexture::getType() const
@@ -3266,15 +3418,22 @@ void LLViewerLODTexture::processTextureStats()
 
     static LLCachedControl<bool> textures_fullres(gSavedSettings,"TextureLoadFullRes", false);
 
-    F32 max_tex_res = MAX_IMAGE_SIZE_DEFAULT;
+    // <FS:Luna Witch> The limit is shared with predictGPUBytes
+    //F32 max_tex_res = MAX_IMAGE_SIZE_DEFAULT;
+    //if (mBoostLevel < LLGLTexture::BOOST_HIGH)
+    //{
+    //    // restrict texture resolution to download based on RenderMaxTextureResolution
+    //    static LLCachedControl<U32> max_texture_resolution(gSavedSettings, "RenderMaxTextureResolution", 2048);
+    //    // sanity clamp debug setting to avoid settings hack shenanigans
+    //    max_tex_res = (F32)llclamp((S32)max_texture_resolution, 512, MAX_IMAGE_SIZE_DEFAULT);
+    //    mMaxVirtualSize = llmin(mMaxVirtualSize, max_tex_res * max_tex_res);
+    //}
+    const F32 max_tex_res = maxTextureResolution();
     if (mBoostLevel < LLGLTexture::BOOST_HIGH)
     {
-        // restrict texture resolution to download based on RenderMaxTextureResolution
-        static LLCachedControl<U32> max_texture_resolution(gSavedSettings, "RenderMaxTextureResolution", 2048);
-        // sanity clamp debug setting to avoid settings hack shenanigans
-        max_tex_res = (F32)llclamp((S32)max_texture_resolution, 512, MAX_IMAGE_SIZE_DEFAULT);
         mMaxVirtualSize = llmin(mMaxVirtualSize, max_tex_res * max_tex_res);
     }
+    // </FS:Luna Witch>
 
     if (textures_fullres)
     {
@@ -3324,18 +3483,21 @@ void LLViewerLODTexture::processTextureStats()
             discard_level = (F32)(log(mTexelsPerImage / mMaxVirtualSize) / log_4);
         }
 
-        discard_level = floorf(discard_level);
-
-        F32 min_discard = 0.f;
-        if (mFullWidth > max_tex_res || mFullHeight > max_tex_res)
-            min_discard = 1.f;
-
-        discard_level = llclamp(discard_level, min_discard, (F32)MAX_DISCARD_LEVEL);
-
-        // Can't go higher than the max discard level
-        mDesiredDiscardLevel = llmin(getMaxDiscardLevel() + 1, (S32)discard_level);
-        // Clamp to min desired discard
-        mDesiredDiscardLevel = llmin(mMinDesiredDiscardLevel, mDesiredDiscardLevel);
+        // <FS:Luna Witch> Shared with predictGPUBytes
+        //discard_level = floorf(discard_level);
+        //
+        //F32 min_discard = 0.f;
+        //if (mFullWidth > max_tex_res || mFullHeight > max_tex_res)
+        //    min_discard = 1.f;
+        //
+        //discard_level = llclamp(discard_level, min_discard, (F32)MAX_DISCARD_LEVEL);
+        //
+        //// Can't go higher than the max discard level
+        //mDesiredDiscardLevel = llmin(getMaxDiscardLevel() + 1, (S32)discard_level);
+        //// Clamp to min desired discard
+        //mDesiredDiscardLevel = llmin(mMinDesiredDiscardLevel, mDesiredDiscardLevel);
+        mDesiredDiscardLevel = discardFromLevels(discard_level, max_tex_res);
+        // </FS:Luna Witch>
 
         //
         // At this point we've calculated the quality level that we want,
@@ -3346,8 +3508,19 @@ void LLViewerLODTexture::processTextureStats()
         S32 current_discard = getDiscardLevel();
         if (mBoostLevel < LLGLTexture::BOOST_AVATAR_BAKED)
         {
-            if (current_discard < mDesiredDiscardLevel && !mForceToSaveRawImage)
+            // <FS:Luna Witch> Shrink only when two levels finer than wanted (one when over the budget), so that
+            // small changes in size on screen don't shrink a texture and load it again, over and over
+            //if (current_discard < mDesiredDiscardLevel && !mForceToSaveRawImage)
+            const S32 shrink_slack = FSTextureBudget::isOverBudget() ? 1 : 2;
+            if (current_discard >= 0 && mDesiredDiscardLevel >= current_discard + shrink_slack && !mForceToSaveRawImage)
+            // </FS:Luna Witch>
             { // should scale down
+                // <FS:Luna Witch>
+                if (mWantedInView && hasGLTexture())
+                {
+                    FSTextureBudget::noteShrunkInView();
+                }
+                // </FS:Luna Witch>
                 scaleDown();
             }
         }
@@ -3381,6 +3554,124 @@ void LLViewerLODTexture::processTextureStats()
 }
 
 extern LLGLSLShader gCopyProgram;
+
+// <FS:Luna Witch> Texture memory budget (fstexturebudget.h)
+F32 LLViewerLODTexture::maxTextureResolution() const
+{
+    if (mBoostLevel < LLGLTexture::BOOST_HIGH)
+    {
+        // restrict texture resolution to download based on RenderMaxTextureResolution
+        static LLCachedControl<U32> max_texture_resolution(gSavedSettings, "RenderMaxTextureResolution", 2048);
+        // sanity clamp debug setting to avoid settings hack shenanigans
+        return (F32)llclamp((S32)max_texture_resolution, 512, MAX_IMAGE_SIZE_DEFAULT);
+    }
+    return (F32)MAX_IMAGE_SIZE_DEFAULT;
+}
+
+S32 LLViewerLODTexture::discardFromLevels(F32 levels, F32 max_tex_res) const
+{
+    F32 discard_level = floorf(levels);
+
+    F32 min_discard = 0.f;
+    if (mFullWidth > max_tex_res || mFullHeight > max_tex_res)
+        min_discard = 1.f;
+
+    discard_level = llclamp(discard_level, min_discard, (F32)MAX_DISCARD_LEVEL);
+
+    // Can't go higher than the max discard level
+    S32 desired = llmin(getMaxDiscardLevel() + 1, (S32)discard_level);
+    // Clamp to min desired discard
+    return llmin((S32)mMinDesiredDiscardLevel, desired);
+}
+
+U64 LLViewerLODTexture::bytesAtDiscard(S32 discard) const
+{
+    LLImageGL* image = getGLTexture();
+    if (image && image->getHasGLTexture())
+    {
+        return (U64)image->getMipBytes(llclamp(discard, 0, image->getMaxDiscardLevel()));
+    }
+    if (!mFullWidth || !mFullHeight)
+    {
+        return 0;
+    }
+    discard = llclamp(discard, 0, (S32)MAX_DISCARD_LEVEL);
+    const U64 width = llmax(mFullWidth >> discard, 1U);
+    const U64 height = llmax(mFullHeight >> discard, 1U);
+    return width * height * llmax((S32)mComponents, 1) * 4 / 3;
+}
+
+void LLViewerLODTexture::predictGPUBytes(const F32* biases, S32 count, U64* bytes) const
+{
+    static LLCachedControl<bool> textures_fullres(gSavedSettings, "TextureLoadFullRes", false);
+    if (textures_fullres || mDontDiscard || !mUseMipMaps || mWantedFixed || mBoostLevel >= LLGLTexture::BOOST_HIGH
+        || !mFullWidth || !mFullHeight)
+    {
+        LLViewerFetchedTexture::predictGPUBytes(biases, count, bytes);
+        return;
+    }
+
+    // Work in "levels": log4(texels in the image / size asked). Each discard level is one.
+    static const F32 log_4 = logf(4.f);
+    const F32 texels = (F32)mTexelsPerImage;
+    auto levels_for = [&](F32 size) { return size > 0.f ? logf(texels / size) / log_4 : F32_MAX; };
+
+    const F32 max_tex_res = maxTextureResolution();
+    // Sizes are capped (addTextureStats, processTextureStats), so levels can't go below the cap's
+    const F32 cap_levels = levels_for(llmin(LLViewerFetchedTexture::sMaxVirtualSize, max_tex_res * max_tex_res));
+    // At or below a size of 10 a texture is not wanted, and keeps what it has until it is flushed
+    const F32 unseen_levels = levels_for(10.f);
+    const F32 off_screen = levels_for(mWantedOffScreen);
+    const F32 on_screen = levels_for(mWantedOnScreen);
+    const F32 important = levels_for(mWantedOnScreenImportant);
+    const F32 kept = levels_for(mMaxVirtualSize);
+
+    F32 draw_levels = 0.f;
+    const bool known_draw = mKnownDrawWidth && mKnownDrawHeight;
+    if (known_draw)
+    {
+        const S32 draw_texels = llclamp(mKnownDrawWidth * mKnownDrawHeight, MIN_IMAGE_AREA, MAX_IMAGE_AREA);
+        draw_levels = logf(texels / (F32)draw_texels) / log_4;
+    }
+
+    LLImageGL* image = getGLTexture();
+    const F32 max_discard = (F32)(image ? image->getMaxDiscardLevel() : MAX_DISCARD_LEVEL);
+    const S32 current = (image && image->getHasGLTexture()) ? getDiscardLevel() : -1;
+    const U64 current_bytes = currentGPUBytes();
+
+    for (S32 i = 0; i < count; ++i)
+    {
+        const F32 bias = biases[i];
+        // LLViewerTextureList::updateImageDecodePriority divides sizes by 4^(bias - 1), the bias limited by
+        // the image's size: off screen always, on screen above 1.9 + importance / 2.
+        const F32 scale_levels = llclamp(max_discard - 2.f, 1.f, bias) - 1.f;
+        F32 levels = off_screen + scale_levels;
+        levels = llmin(levels, on_screen + (bias > 1.9f ? scale_levels : 0.f));
+        levels = llmin(levels, important + (bias > 2.4f ? scale_levels : 0.f));
+        // mMaxVirtualSize is reset (so that it can fall) only above these biases
+        if (bias <= 1.f || (mWantedInView && bias <= 1.5f))
+        {
+            levels = llmin(levels, kept);
+        }
+        levels = llmax(levels, cap_levels);
+
+        if (levels >= unseen_levels)
+        {
+            bytes[i] = current_bytes;
+            continue;
+        }
+
+        S32 discard = discardFromLevels(known_draw ? draw_levels : levels, max_tex_res);
+        discard = llmin(discard, (S32)mLoadedCallbackDesiredDiscardLevel);
+        // Shrunk only when two levels coarser than what is on the GPU (processTextureStats)
+        if (current >= 0 && discard > current && discard < current + 2)
+        {
+            discard = current;
+        }
+        bytes[i] = bytesAtDiscard(discard);
+    }
+}
+// </FS:Luna Witch>
 
 bool LLViewerLODTexture::scaleDown()
 {

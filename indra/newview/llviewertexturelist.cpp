@@ -62,6 +62,7 @@
 #include "llviewerdisplay.h"
 #include "llviewerwindow.h"
 #include "llprogressview.h"
+#include "fstexturebudget.h" // <FS:Luna Witch/>
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -938,6 +939,12 @@ void LLViewerTextureList::updateImageDecodePriority(LLViewerFetchedTexture* imag
 
         F32 max_vsize = 0.f;
         bool on_screen = false;
+        // <FS:Luna Witch> Sizes asked before the discard bias, for the texture memory budget (fstexturebudget.h)
+        static LLCachedControl<F32> budget_camera_boost(gSavedSettings, "TextureCameraBoost", 8.f);
+        F32 wanted_off_screen = 0.f;
+        F32 wanted_on_screen = 0.f;
+        F32 wanted_important = 0.f;
+        // </FS:Luna Witch>
 
         U32 face_count = 0;
         U32 max_faces_to_check = 1024;
@@ -992,6 +999,20 @@ void LLViewerTextureList::updateImageDecodePriority(LLViewerFetchedTexture* imag
                     min_scale = llclamp(min_scale * min_scale, texture_scale_min(), texture_scale_max());
                     vsize /= min_scale;
 
+                    // <FS:Luna Witch> What this face asks before the bias (the camera boost below included)
+                    if (!face->mInFrustum)
+                    {
+                        wanted_off_screen = llmax(wanted_off_screen, vsize);
+                    }
+                    else
+                    {
+                        // Faces this important to the camera are left alone by a bias of 2 (see below)
+                        const F32 wanted = vsize * llmax(face->mImportanceToCamera * budget_camera_boost, 1.f);
+                        F32& wanted_group = face->mImportanceToCamera >= 0.2f ? wanted_important : wanted_on_screen;
+                        wanted_group = llmax(wanted_group, wanted);
+                    }
+                    // </FS:Luna Witch>
+
                     // apply bias to offscreen faces all the time, but only to onscreen faces when bias is large
                     // use mImportanceToCamera to make bias switch a bit more gradual
                     if (!face->mInFrustum || LLViewerTexture::sDesiredDiscardBias > 1.9f + face->mImportanceToCamera / 2.f)
@@ -1043,7 +1064,22 @@ void LLViewerTextureList::updateImageDecodePriority(LLViewerFetchedTexture* imag
         }
 
         imagep->addTextureStats(max_vsize);
+
+        // <FS:Luna Witch>
+        imagep->mWantedOffScreen = wanted_off_screen;
+        imagep->mWantedOnScreen = wanted_on_screen;
+        imagep->mWantedOnScreenImportant = wanted_important;
+        imagep->mWantedInView = on_screen;
+        imagep->mWantedFixed = face_count > max_faces_to_check;
+        // </FS:Luna Witch>
     }
+    // <FS:Luna Witch>
+    else
+    {
+        imagep->mWantedFixed = true;
+    }
+    FSTextureBudget::update(imagep);
+    // </FS:Luna Witch>
 
 #if 0
     imagep->setDebugText(llformat("%d/%d - %d/%d -- %d/%d",
@@ -1151,7 +1187,11 @@ F32 LLViewerTextureList::updateImagesCreateTextures(F32 max_time)
         imagep->postCreateTexture();
         imagep->mCreatePending = false;
 
-        if (imagep->hasGLTexture() && imagep->getDiscardLevel() < imagep->getDesiredDiscardLevel() &&
+        // <FS:Luna Witch> Keep a texture one level finer than wanted, unless over the budget (see processTextureStats)
+        //if (imagep->hasGLTexture() && imagep->getDiscardLevel() < imagep->getDesiredDiscardLevel() &&
+        if (imagep->hasGLTexture() &&
+            imagep->getDesiredDiscardLevel() >= imagep->getDiscardLevel() + (FSTextureBudget::isOverBudget() ? 1 : 2) &&
+        // </FS:Luna Witch>
            (imagep->getDesiredDiscardLevel() <= MAX_DISCARD_LEVEL))
         {
             // NOTE: this may happen if the desired discard reduces while a decode is in progress and does not

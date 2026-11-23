@@ -51,6 +51,16 @@ class LLWindow;
 namespace LLImageGLMemory
 {
     void alloc_tex_image(U32 width, U32 height, U32 intformat, U32 count);
+    // <FS:Luna Witch> Texture memory accounting that knows about mipmap levels and cube map faces
+    // Adds a mipmap level or cube map face to the currently bound texture's count.
+    void add_tex_image(U32 width, U32 height, U32 intformat, U32 count);
+    // Counts bytes already known (compressed uploads) as the currently bound texture's level 0, or adds them.
+    void alloc_tex_bytes(U64 bytes, U32 width, U32 height);
+    void add_tex_bytes(U64 bytes);
+    // After glGenerateMipmap: count the whole mipmap chain below the level 0 already counted.
+    // texName 0 means the texture bound to texture unit 0.
+    void count_generated_mips(U32 texName = 0);
+    // </FS:Luna Witch>
     void free_tex_image(U32 texName);
     void free_tex_images(U32 count, const U32* texNames);
     void free_cur_tex_image();

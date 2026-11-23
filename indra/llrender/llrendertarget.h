@@ -63,7 +63,7 @@ class LLRenderTarget
 public:
     // Whether or not to use FBO implementation
     static bool sUseFBO;
-    static U32 sBytesAllocated;
+    static U64 sBytesAllocated; // <FS:Luna Witch/> was U32
     static U32 sCurFBO;
     static U32 sCurResX;
     static U32 sCurResY;
