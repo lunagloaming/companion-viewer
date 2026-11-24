@@ -1,0 +1,32 @@
+#!/bin/bash
+# Build SL Money for Linux and install it for this user: ~/Applications/slmoney and a menu
+# entry (~/.local/share/applications/slmoney.desktop). Run again to update; quit it first.
+#
+#   tools/slmoney/install-linux
+set -euo pipefail
+
+HERE="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
+DEST="$HOME/Applications/slmoney"
+APPS="$HOME/.local/share/applications"
+
+cd "$HERE"
+[ -d node_modules ] || npm install
+npm run dist:linux
+rm -rf "$DEST"
+mkdir -p "$(dirname "$DEST")" "$APPS"
+cp -a dist/linux-unpacked "$DEST"
+cp build/icon.png "$DEST/icon.png"
+
+cat > "$APPS/slmoney.desktop" <<DESKTOP
+[Desktop Entry]
+Type=Application
+Name=SL Money
+Comment=L\$ balances and transactions from Companion Viewer's money logs
+Exec=$DEST/slmoney
+Icon=$DEST/icon.png
+Terminal=false
+Categories=Office;Finance;
+StartupWMClass=slmoney
+DESKTOP
+command -v update-desktop-database >/dev/null && update-desktop-database "$APPS" || true
+echo "Installed to $DEST; start SL Money from the menu."

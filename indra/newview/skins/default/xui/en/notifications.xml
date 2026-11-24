@@ -15542,7 +15542,7 @@ Folder names cannot contain / or \.
    icon="alertmodal.tga"
    name="GlobalAccountantMissing"
    type="alertmodal">
-Global Accountant is the SL Money app, which isn't installed. Install it from Companion Viewer's tools/slmoney, or set the debug setting FSGlobalAccountantPath to where it is.
+Global Accountant opens the SL Money app, which comes with Companion Viewer but wasn't found in this install. Reinstall the viewer, or set the debug setting FSGlobalAccountantPath to where SL Money is.
     <tag>fail</tag>
     <usetemplate
      name="okbutton"
