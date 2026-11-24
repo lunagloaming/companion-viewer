@@ -643,7 +643,7 @@ WriteRegStr SHELL_CONTEXT "${INSTNAME_KEY}" "Version" "${VERSION_LONG}"
 WriteRegStr SHELL_CONTEXT "${INSTNAME_KEY}" "Shortcut" "$INSTSHORTCUT"
 WriteRegStr SHELL_CONTEXT "${INSTNAME_KEY}" "Exe" "$VIEWER_EXE"
 WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "Publisher" "Companion Viewer"
-WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "DisplayName" "$INSTNAME"
+WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "DisplayName" "$INSTSHORTCUT"
 WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "UninstallString" '"$INSTDIR\uninst.exe"'
 WriteRegStr SHELL_CONTEXT "${MSUNINSTALL_KEY}" "DisplayVersion" "${VERSION_LONG}"
 # <FS:Ansariel> Separate install sizes for 32 and 64 bit
@@ -655,11 +655,8 @@ ${Else}
 ${EndIf}
 
 # <FS:Ansariel> FIRE-30446: Set FriendlyAppName for protocols
-${If} ${ISOPENSIM} == "1"
-  StrCpy $FRIENDLY_APP_NAME "${INSTNAME} $(ForOpenSimSuffix)"
-${Else}
-  StrCpy $FRIENDLY_APP_NAME "${INSTNAME}"
-${EndIf}
+# Companion Viewer: one build serves Second Life and OpenSim, so no "for OpenSimulator"
+StrCpy $FRIENDLY_APP_NAME "${SHORTCUT}"
 # </FS:Ansariel>
 
 

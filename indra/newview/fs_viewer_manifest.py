@@ -4,20 +4,23 @@ import tarfile
 
 class FSViewerManifest:
     def fs_installer_basename(self):
+        # Companion Viewer: packages are named after the channel and the full version,
+        # e.g. CompanionViewer-Nightly-7.4.0.83387, with -AVX2 after the channel for AVX2 builds
+        name = self.fs_install_name()
         if self.fs_is_avx2():
-            opt_string = "AVX2"
-        else:
-            opt_string = "LEGACY"
-        substitution_strings = {
-            'version' : '.'.join(self.args['version']),
-            'version_short' : '.'.join(self.args['version'][:-1]),
-            'version_dashes' : '-'.join(self.args['version']),
-            'app_name':self.app_name(),
-            'optimized': opt_string,
-            'app_name_oneword':self.app_name_oneword()
-            }
+            name += "-AVX2"
+        return "%s-%s" % (name, '.'.join(self.args['version']))
 
-        return "Phoenix-%(app_name)s_%(optimized)s-%(version_dashes)s" % substitution_strings
+    def fs_install_name(self):
+        # The channel in one word, e.g. CompanionViewer-Nightly: the Windows install folder
+        # and registry keys
+        return "".join(self.channel().split())
+
+    def fs_display_name(self):
+        # The name people see, e.g. "Companion Viewer Nightly": the Windows installer's
+        # title, Start menu entry and installed programs list
+        variant = self.channel_variant().lstrip("-_ ").strip()
+        return " ".join(["Companion Viewer"] + variant.split())
 
     def fs_is_opensim(self):
         return self.args['viewer_flavor'] == 'oss' #Havok would be hvk
