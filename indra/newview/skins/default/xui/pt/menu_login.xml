@@ -16,9 +16,10 @@
 		<menu_item_call label="Portal de suporte" name="Support portal"/>
 		<menu_item_call label="Notícias do [SECOND_LIFE]" name="Second Life News"/>
 		<menu_item_call label="Blogs do [SECOND_LIFE]" name="Second Life Blogs"/>
-		<menu_item_call label="Assistente da lista de permissões" name="whitelist_folders"/>
 		<menu_item_call label="Reportar problema" name="Report Bug"/>
 		<menu_item_call label="Ajuda do [APP_NAME]" name="Second Life Help"/>
+		<menu_item_call label="Definir tamanho da UI para padrão" name="Set UI Size to Default"/>
+		<menu_item_call label="Definir tamanho da janela..." name="Set Window Size..."/>
 		<menu_item_call label="Sobre o [APP_NAME]" name="About Second Life"/>
 	</menu>
 	<menu_item_check label="Mostrar menu de depuração" name="Show Debug Menu"/>
@@ -32,7 +33,6 @@
 		</menu>
 		<menu_item_call label="Ferramenta de pré-visualização XUI" name="UI Preview Tool"/>
 		<menu label="Testes de UI" name="UI Tests"/>
-		<menu_item_call label="Definir tamanho da janela..." name="Set Window Size..."/>
 		<menu_item_call label="Mostrar TOS" name="TOS"/>
 		<menu_item_call label="Mostrar mensagem crítica" name="Critical"/>
 		<menu_item_call label="Navegador de mídia" name="Media Browser"/>

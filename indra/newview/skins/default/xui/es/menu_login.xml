@@ -16,13 +16,14 @@
 		<menu_item_call label="Noticias de [SECOND_LIFE]" name="Second Life News"/>
 		<menu_item_call label="Blogs de [SECOND_LIFE]" name="Second Life Blogs"/>
 		<menu_item_call label="Informar de un fallo" name="Report Bug"/>
+		<menu_item_call label="Interfaz en el tamaño predeterminado" name="Set UI Size to Default"/>
+		<menu_item_call label="Definir el tamaño de la ventana..." name="Set Window Size..."/>
 		<menu_item_call label="Acerca de [APP_NAME]" name="About Second Life"/>
 	</menu>
 	<menu_item_check label="Mostrar el menú 'Debug'" name="Show Debug Menu"/>
 	<menu label="Depurar" name="Debug">
 		<menu_item_call label="Mostrar las configuraciones del depurador" name="Debug Settings"/>
 		<menu label="Pruebas de la interfaz" name="UI Tests"/>
-		<menu_item_call label="Definir el tamaño de la ventana..." name="Set Window Size..."/>
 		<menu_item_call label="Mostrar los 'TOS'" name="TOS"/>
 		<menu_item_call label="Mostrar mensaje crítico" name="Critical"/>
 		<menu_item_call label="Navegador de medios" name="Media Browser"/>

@@ -278,6 +278,8 @@
 		<menu_item_call label="今日訊息" name="Firestorm MoTD" />
 	</menu>
 	<menu label="幫助" name="Help">
+		<menu_item_call label="以預設值設定UI大小" name="Set UI Size to Default" />
+		<menu_item_call label="設定視窗大小" name="Set Window Size..." />
 		<menu_item_call label="關於 [APP_NAME]" name="About Second Life" />
 	</menu>
 	<menu label="RLVa" name="RLVa Main">
@@ -307,8 +309,6 @@
 	<menu label="進階" name="Advanced">
 		<menu_item_call label="重新烘焙紋理" name="Rebake Texture" />
 		<menu_item_call label="更新附件" name="Refresh Attachments" />
-		<menu_item_call label="以預設值設定UI大小" name="Set UI Size to Default" />
-		<menu_item_call label="設定視窗大小" name="Set Window Size..." />
 		<menu_item_check label="限制選擇距離" name="Limit Select Distance" />
 		<menu_item_check label="取消鏡頭限制" name="Disable Camera Distance" />
 		<menu_item_check label="高解析度快照" name="HighResSnapshot" />
