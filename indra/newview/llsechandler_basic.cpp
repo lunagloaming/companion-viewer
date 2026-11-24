@@ -55,22 +55,29 @@
 #include <array>
 #include <filesystem>
 #include <fstream>
+#include <map>
 
 namespace
 {
     typedef std::array<unsigned char, MAC_ADDRESS_BYTES> machine_key_t;
 
-    // The keys the protected data store may have been written with, the current machine ID first.
+    bool is_zero_key(const machine_key_t& key)
+    {
+        return std::all_of(key.begin(), key.end(), [](unsigned char byte) { return byte == 0; });
+    }
+
+    // The keys the protected data store may have been written with, best first: the machine ID, the legacy ID,
+    // the address of every network interface (Linux), and last the all-zero key.
     // On Linux the machine ID is the MAC address of whichever interface had an IPv4 address first when the
     // viewer started (LLUUID::getNodeID), so a viewer started on wifi wrote the store with a different key
-    // than one started on a wired connection, and every saved login was lost. The address of every
-    // interface the system has, up or down, is tried too.
+    // than one started on a wired connection, and every saved login was lost. With no address at all (no
+    // network at startup) the machine ID is all zeros, and a store saved then was written with zeros.
     std::vector<machine_key_t> protected_data_keys()
     {
         std::vector<machine_key_t> keys;
         auto add = [&keys](const machine_key_t& key)
         {
-            if (std::find(keys.begin(), keys.end(), key) == keys.end())
+            if (!is_zero_key(key) && std::find(keys.begin(), keys.end(), key) == keys.end())
             {
                 keys.push_back(key);
             }
@@ -81,12 +88,15 @@ namespace
         {
             add(key);
         }
+        key.fill(0);
         if (LLMachineID::getLegacyID(key.data(), key.size()))
         {
             add(key);
         }
 
 #if LL_LINUX
+        // Every interface the system has, up or down, in name order so the choice is the same every time
+        std::map<std::string, machine_key_t> interfaces;
         std::error_code error;
         for (const auto& entry : std::filesystem::directory_iterator("/sys/class/net", error))
         {
@@ -103,13 +113,23 @@ namespace
             {
                 key[i] = (unsigned char)bytes[i];
             }
-            if (std::any_of(key.begin(), key.end(), [](unsigned char byte) { return byte != 0; })) // not loopback
-            {
-                add(key);
-            }
+            interfaces[entry.path().filename().string()] = key;
+        }
+        for (const auto& [name, address] : interfaces)
+        {
+            add(address); // loopback's address is all zeros and is left out
         }
 #endif
+
+        keys.push_back(machine_key_t{}); // last: a store written with no address at all
         return keys;
+    }
+
+    // The key the store is written with: the best one there is. All zeros only on a machine with no network
+    // address at all, as before, since a store written with zeros can be read by anyone who has the file.
+    machine_key_t protected_data_write_key()
+    {
+        return protected_data_keys().front();
     }
 }
 // </FS:Luna Witch>
@@ -1471,9 +1491,11 @@ void LLSecAPIBasicHandler::_readProtectedData()
             mProtectedDataMap = LLSD::emptyMap();
             throw;
         }
-        if (i > 0)
+        // Write it again with the best key, so that this one doesn't have to be found next time. Never with the
+        // all-zero key: then the store stays as it is until a real address is there.
+        const machine_key_t write_key = protected_data_write_key();
+        if (key != write_key && !is_zero_key(write_key) && LLFile::isfile(mProtectedDataFilename))
         {
-            // Write it again with the current key, so that this one doesn't have to be found next time
             LL_INFOS("SECAPI") << "Read the saved logins with an earlier machine ID (key " << i + 1 << " of "
                                << keys.size() << "); writing them with the current one" << LL_ENDL;
             _writeProtectedData();
@@ -1539,9 +1561,13 @@ void LLSecAPIBasicHandler::_writeProtectedData()
         // todo: ctx error handling
 
         EVP_EncryptInit(ctx, EVP_rc4(), salt, NULL);
-        unsigned char unique_id[MAC_ADDRESS_BYTES];
-        LLMachineID::getUniqueID(unique_id, sizeof(unique_id));
-        LLXORCipher cipher(unique_id, sizeof(unique_id));
+        // <FS:Luna Witch> The best key there is (protected_data_write_key), not always the machine ID
+        //unsigned char unique_id[MAC_ADDRESS_BYTES];
+        //LLMachineID::getUniqueID(unique_id, sizeof(unique_id));
+        //LLXORCipher cipher(unique_id, sizeof(unique_id));
+        machine_key_t write_key = protected_data_write_key();
+        LLXORCipher cipher(write_key.data(), (U32)write_key.size());
+        // </FS:Luna Witch>
         cipher.encrypt(salt, STORE_SALT_SIZE);
         protected_data_stream.write((const char *)salt, STORE_SALT_SIZE);
 
