@@ -30,8 +30,8 @@
 
 // Help > Global Accountant: starts SL Money (companion-viewer/tools/slmoney), a separate app
 // that shows every account's balance, income and expenses from the money logs (fsmoneylog).
-// It looks where SL Money's installers put it, or at FSGlobalAccountantPath if that is set,
-// and says so if SL Money isn't there.
+// SL Money is packaged with the viewer (tools/slmoney); the viewer also looks where SL Money's
+// own installers put it, or at FSGlobalAccountantPath if that is set, and says so if it isn't there.
 namespace FSGlobalAccountant
 {
     void launch();

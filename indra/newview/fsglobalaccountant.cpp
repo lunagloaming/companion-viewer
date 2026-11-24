@@ -29,6 +29,7 @@
 
 #include "fsglobalaccountant.h"
 
+#include "lldir.h"
 #include "llfile.h"
 #include "llnotificationsutil.h"
 #include "llprocess.h"
@@ -44,7 +45,8 @@ namespace
         return value ? value : "";
     }
 
-    // Where SL Money's installers put it: the user's own folder first.
+    // The copy packaged with the viewer first (fs_bundle_slmoney in fs_viewer_manifest.py),
+    // then where SL Money's own installers put it, the user's own folder first.
     std::vector<std::string> candidates()
     {
         std::string custom = gSavedSettings.getString("FSGlobalAccountantPath");
@@ -52,19 +54,24 @@ namespace
         {
             return { custom };
         }
+        const std::string sep = gDirUtilp->getDirDelimiter();
+        const std::string viewer = gDirUtilp->getAppRODataDir(); // the install folder; Contents/Resources on macOS
         std::vector<std::string> paths;
 #if LL_WINDOWS
+        paths.push_back(viewer + sep + "slmoney" + sep + "SL Money.exe");
         if (!env("LOCALAPPDATA").empty())
         {
             paths.push_back(env("LOCALAPPDATA") + "\\Programs\\slmoney\\SL Money.exe");
         }
 #elif LL_DARWIN
+        paths.push_back(viewer + sep + "SL Money.app");
         if (!env("HOME").empty())
         {
             paths.push_back(env("HOME") + "/Applications/SL Money.app");
         }
         paths.push_back("/Applications/SL Money.app");
 #else
+        paths.push_back(viewer + sep + "slmoney" + sep + "slmoney");
         if (!env("HOME").empty())
         {
             paths.push_back(env("HOME") + "/Applications/slmoney/slmoney");
