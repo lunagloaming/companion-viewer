@@ -880,6 +880,8 @@ class Windows_x86_64_Manifest(ViewerManifest):
                 self.path("libvlccore.dll")
                 self.path("plugins/")
 
+        self.fs_bundle_slmoney('win-unpacked', 'slmoney') # <FS:Luna Witch/> SL Money for Help > Global Accountant
+
         if not self.is_packaging_viewer():
             self.package_file = "copied_deps"
 
@@ -1474,6 +1476,9 @@ class Darwin_x86_64_Manifest(ViewerManifest):
         # script)
         #self.path(os.path.join(self.args['configuration'], self.channel() + ".app"), dst="")
         self.path(os.path.join(self.args['configuration'], "CompanionViewer.app"), dst="")
+        # <FS:Luna Witch/> SL Money for Help > Global Accountant, inside the viewer's bundle
+        self.fs_bundle_slmoney(os.path.join('mac-universal', 'SL Money.app'),
+                               os.path.join('Contents', 'Resources', 'SL Money.app'))
 
         pkgdir = os.path.join(self.args['build'], os.pardir, 'packages')
         relpkgdir = os.path.join(pkgdir, "lib", "release")
@@ -2321,6 +2326,8 @@ class LinuxManifest(ViewerManifest):
                 self.path("libsndfile*")
                 self.path("*.crt")
         # </FS:TJ>
+
+        self.fs_bundle_slmoney('linux-unpacked', 'slmoney') # <FS:Luna Witch/> SL Money for Help > Global Accountant
 
     def package_finish(self):
         # a standard map of strings for replacing in the templates

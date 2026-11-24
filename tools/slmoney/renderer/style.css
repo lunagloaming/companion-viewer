@@ -1,0 +1,63 @@
+:root {
+    color-scheme: light dark;
+    --line: color-mix(in srgb, currentColor 15%, transparent);
+    --soft: color-mix(in srgb, currentColor 6%, transparent);
+    --accent: #3b82c4;
+    font: 14px/1.4 system-ui, sans-serif;
+}
+
+body { margin: 0; height: 100vh; display: flex; flex-direction: column; }
+
+#tabs { display: flex; gap: 2px; padding: 6px 8px 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+.tab {
+    display: flex; align-items: center; gap: 6px; padding: 6px 12px;
+    border: 1px solid transparent; border-bottom: none; border-radius: 6px 6px 0 0;
+    background: none; color: inherit; font: inherit; cursor: pointer; white-space: nowrap;
+}
+.tab:hover { background: var(--soft); }
+.tab.selected { border-color: var(--line); background: Canvas; margin-bottom: -1px; }
+.close { opacity: 0.5; padding: 0 2px; border-radius: 3px; }
+.close:hover { opacity: 1; background: var(--line); }
+
+#panes { flex: 1; overflow: hidden; }
+.pane { height: 100%; overflow: auto; padding: 12px 16px; box-sizing: border-box; }
+
+h1 { font-size: 1.25em; margin: 0; }
+header.avatar { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+
+/* Profile pictures are square images that the picture service stretches to 4:3
+   (256 x 192); squeezing them back to square, uncropped, restores their shape. */
+.picture { width: 40px; height: 40px; object-fit: fill; border-radius: 4px; display: block; }
+.picture.large { width: 112px; height: 112px; border-radius: 6px; }
+.placeholder {
+    display: flex; align-items: center; justify-content: center;
+    background: var(--soft); border: 1px solid var(--line); box-sizing: border-box;
+    font-weight: 600; opacity: 0.7;
+}
+.picture.large.placeholder { font-size: 2.5em; }
+td.picture-cell { padding: 3px 4px 3px 10px; width: 40px; }
+h2 { font-size: 1.05em; margin: 0 0 6px; }
+
+.columns { display: grid; grid-template-columns: repeat(auto-fit, minmax(640px, 1fr)); gap: 24px 32px; }
+
+table { border-collapse: collapse; width: 100%; }
+th, td { padding: 4px 10px; text-align: left; border-bottom: 1px solid var(--line); }
+th { position: sticky; top: -12px; background: Canvas; font-weight: 600; }
+.amount { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.when { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.detail { opacity: 0.75; }
+.name { overflow-wrap: anywhere; }
+tr.openable { cursor: default; }
+tr.openable:hover { background: var(--soft); }
+tr.openable:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+tr.group { cursor: default; }
+tr.group:hover { background: var(--soft); }
+tr.group:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
+.toggle { width: 1em; padding-right: 0; opacity: 0.6; }
+td.details { padding: 0 0 8px 2.2em; }
+td.details table { font-size: 0.95em; }
+td.details th { position: static; }
+
+.empty, .hint { opacity: 0.6; }
+.hint { font-size: 0.9em; }

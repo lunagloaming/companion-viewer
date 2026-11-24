@@ -1,0 +1,67 @@
+{
+  "name": "slmoney",
+  "productName": "SL Money",
+  "version": "1.0.0",
+  "description": "L$ balances and transactions from Companion Viewer's money logs (read only)",
+  "author": "Luna Gloaming",
+  "license": "LGPL-2.1-only",
+  "private": true,
+  "main": "main.js",
+  "desktopName": "slmoney.desktop",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test src/ledger.test.js",
+    "dist:linux": "electron-builder --linux",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "bundle:linux": "electron-builder --linux dir",
+    "bundle:mac": "electron-builder --mac dir --universal",
+    "bundle:win": "electron-builder --win dir"
+  },
+  "build": {
+    "appId": "io.github.lunagloaming.slmoney",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/ledger.js",
+      "renderer/**",
+      "build/icon.png"
+    ],
+    "directories": {
+      "buildResources": "build",
+      "output": "dist"
+    },
+    "linux": {
+      "target": "dir",
+      "icon": "build/icon.png",
+      "category": "Office"
+    },
+    "mac": {
+      "target": {
+        "target": "dmg",
+        "arch": "universal"
+      },
+      "icon": "build/icon.png",
+      "category": "public.app-category.finance",
+      "identity": "-",
+      "hardenedRuntime": false
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.5.0",
+    "electron-builder": "^26.18.0"
+  },
+  "allowScripts": {
+    "electron-winstaller": false
+  }
+}
