@@ -291,13 +291,13 @@
 		<menu_item_call label="Message du jour" name="Firestorm MoTD"/>
 	</menu>
 	<menu label="Aide" name="Help">
+		<menu_item_call label="Taille de l&apos;interface par défaut" name="Set UI Size to Default"/>
+		<menu_item_call label="Définir la taille de la fenêtre…" name="Set Window Size..."/>
 		<menu_item_call label="À propos de [APP_NAME]" name="About Second Life"/>
 	</menu>
 	<menu label="Avancé" name="Advanced">
 		<menu_item_call label="Refixer les textures" name="Rebake Texture"/>
 		<menu_item_call label="Actualiser les attachements" name="Refresh Attachments"/>
-		<menu_item_call label="Taille de l&apos;interface par défaut" name="Set UI Size to Default"/>
-		<menu_item_call label="Définir la taille de la fenêtre…" name="Set Window Size..."/>
 		<menu_item_check label="Limiter la distance de sélection" name="Limit Select Distance"/>
 		<menu_item_check label="Désactiver les contraintes de la caméra" name="Disable Camera Distance"/>
 		<menu_item_check label="Photo haute résolution" name="HighResSnapshot"/>

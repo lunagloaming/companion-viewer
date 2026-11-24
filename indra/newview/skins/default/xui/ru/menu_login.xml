@@ -17,8 +17,9 @@
 		<menu_item_call label="Портал поддержки" name="Support portal"/>
 		<menu_item_call label="Блоги: [SECOND_LIFE]" name="Second Life Blogs"/>
 		 -->
-		<menu_item_call label="Советник Белого Списка" name="whitelist_folders"/>
 		<menu_item_call label="Сообщить об ошибке" name="Report Bug"/>
+		<menu_item_call label="Восстановить исходный размер интерфейса" name="Set UI Size to Default"/>
+		<menu_item_call label="Установить размер окна..." name="Set Window Size..."/>
 		<menu_item_call label="Информация о [APP_NAME]" name="About Second Life"/>
 		<menu_item_call label="Помощь для [CURRENT_GRID]" name="current_grid_help_login"/>
 		<menu_item_call label="Информация о [CURRENT_GRID]" name="current_grid_about_login"/>
@@ -34,7 +35,6 @@
 			<menu_item_call label="Дамп текстур шрифтов" name="Dump Font Textures"/>
 		</menu>
 		<menu label="Тесты интерфейса" name="UI Tests"/>
-		<menu_item_call label="Установить размер окна..." name="Set Window Size..."/>
 		<menu_item_call label="Показать условия использования (ТОS)" name="TOS"/>
 		<menu_item_call label="Показать критические сообщения" name="Critical"/>
 		<menu_item_call label="Медиа-браузер" name="Media Browser"/>

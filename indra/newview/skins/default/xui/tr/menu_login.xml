@@ -16,6 +16,8 @@
 		<menu_item_call label="[SECOND_LIFE] Haberler" name="Second Life News"/>
 		<menu_item_call label="[SECOND_LIFE] Bloklar" name="Second Life Blogs"/>
 		<menu_item_call label="Hata Bildir" name="Report Bug"/>
+		<menu_item_call label="KA Büyüklüğünü Varsayılana Ayarla" name="Set UI Size to Default"/>
+		<menu_item_call label="Pencere Büyüklüğünü Ayarla..." name="Set Window Size..."/>
 		<menu_item_call label="[APP_NAME] Hakkında" name="About Second Life"/>
 	</menu>
 	<menu_item_check label="Hata Ayıklama Menüsünü Göster" name="Show Debug Menu"/>
@@ -23,7 +25,6 @@
 		<menu_item_call label="Hata Ayıklama Ayarlarını Göster" name="Debug Settings"/>
 		<menu_item_call label="XKA Önizleme Aracı" name="UI Preview Tool"/>
 		<menu label="KA Testleri" name="UI Tests"/>
-		<menu_item_call label="Pencere Büyüklüğünü Ayarla..." name="Set Window Size..."/>
 		<menu_item_call label="Hizmet Şartlarını Göster" name="TOS"/>
 		<menu_item_call label="Kritik İletiyi Göster" name="Critical"/>
 		<menu_item_call label="Ortam Tarayıcı" name="Media Browser"/>
