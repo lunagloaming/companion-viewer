@@ -121,9 +121,21 @@ S32 LLMachineID::getUniqueID(unsigned char *unique_id, size_t len)
     memcpy(unique_id, gMACAddress, len);
     return 1;
 }
+// <FS:Luna Witch> A legacy ID for the key tests (test<10>); none by default
+unsigned char gLegacyAddress[MAC_ADDRESS_BYTES] = {0,0,0,0,0,0};
+bool gHasLegacyAddress = false;
+// </FS:Luna Witch>
 S32 LLMachineID::getLegacyID(unsigned char *unique_id, size_t len)
 {
-    return 0;
+    // <FS:Luna Witch>
+    //return 0;
+    if (!gHasLegacyAddress)
+    {
+        return 0;
+    }
+    memcpy(unique_id, gLegacyAddress, len);
+    return 1;
+    // </FS:Luna Witch>
 }
 S32 LLMachineID::init() { return 1; }
 
@@ -1434,5 +1446,88 @@ namespace tut
         test_store->validate(0, test_chain, validation_params);
     }
 
+    // <FS:Luna Witch> Saved logins written with one machine ID are read with another one that is still around and
+    // written again with the current one; a store is never written with the all-zero key while a real one exists,
+    // and a store written with zeros (no network address when it was saved) is read and written with a real key.
+    template<> template<>
+    void sechandler_basic_test_object::test<10>()
+    {
+        const unsigned char key_a[MAC_ADDRESS_BYTES] = {10, 20, 30, 40, 50, 60};
+        const unsigned char key_b[MAC_ADDRESS_BYTES] = {11, 21, 31, 41, 51, 61};
+        const unsigned char key_c[MAC_ADDRESS_BYTES] = {12, 22, 32, 42, 52, 62};
+        const unsigned char zero[MAC_ADDRESS_BYTES] = {0, 0, 0, 0, 0, 0};
+        unsigned char saved_mac[MAC_ADDRESS_BYTES];
+        memcpy(saved_mac, gMACAddress, MAC_ADDRESS_BYTES);
+        const std::string file = "sechandler_keys.tmp";
+        LLFile::remove(file);
+
+        // A handler for the store with these IDs; null if the store can't be read
+        auto open_store = [&](const unsigned char* unique, const unsigned char* legacy) -> LLPointer<LLSecAPIBasicHandler>
+        {
+            memcpy(gMACAddress, unique, MAC_ADDRESS_BYTES);
+            gHasLegacyAddress = legacy != nullptr;
+            if (legacy)
+            {
+                memcpy(gLegacyAddress, legacy, MAC_ADDRESS_BYTES);
+            }
+            LLPointer<LLSecAPIBasicHandler> handler = new LLSecAPIBasicHandler(file, "test_password.dat");
+            try
+            {
+                handler->init();
+            }
+            catch (LLProtectedDataException&)
+            {
+                return LLPointer<LLSecAPIBasicHandler>();
+            }
+            return handler;
+        };
+        auto secret_of = [](const LLPointer<LLSecAPIBasicHandler>& handler)
+        {
+            return handler.notNull() ? handler->getProtectedData("login", "account")["password"].asString() : std::string("(unreadable)");
+        };
+
+        // Saved with key A
+        LLPointer<LLSecAPIBasicHandler> handler = open_store(key_a, nullptr);
+        ensure("new store opens", handler.notNull());
+        LLSD data = LLSD::emptyMap();
+        data["password"] = "secret";
+        handler->setProtectedData("login", "account", data);
+        handler->syncProtectedMap();
+
+        // The machine ID is now B, and A is still known: read with A, written again with B
+        ensure_equals("read with an earlier ID", secret_of(open_store(key_b, key_a)), "secret");
+        ensure_equals("read with the current ID", secret_of(open_store(key_b, nullptr)), "secret");
+        ensure("no longer written with A", open_store(key_c, key_a).isNull());
+
+        // No address at startup (machine ID all zeros), B known as the legacy ID: read with B, and saving
+        // writes with B, never with zeros
+        handler = open_store(zero, key_b);
+        ensure_equals("read with a zero machine ID", secret_of(handler), "secret");
+        data["password"] = "secret2";
+        handler->setProtectedData("login", "account", data);
+        handler->syncProtectedMap();
+        ensure("not written with zeros", open_store(key_c, nullptr).isNull());
+        ensure_equals("written with the legacy ID", secret_of(open_store(key_b, nullptr)), "secret2");
+
+        // A store written with zeros by an older version: read, then written with the current ID
+        {
+            std::fstream store(file, std::ios::in | std::ios::out | std::ios::binary);
+            U8 salt[16];
+            store.read((char*)salt, sizeof(salt));
+            LLXORCipher cipher(key_b, MAC_ADDRESS_BYTES);
+            cipher.decrypt(salt, sizeof(salt)); // a salt XORed with zeros is the salt itself
+            store.seekp(0);
+            store.write((const char*)salt, sizeof(salt));
+        }
+        ensure_equals("zero-keyed store read", secret_of(open_store(key_c, nullptr)), "secret2");
+        ensure("zero-keyed store written with the current ID", open_store(key_a, nullptr).isNull());
+        ensure_equals("and readable with it", secret_of(open_store(key_c, nullptr)), "secret2");
+
+        LLFile::remove(file);
+        memcpy(gMACAddress, saved_mac, MAC_ADDRESS_BYTES);
+        gHasLegacyAddress = false;
+    }
+    // </FS:Luna Witch>
 };
+
 
