@@ -1122,7 +1122,7 @@ class Windows_x86_64_Manifest(ViewerManifest):
 
         # <FS:ND> Properly name OS version, also add Phoenix- in front of installer name
         #installer_file = self.installer_base_name() + '_Setup.exe'
-        installer_file = self.fs_installer_basename() + "_Setup.exe"
+        installer_file = self.fs_installer_basename() + "-Setup.exe"
         # </FS:ND>
         
         substitution_strings['installer_file'] = installer_file
@@ -1141,15 +1141,17 @@ class Windows_x86_64_Manifest(ViewerManifest):
         !define VIEWER_EXE "%(final_exe)s"
         """ % substitution_strings
 
+        substitution_strings['install_name'] = self.fs_install_name()
+        substitution_strings['display_name'] = self.fs_display_name()
         if self.channel_type() == 'release':
-            substitution_strings['caption'] = CHANNEL_VENDOR_BASE
+            substitution_strings['caption'] = self.fs_display_name()
         else:
-            substitution_strings['caption'] = self.app_name() + ' ${VERSION}'
+            substitution_strings['caption'] = self.fs_display_name() + ' ${VERSION}'
 
         inst_vars_template = """
             OutFile "%(installer_file)s"
-            !define INSTNAME   "%(app_name_oneword)s"
-            !define SHORTCUT   "%(app_name)s"
+            !define INSTNAME   "%(install_name)s"
+            !define SHORTCUT   "%(display_name)s"
             !define DL_URL   "%(dl_url)s"
             !define URLNAME   "secondlife"
             !define IS64BIT   "%(is64bit)d"
