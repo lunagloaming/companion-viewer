@@ -57,6 +57,13 @@
      tear_off="true"
      name="Help">
         <menu_item_call
+         label="Global Accountant"
+         name="Global Accountant">
+            <menu_item_call.on_click
+             function="GlobalAccountant.Launch" />
+        </menu_item_call>
+        <menu_item_separator/>
+        <menu_item_call
          label="Firestorm Wiki"
          name="Firestorm Wiki"
          shortcut="F1">
