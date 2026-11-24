@@ -1505,7 +1505,7 @@ namespace tut
             }
             return handler;
         };
-        auto secret_of = [](const LLPointer<LLSecAPIBasicHandler>& handler)
+        auto secret_of = [](LLPointer<LLSecAPIBasicHandler> handler)
         {
             return handler.notNull() ? handler->getProtectedData("login", "account")["password"].asString() : std::string("(unreadable)");
         };
