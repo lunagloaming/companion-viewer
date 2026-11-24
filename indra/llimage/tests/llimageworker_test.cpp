@@ -29,6 +29,7 @@
 #include "linden_common.h"
 // Class to test
 #include "../llimageworker.h"
+#include "../fsimagebc7.h" // <FS:Luna Witch/>
 // For timer class
 #include "../llcommon/lltimer.h"
 // for lltrace class
@@ -69,6 +70,10 @@ U8* LLImageRaw::reallocateData(S32 size) { return NULL; }
 const U8* LLImageBase::getData() const { return NULL; }
 U8* LLImageBase::getData() { return NULL; }
 const std::string& LLImage::getLastThreadError() { static std::string msg; return msg; }
+// <FS:Luna Witch> BC7 compression on the decode thread (fsimagebc7.h)
+LLPointer<FSImageBC7> FSImageBC7::compress(const LLImageRaw*) { return nullptr; }
+void FSImageBC7::addDecodeTime(U64) { }
+// </FS:Luna Witch>
 
 // End Stubbing
 // -------------------------------------------------------------------------------------------
