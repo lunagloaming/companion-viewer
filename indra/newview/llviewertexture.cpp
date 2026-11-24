@@ -643,7 +643,9 @@ void LLViewerTexture::updateClass()
     // A budget set by hand, or the whole card shared by the divisor
     const F32 ceiling = !max_vram_budget_enabled ? llmax(1024.f, (F32)gGLManager.mVRAM / (tex_vram_divisor() > 0.f ? tex_vram_divisor() : 1.f))
                                                  : (F32)max_vram_budget;
-    F32 target = target_for(ceiling);
+    // An automatic budget is shared with the other running viewer instances (FSInstanceSlots)
+    const F32 instance_count = !max_vram_budget_enabled ? (F32)llmax(FSInstanceSlots::instance().getActiveInstanceCount(), 1) : 1.f;
+    F32 target = target_for(ceiling / instance_count);
     S32 card_free_mb = -1;
     S32 evictions = -1;
     if (!max_vram_budget_enabled && budget_from_card)
@@ -653,9 +655,10 @@ void LLViewerTexture::updateClass()
         if (card_free_mb >= 0)
         {
             // What this viewer uses plus what is free, less a reserve for the desktop, other programs and what
-            // isn't counted. Never less than half the card: other programs count as one more viewer.
+            // isn't counted. Never less than an even share of the card, with other programs counted as one
+            // more viewer, so a viewer that has taken more gives memory back as another one grows.
             const F32 live = used + (F32)card_free_mb - (F32)vram_reserve();
-            target = llclamp(live, target_for(ceiling / 2.f), target);
+            target = llclamp(live, target_for(ceiling / (instance_count + 1.f)), target_for(ceiling));
         }
     }
 
