@@ -72,11 +72,11 @@ namespace tut
     template<> template<>
     void greetingnames_object::test<1>()
     {
-        ensure_equals("words, lowercase, punctuation dropped", joined(FSGreetingNames::chatWords("Welcome, Bel!")),
-                      joined(FSGreetingNames::chatWords("welcome bel")));
-        ensure_equals("an apostrophe joins", joined(FSGreetingNames::chatWords("D'Arcy")), joined(FSGreetingNames::chatWords("darcy")));
-        ensure_equals("digits separate", FSGreetingNames::chatWords("Mia77").size(), (size_t)1);
-        ensure("l and i are the same letter", folded("Lily") == folded("iiiy"));
+        ensure_equals("words, lowercase, punctuation dropped", joined(FSGreetingNames::chatWords("Welcome, Quorra!")),
+                      joined(FSGreetingNames::chatWords("welcome quorra")));
+        ensure_equals("an apostrophe joins", joined(FSGreetingNames::chatWords("D'Ambrin")), joined(FSGreetingNames::chatWords("dambrin")));
+        ensure_equals("digits separate", FSGreetingNames::chatWords("Kea77").size(), (size_t)1);
+        ensure("l and i are the same letter", folded("Lulla") == folded("Iuiia"));
     }
 
     // Lookalike letters fold to the letters they imitate
@@ -84,33 +84,33 @@ namespace tut
     void greetingnames_object::test<2>()
     {
         ensure("small capitals", has_key(FSGreetingNames::nameKeys("ᴘᴇʙʙʟᴇ", "pebble.resident"), "pebble"));
-        ensure("Greek capitals look like Latin capitals", has_key(FSGreetingNames::nameKeys("ΗΑΝΝΑΗ", "x1"), "hannah"));
-        ensure("Greek capital mu and nu", has_key(FSGreetingNames::nameKeys("ΜΙΝΑ", "x1"), "mina"));
-        ensure("Greek capital upsilon", has_key(FSGreetingNames::nameKeys("ΥΑΝΑ", "x1"), "yana"));
+        ensure("Greek capitals look like Latin capitals", has_key(FSGreetingNames::nameKeys("ΤΗΙΚΑ", "x1"), "thika"));
+        ensure("Greek capital mu and nu", has_key(FSGreetingNames::nameKeys("ΝΙΜΑ", "x1"), "nima"));
+        ensure("Greek capital upsilon", has_key(FSGreetingNames::nameKeys("ΥΑΚΙ", "x1"), "yaki"));
         ensure("Greek lowercase by shape", has_key(FSGreetingNames::nameKeys("Nεℓℓιε", "x1"), "nellie"));
         ensure("Cyrillic и reads as n", has_key(FSGreetingNames::nameKeys("Nαиcу", "x1"), "nancy"));
         ensure("Cyrillic capital У is Y", has_key(FSGreetingNames::nameKeys("УАRA", "x1"), "yara"));
-        ensure("mathematical script", has_key(FSGreetingNames::nameKeys("𝓜𝓲𝓪", "x1"), "mia"));
-        ensure("fullwidth", has_key(FSGreetingNames::nameKeys("Ｍｉａ", "x1"), "mia"));
-        ensure("circled", has_key(FSGreetingNames::nameKeys("ⓜⓘⓐ", "x1"), "mia"));
-        ensure("negative squared", has_key(FSGreetingNames::nameKeys("🅼🅸🅰", "x1"), "mia"));
-        ensure("regional indicators", has_key(FSGreetingNames::nameKeys("🇲🇮🇦", "x1"), "mia"));
-        ensure("accents dropped", has_key(FSGreetingNames::nameKeys("Zoë", "x1"), "zoe"));
+        ensure("mathematical script", has_key(FSGreetingNames::nameKeys("𝓚𝓮𝓪", "x1"), "kea"));
+        ensure("fullwidth", has_key(FSGreetingNames::nameKeys("Ｋｅａ", "x1"), "kea"));
+        ensure("circled", has_key(FSGreetingNames::nameKeys("ⓚⓔⓐ", "x1"), "kea"));
+        ensure("negative squared", has_key(FSGreetingNames::nameKeys("🅺🅴🅰", "x1"), "kea"));
+        ensure("regional indicators", has_key(FSGreetingNames::nameKeys("🇰🇪🇦", "x1"), "kea"));
+        ensure("accents dropped", has_key(FSGreetingNames::nameKeys("Ilvë", "x1"), "ilve"));
         ensure("CJK decoration letters", has_key(FSGreetingNames::nameKeys("尺ﾑ卄", "x1"), "rah"));
         ensure("Thai fancy alphabet", has_key(FSGreetingNames::nameKeys("ค๒๔", "x1"), "abd"));
         ensure("decoration around a name", has_key(FSGreetingNames::nameKeys("亗Wren亗", "x1"), "wren"));
-        ensure("leet digits in names", has_key(FSGreetingNames::nameKeys("R0s3", "x1"), "rose"));
+        ensure("leet digits in names", has_key(FSGreetingNames::nameKeys("Qu1ll", "x1"), "quill"));
     }
 
     // Name keys: digits, CamelCase, single letters, usernames, Resident
     template<> template<>
     void greetingnames_object::test<3>()
     {
-        const std::vector<LLWString> keys = FSGreetingNames::nameKeys("HollyBramble", "holly.bramble");
-        ensure("whole display name", has_key(keys, "hollybramble"));
-        ensure("CamelCase first part", has_key(keys, "holly"));
-        ensure("CamelCase second part", has_key(keys, "bramble"));
-        ensure("digits as separators", has_key(FSGreetingNames::nameKeys("Mia77", "x1"), "mia"));
+        const std::vector<LLWString> keys = FSGreetingNames::nameKeys("OrielVantwick", "oriel.vantwick");
+        ensure("whole display name", has_key(keys, "orielvantwick"));
+        ensure("CamelCase first part", has_key(keys, "oriel"));
+        ensure("CamelCase second part", has_key(keys, "vantwick"));
+        ensure("digits as separators", has_key(FSGreetingNames::nameKeys("Kea77", "x1"), "kea"));
         ensure("single letters joined", has_key(FSGreetingNames::nameKeys("K T", "x1"), "kt"));
         ensure("username words", has_key(FSGreetingNames::nameKeys("Somebody", "wren.ashdown"), "ashdown"));
         ensure("Resident is never a name", !has_key(FSGreetingNames::nameKeys("Wren", "wren.resident"), "resident"));
@@ -126,7 +126,7 @@ namespace tut
     {
         using FSGreetingNames::chatWords;
         using FSGreetingNames::isWelcome;
-        ensure("welcome with a name", isWelcome(chatWords("welcome Bel!")));
+        ensure("welcome with a name", isWelcome(chatWords("welcome Quorra!")));
         ensure("welcome back", isWelcome(chatWords("Welcome back, everyone :)")));
         ensure("welcome later in the line", isWelcome(chatWords("hi Juniper, welcome to the club")));
         ensure("you're welcome", !isWelcome(chatWords("you're welcome")));
@@ -135,7 +135,7 @@ namespace tut
         ensure("ur welcome", !isWelcome(chatWords("ur welcome")));
         ensure("you are welcome", !isWelcome(chatWords("you are welcome")));
         ensure("not part of a word", !isWelcome(chatWords("an unwelcome guest")));
-        ensure("no welcome", !isWelcome(chatWords("hello Bel")));
+        ensure("no welcome", !isWelcome(chatWords("hello Quorra")));
     }
 
     // Filler words are never taken for names
@@ -146,7 +146,7 @@ namespace tut
         {
             ensure(std::string("filler: ") + word, FSGreetingNames::isFillerWord(folded(word)));
         }
-        for (const char* word : { "bel", "juniper", "bramble" })
+        for (const char* word : { "quorra", "juniper", "vantwick" })
         {
             ensure(std::string("not filler: ") + word, !FSGreetingNames::isFillerWord(folded(word)));
         }
