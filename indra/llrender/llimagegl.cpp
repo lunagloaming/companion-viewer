@@ -2633,7 +2633,11 @@ void LLImageGL::resetCurTexSizebar()
 bool LLImageGL::bc7Supported()
 {
     // BPTC is core in OpenGL 4.2, glCopyImageSubData in 4.3
+#if LL_DARWIN
+    return false; // macOS stops at OpenGL 4.1
+#else
     return gGLManager.mInited && gGLManager.mGLVersion >= 4.29f;
+#endif
 }
 
 bool LLImageGL::setImageBC7(const FSImageBC7& bc7, const U8* raw_data)
@@ -2689,6 +2693,10 @@ bool LLImageGL::setImageBC7(const FSImageBC7& bc7, const U8* raw_data)
 bool LLImageGL::scaleDownBC7(S32 desired_discard)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_TEXTURE;
+#if LL_DARWIN
+    // Never reached: bc7Supported() is false on macOS, whose OpenGL.framework has no glCopyImageSubData to link.
+    return false;
+#else
     if (!mTexName)
     {
         return false;
@@ -2749,6 +2757,7 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
     mTexOptionsDirty = true; // filtering and address modes are set again on the next bind
     mTextureMemory = (S64Bytes)getMipBytes(mCurrentDiscardLevel);
     return true;
+#endif
 }
 // </FS:Luna Witch>
 
