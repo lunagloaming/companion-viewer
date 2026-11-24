@@ -15537,4 +15537,28 @@ Folder names cannot contain / or \.
   </notification>
   <!-- </FS:Amy> Favorite Wearables folders -->
 
+  <!-- <FS:Luna Witch> Help > Global Accountant -->
+  <notification
+   icon="alertmodal.tga"
+   name="GlobalAccountantMissing"
+   type="alertmodal">
+Global Accountant is the SL Money app, which isn't installed. Install it from Companion Viewer's tools/slmoney, or set the debug setting FSGlobalAccountantPath to where it is.
+    <tag>fail</tag>
+    <usetemplate
+     name="okbutton"
+     yestext="OK"/>
+  </notification>
+
+  <notification
+   icon="alertmodal.tga"
+   name="GlobalAccountantFailed"
+   type="alertmodal">
+Could not start SL Money ([PATH]).
+    <tag>fail</tag>
+    <usetemplate
+     name="okbutton"
+     yestext="OK"/>
+  </notification>
+  <!-- </FS:Luna Witch> -->
+
 </notifications>

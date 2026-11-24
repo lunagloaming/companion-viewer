@@ -163,6 +163,7 @@
 #include "fsfloateravataralign.h" // <FS:Chanayane> Compass floater
 #include "fsassetblacklist.h"
 #include "fsdata.h"
+#include "fsglobalaccountant.h" // <FS:Luna Witch/> Help > Global Accountant
 #include "fslslbridge.h"
 #include "fscommon.h"
 #include "fsfloaterexport.h"
@@ -12845,6 +12846,7 @@ void initialize_menus()
     enable.add("GridCheck", boost::bind(&checkIsGrid, _2)); // <FS:CR> Opensim menu item visibility control
     enable.add("GridFeatureCheck", boost::bind(&isGridFeatureEnabled, _2));
     commit.add("OpenGridStatus", boost::bind(&openGridStatus)); // <FS:Ansariel> FIRE-21236 - Help Menu - Check Grid Status doesn't open using External Browser
+    commit.add("GlobalAccountant.Launch", boost::bind(&FSGlobalAccountant::launch)); // <FS:Luna Witch/> Help > Global Accountant
 
     // Agent
     commit.add("Agent.toggleFlying", boost::bind(&LLAgent::toggleFlying));

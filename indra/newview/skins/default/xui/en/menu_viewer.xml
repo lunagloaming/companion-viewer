@@ -2687,198 +2687,13 @@
      name="Help"
      tear_off="true"
      visible="true">
-        <menu_item_check
-         label="Enable Viewer UI Hints"
-         name="Enable Hints">
-          <on_check
-            control="EnableUIHints"/>
-          <on_click
-            function="ToggleUIHints"/>
-        </menu_item_check>
-        
         <menu_item_call
-         label="Firestorm Wiki"
-         visible="false"
-         name="Firestorm Wiki">
-             <menu_item_call.on_click
-             function="PromptShowURL"
-             name="script_library_url"
-             parameter="WebLaunchExternalTarget,https://wiki.firestormviewer.org" />
-        </menu_item_call>
-        
-        <menu_item_call
-         label="Troubleshooting"
-         visible="false"
-         name="Troubleshooting">
+         label="Global Accountant"
+         name="Global Accountant">
             <menu_item_call.on_click
-             function="PromptShowURL"
-             name="wiki_troubleshooting_url"
-             parameter="WebLaunchExternalTarget,https://wiki.firestormviewer.org/firestorm_troubleshooting" />
-        </menu_item_call>
-	   
-        <menu_item_call
-         label="Join Firestorm Support Group"
-         visible="false"
-         name="firestorm_support_group">
-            <menu_item_call.on_click
-             function="Advanced.WebBrowserTest"
-             parameter="https://wiki.firestormviewer.org/firestorm_support_groups_join" />
-        </menu_item_call>
-
-        <menu_item_call
-         label="Firestorm Classes Schedule"
-         visible="false"
-         name="Firestorm Classes Schedule">
-             <menu_item_call.on_click
-             function="PromptShowURL"
-             name="wiki_classes_url"
-             parameter="WebLaunchExternalTarget,https://wiki.firestormviewer.org/firestorm_classes" />
-        </menu_item_call>
-
-        <menu_item_call
-         label="Firestorm Events Calendar"
-         visible="false"
-         name="Firestorm Events Calendar">
-             <menu_item_call.on_click
-             function="PromptShowURL"
-             name="events_calendar_url"
-             parameter="WebLaunchExternalTarget,https://teamup.com/ksxdajnbw9mvw7cbwz" />
-        </menu_item_call>
-
-        <menu_item_check
-         label="Guidebook"
-         visible="false"
-         name="How To">
-            <menu_item_check.on_click
-             function="Help.ToggleHowTo"
-             parameter="" />
-            <menu_item_check.on_check
-             function="Floater.Visible"
-             parameter="guidebook" />
-        </menu_item_check>
-
-<!--       <menu_item_call
-         label="Second Life Help"
-         name="Second Life Help">
-             <menu_item_call.on_click
-             function="PromptShowURL"
-             name="script_library_url"
-             parameter="WebLaunchExternalTarget,https://support.secondlife.com/" />
-        </menu_item_call>-->
-        <menu_item_separator name="grid_help_seperator"/>
-        <menu_item_call
-         label="[CURRENT_GRID] Help"
-         name="current_grid_help">
-            <menu_item_call.on_click
-             function="ShowHelp"
-             parameter="grid_help" />
-        </menu_item_call>
-        <menu_item_call
-         label="About [CURRENT_GRID]"
-         name="current_grid_about">
-            <menu_item_call.on_click
-             function="ShowHelp"
-             parameter="grid_about" />
-        </menu_item_call>
-<!--        <menu_item_call
-         label="Tutorial"
-         name="Tutorial">
-            <menu_item_call.on_click
-             function="Floater.Show"
-             parameter="hud" />
-        </menu_item_call>
-		<menu_item_separator/>
-        <menu_item_call
-             label="Knowledge Base"
-             name="Knowledge Base">
-             <menu_item_call.on_click
-                 function="Advanced.ShowURL"
-            parameter="http://community.secondlife.com/t5/English-Knowledge-Base/Second-Life-User-s-Guide/ta-p/1244857"/>
-        </menu_item_call>
-        <menu_item_call
-             label="Wiki"
-             name="Wiki">
-             <menu_item_call.on_click
-                 function="Advanced.ShowURL"
-                 parameter="http://wiki.secondlife.com"/>
-        </menu_item_call>
-        <menu_item_call
-             label="Community Forums"
-             name="Community Forums">
-             <menu_item_call.on_click
-                 function="Advanced.ShowURL"
-                 parameter="http://community.secondlife.com/t5/Forums/ct-p/Forums"/>
-        </menu_item_call>         
-        <menu_item_call
-             label="Support portal"
-             name="Support portal">
-             <menu_item_call.on_click
-                 function="Advanced.ShowURL"
-                 parameter="https://support.secondlife.com/"/>         
+             function="GlobalAccountant.Launch" />
         </menu_item_call>
         <menu_item_separator/>
-        <menu_item_call
-             label="[SECOND_LIFE] Blogs"
-             name="Second Life Blogs">
-             <menu_item_call.on_click
-                 function="Advanced.ShowURL"
-                 parameter="https://community.secondlife.com/news/"/>
-        </menu_item_call>-->
-        <menu_item_separator/>
-        <menu_item_call
-            name="whitelist_folders"
-            label="Whitelist adviser">
-            <menu_item_call.on_click
-               function="Floater.Show"
-               parameter="fs_whitelist_floater" />
-        </menu_item_call>
-        <menu_item_check
-             label="Check Grid status"
-             name="Grid Status">
-            <menu_item_check.on_click
-             function="OpenGridStatus"/>
-            <menu_item_check.on_check
-             function="Floater.Visible"
-             parameter="grid_status" />
-        </menu_item_check>
-        <menu_item_call
-             label="Report Abuse"
-             name="Report Abuse">
-                <menu_item_call.on_click
-                 function="ReportAbuse" />
-            </menu_item_call>
-        <menu_item_call
-             label="Report Problem"
-             visible="false"
-             name="Report Bug">
-                <menu_item_call.on_click
-                 function="Advanced.ReportBug"/>
-            </menu_item_call>
-
-        <menu_item_separator/>
-        <menu_item_call
-             label="Bumps, Pushes &amp; Hits"
-             name="Bumps, Pushes &amp;amp; Hits">
-                <menu_item_call.on_click
-                 function="Floater.Show"
-                 parameter="bumps" />
-            </menu_item_call>
-
-        <menu_item_separator/>
-
-        <menu_item_check
-            label="Enable Sysinfo Button"
-            name="Enable Sysinfo Button">
-            <menu_item_check.on_check
-                function="CheckControl"
-                parameter="SysinfoButtonInIM" />
-            <menu_item_check.on_click
-                function="ToggleControl"
-                parameter="SysinfoButtonInIM" />
-        </menu_item_check>
-
-        <menu_item_separator/>
-
         <menu_item_call
          label="About [APP_NAME]"
          name="About Second Life">
@@ -3923,6 +3738,201 @@
              parameter="QAMode" />
         </menu_item_check>
      <!-- </FS:TS> FIRE-17589 -->
+        <menu_item_separator/>
+        <menu
+         label="Help"
+         name="Advanced Help"
+         tear_off="true">
+            <menu_item_check
+             label="Enable Viewer UI Hints"
+             name="Enable Hints">
+              <on_check
+                control="EnableUIHints"/>
+              <on_click
+                function="ToggleUIHints"/>
+            </menu_item_check>
+        
+            <menu_item_call
+             label="Firestorm Wiki"
+             visible="false"
+             name="Firestorm Wiki">
+                 <menu_item_call.on_click
+                 function="PromptShowURL"
+                 name="script_library_url"
+                 parameter="WebLaunchExternalTarget,https://wiki.firestormviewer.org" />
+            </menu_item_call>
+        
+            <menu_item_call
+             label="Troubleshooting"
+             visible="false"
+             name="Troubleshooting">
+                <menu_item_call.on_click
+                 function="PromptShowURL"
+                 name="wiki_troubleshooting_url"
+                 parameter="WebLaunchExternalTarget,https://wiki.firestormviewer.org/firestorm_troubleshooting" />
+            </menu_item_call>
+	   
+            <menu_item_call
+             label="Join Firestorm Support Group"
+             visible="false"
+             name="firestorm_support_group">
+                <menu_item_call.on_click
+                 function="Advanced.WebBrowserTest"
+                 parameter="https://wiki.firestormviewer.org/firestorm_support_groups_join" />
+            </menu_item_call>
+
+            <menu_item_call
+             label="Firestorm Classes Schedule"
+             visible="false"
+             name="Firestorm Classes Schedule">
+                 <menu_item_call.on_click
+                 function="PromptShowURL"
+                 name="wiki_classes_url"
+                 parameter="WebLaunchExternalTarget,https://wiki.firestormviewer.org/firestorm_classes" />
+            </menu_item_call>
+
+            <menu_item_call
+             label="Firestorm Events Calendar"
+             visible="false"
+             name="Firestorm Events Calendar">
+                 <menu_item_call.on_click
+                 function="PromptShowURL"
+                 name="events_calendar_url"
+                 parameter="WebLaunchExternalTarget,https://teamup.com/ksxdajnbw9mvw7cbwz" />
+            </menu_item_call>
+
+            <menu_item_check
+             label="Guidebook"
+             visible="false"
+             name="How To">
+                <menu_item_check.on_click
+                 function="Help.ToggleHowTo"
+                 parameter="" />
+                <menu_item_check.on_check
+                 function="Floater.Visible"
+                 parameter="guidebook" />
+            </menu_item_check>
+
+    <!--       <menu_item_call
+             label="Second Life Help"
+             name="Second Life Help">
+                 <menu_item_call.on_click
+                 function="PromptShowURL"
+                 name="script_library_url"
+                 parameter="WebLaunchExternalTarget,https://support.secondlife.com/" />
+            </menu_item_call>-->
+            <menu_item_separator name="grid_help_seperator"/>
+            <menu_item_call
+             label="[CURRENT_GRID] Help"
+             name="current_grid_help">
+                <menu_item_call.on_click
+                 function="ShowHelp"
+                 parameter="grid_help" />
+            </menu_item_call>
+            <menu_item_call
+             label="About [CURRENT_GRID]"
+             name="current_grid_about">
+                <menu_item_call.on_click
+                 function="ShowHelp"
+                 parameter="grid_about" />
+            </menu_item_call>
+    <!--        <menu_item_call
+             label="Tutorial"
+             name="Tutorial">
+                <menu_item_call.on_click
+                 function="Floater.Show"
+                 parameter="hud" />
+            </menu_item_call>
+    		<menu_item_separator/>
+            <menu_item_call
+                 label="Knowledge Base"
+                 name="Knowledge Base">
+                 <menu_item_call.on_click
+                     function="Advanced.ShowURL"
+                parameter="http://community.secondlife.com/t5/English-Knowledge-Base/Second-Life-User-s-Guide/ta-p/1244857"/>
+            </menu_item_call>
+            <menu_item_call
+                 label="Wiki"
+                 name="Wiki">
+                 <menu_item_call.on_click
+                     function="Advanced.ShowURL"
+                     parameter="http://wiki.secondlife.com"/>
+            </menu_item_call>
+            <menu_item_call
+                 label="Community Forums"
+                 name="Community Forums">
+                 <menu_item_call.on_click
+                     function="Advanced.ShowURL"
+                     parameter="http://community.secondlife.com/t5/Forums/ct-p/Forums"/>
+            </menu_item_call>         
+            <menu_item_call
+                 label="Support portal"
+                 name="Support portal">
+                 <menu_item_call.on_click
+                     function="Advanced.ShowURL"
+                     parameter="https://support.secondlife.com/"/>         
+            </menu_item_call>
+            <menu_item_separator/>
+            <menu_item_call
+                 label="[SECOND_LIFE] Blogs"
+                 name="Second Life Blogs">
+                 <menu_item_call.on_click
+                     function="Advanced.ShowURL"
+                     parameter="https://community.secondlife.com/news/"/>
+            </menu_item_call>-->
+            <menu_item_separator/>
+            <menu_item_call
+                name="whitelist_folders"
+                label="Whitelist adviser">
+                <menu_item_call.on_click
+                   function="Floater.Show"
+                   parameter="fs_whitelist_floater" />
+            </menu_item_call>
+            <menu_item_check
+                 label="Check Grid status"
+                 name="Grid Status">
+                <menu_item_check.on_click
+                 function="OpenGridStatus"/>
+                <menu_item_check.on_check
+                 function="Floater.Visible"
+                 parameter="grid_status" />
+            </menu_item_check>
+            <menu_item_call
+                 label="Report Abuse"
+                 name="Report Abuse">
+                    <menu_item_call.on_click
+                     function="ReportAbuse" />
+                </menu_item_call>
+            <menu_item_call
+                 label="Report Problem"
+                 visible="false"
+                 name="Report Bug">
+                    <menu_item_call.on_click
+                     function="Advanced.ReportBug"/>
+                </menu_item_call>
+
+            <menu_item_separator/>
+            <menu_item_call
+                 label="Bumps, Pushes &amp; Hits"
+                 name="Bumps, Pushes &amp;amp; Hits">
+                    <menu_item_call.on_click
+                     function="Floater.Show"
+                     parameter="bumps" />
+                </menu_item_call>
+
+            <menu_item_separator/>
+
+            <menu_item_check
+                label="Enable Sysinfo Button"
+                name="Enable Sysinfo Button">
+                <menu_item_check.on_check
+                    function="CheckControl"
+                    parameter="SysinfoButtonInIM" />
+                <menu_item_check.on_click
+                    function="ToggleControl"
+                    parameter="SysinfoButtonInIM" />
+            </menu_item_check>
+        </menu>
     </menu>
 
     <menu
