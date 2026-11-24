@@ -37,7 +37,9 @@
 #include "llglslshader.h"
 #include "llmemory.h"
 #include "llframetimer.h" // <FS:Luna Witch/>
+#include "llthread.h" // <FS:Luna Witch/> on_main_thread()
 #include "fsvbotrace.h" // <FS:Luna Witch/>
+static void release_upload_staging(); // <FS:Luna Witch/> GPU-copy upload staging buffer, see upload_via_gpu_copy
 #include <glm/gtc/type_ptr.hpp>
 
 //Next Highest Power Of Two
@@ -1017,6 +1019,8 @@ void LLVertexBuffer::cleanupClass()
 {
     unbind();
 
+    release_upload_staging(); // <FS:Luna Witch/>
+
     delete sVBOPool;
     sVBOPool = nullptr;
 
@@ -1559,14 +1563,28 @@ U8* LLVertexBuffer::mapIndexBuffer(U32 index, S32 count)
 // memory only fell from 4.06 to 3.65 GB: most of it is reserved at glBufferData(NULL) instead.
 bool LLVertexBuffer::sGPUCopyUpload = false;
 
+// The staging buffer belongs to the main thread's GL context: only the main thread uploads this way (others
+// upload directly), and cleanupClass deletes it with the pool, so it never outlives the buffers it fills.
+static GLuint sUploadStaging = 0;
+static U32 sUploadStagingPos = 0;
+
+static void release_upload_staging()
+{
+    if (sUploadStaging)
+    {
+        glDeleteBuffers(1, &sUploadStaging);
+        sUploadStaging = 0;
+        sUploadStagingPos = 0;
+    }
+}
+
 static void upload_via_gpu_copy(GLenum target, U32 offset, U32 size, const U8* data)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_VERTEX;
     FSVBOTrace::Scope trace(FSVBOTrace::CALL_UPLOAD, size);
     constexpr U32 staging_size = 4 * 1024 * 1024;
-    // per thread, since binding state belongs to the thread's GL context
-    thread_local GLuint staging = 0;
-    thread_local U32 staging_pos = 0;
+    GLuint& staging = sUploadStaging;
+    U32& staging_pos = sUploadStagingPos;
 
     if (!staging)
     {
@@ -1626,7 +1644,7 @@ void LLVertexBuffer::flush_vbo(GLenum target, U32 start, U32 end, void* data, U8
             LL_PROFILE_ZONE_NUM(end-start);
 
             // <FS:Luna Witch>
-            if (sGPUCopyUpload)
+            if (sGPUCopyUpload && on_main_thread())
             {
                 upload_via_gpu_copy(target, start, end - start + 1, (const U8*)data);
                 return;
