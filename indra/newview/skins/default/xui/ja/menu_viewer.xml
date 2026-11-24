@@ -299,20 +299,6 @@
 		<!-- added Mar.15, 2015 -->
 	</menu>
 	<menu label="ヘルプ" name="Help">
-		<menu_item_check label="ヒントを有効にする" name="Enable Hints"/>
-		<menu_item_call label="Firestorm Wiki" name="Firestorm Wiki"/>
-		<menu_item_call label="問題の解決" name="Troubleshooting"/>
-		<menu_item_call label="Firestormサポートグループに参加" name="firestorm_support_group"/>
-		<menu_item_call label="Firestorm勉強会スケジュール" name="Firestorm Classes Schedule"/>
-		<menu_item_call label="Firestormイベントカレンダー" name="Firestorm Events Calendar"/>
-		<menu_item_call label="[CURRENT_GRID]ヘルプ" name="current_grid_help"/>
-		<menu_item_call label="[CURRENT_GRID]について" name="current_grid_about"/>
-		<menu_item_call label="ホワイトリストアドバイザー" name="whitelist_folders"/>
-		<menu_item_call label="グリッド状況の確認" name="Grid Status"/>
-		<menu_item_call label="嫌がらせの報告" name="Report Abuse"/>
-		<menu_item_call label="バグの報告" name="Report Bug"/>
-		<menu_item_call label="衝突・プッシュ＆打撃" name="Bumps, Pushes &amp;amp; Hits"/>
-		<menu_item_check label="システム情報ボタンを有効化" name="Enable Sysinfo Button"/>
 		<menu_item_call label="[APP_NAME]について" name="About Second Life"/>
 	</menu>
 	<menu label="ＲＬＶａ" name="RLVa Main">
@@ -432,6 +418,22 @@
 		<menu_item_check label="RestrainedLove API（ＲＬＶａ）を有効化" name="RLV API"/>
 		<menu_item_call label="デバッグ設定を表示" name="Debug Settings"/>
 		<menu_item_check label="開発メニューを表示" name="Debug Mode"/>
+		<menu label="ヘルプ" name="Advanced Help">
+			<menu_item_check label="ヒントを有効にする" name="Enable Hints"/>
+			<menu_item_call label="Firestorm Wiki" name="Firestorm Wiki"/>
+			<menu_item_call label="問題の解決" name="Troubleshooting"/>
+			<menu_item_call label="Firestormサポートグループに参加" name="firestorm_support_group"/>
+			<menu_item_call label="Firestorm勉強会スケジュール" name="Firestorm Classes Schedule"/>
+			<menu_item_call label="Firestormイベントカレンダー" name="Firestorm Events Calendar"/>
+			<menu_item_call label="[CURRENT_GRID]ヘルプ" name="current_grid_help"/>
+			<menu_item_call label="[CURRENT_GRID]について" name="current_grid_about"/>
+			<menu_item_call label="ホワイトリストアドバイザー" name="whitelist_folders"/>
+			<menu_item_call label="グリッド状況の確認" name="Grid Status"/>
+			<menu_item_call label="嫌がらせの報告" name="Report Abuse"/>
+			<menu_item_call label="バグの報告" name="Report Bug"/>
+			<menu_item_call label="衝突・プッシュ＆打撃" name="Bumps, Pushes &amp;amp; Hits"/>
+			<menu_item_check label="システム情報ボタンを有効化" name="Enable Sysinfo Button"/>
+		</menu>
 	</menu>
 	<menu label="開発" name="Develop">
 		<menu label="コンソール" name="Consoles">

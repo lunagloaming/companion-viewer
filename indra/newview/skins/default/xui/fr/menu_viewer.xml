@@ -296,27 +296,6 @@
 		<menu_item_call label="Message du jour" name="Firestorm MoTD"/>
 	</menu>
 	<menu label="Aide" name="Help">
-		<menu_item_check label="Affficher les conseils" name="Enable Hints"/>
-		<menu_item_call label="Wiki Firestorm" name="Firestorm Wiki"/>
-		<menu_item_call label="Dépannage" name="Troubleshooting"/>
-		<menu_item_call label="Rejoindre un groupe d'aide Firestorm" name="firestorm_support_group"/>
-		<menu_item_call label="Horaires des classes Firestorm" name="Firestorm Classes Schedule"/>
-		<menu_item_call label="Calendrier des évènements Firestorm" name="Firestorm Events Calendar"/>
-		<!-- <menu_item_call label="Aide Second Life" name="Second Life Help"/>-->
-		<menu_item_call label="Aide [CURRENT_GRID]" name="current_grid_help"/>
-		<menu_item_call label="À propos de [CURRENT_GRID]" name="current_grid_about"/>
-		<!-- <menu_item_call label="Tutoriels" name="Tutorial"/>
-		<menu_item_call label="Base de connaissance" name="Knowledge Base"/>
-		<menu_item_call label="Wiki" name="Wiki"/>
-		<menu_item_call label="Forums communautaires" name="Community Forums"/>
-		<menu_item_call label="Portail d'assistance" name="Support portal"/>
-		<menu_item_call label="Blogs de [SECOND_LIFE]" name="Second Life Blogs"/>-->
-		<menu_item_call name="whitelist_folders" label="Conseils de liste blanche"/>
-		<menu_item_check label="Consulter l'état de la grille" name="Grid Status"/>
-		<menu_item_call label="Signaler une infraction" name="Report Abuse"/>
-		<menu_item_call label="Signaler un problème" name="Report Bug"/>
-		<menu_item_call label="Collisions, coups et bousculades" name="Bumps, Pushes &amp;amp; Hits"/>
-		<menu_item_check label="Activer le bouton Sysinfo" name="Enable Sysinfo Button"/>
 		<menu_item_call label="À propos de [APP_NAME]" name="About Second Life"/>
 	</menu>
 	<menu label="Avancé" name="Advanced">
@@ -406,6 +385,29 @@
 		<menu_item_check label="API RestrainedLove" name="RLV API"/>
 		<menu_item_call label="Afficher les paramètres de débogage" name="Debug Settings"/>
 		<menu_item_check label="Afficher le menu Développeurs" name="Debug Mode"/>
+		<menu label="Aide" name="Advanced Help">
+			<menu_item_check label="Affficher les conseils" name="Enable Hints"/>
+			<menu_item_call label="Wiki Firestorm" name="Firestorm Wiki"/>
+			<menu_item_call label="Dépannage" name="Troubleshooting"/>
+			<menu_item_call label="Rejoindre un groupe d'aide Firestorm" name="firestorm_support_group"/>
+			<menu_item_call label="Horaires des classes Firestorm" name="Firestorm Classes Schedule"/>
+			<menu_item_call label="Calendrier des évènements Firestorm" name="Firestorm Events Calendar"/>
+			<!-- <menu_item_call label="Aide Second Life" name="Second Life Help"/>-->
+			<menu_item_call label="Aide [CURRENT_GRID]" name="current_grid_help"/>
+			<menu_item_call label="À propos de [CURRENT_GRID]" name="current_grid_about"/>
+			<!-- <menu_item_call label="Tutoriels" name="Tutorial"/>
+			<menu_item_call label="Base de connaissance" name="Knowledge Base"/>
+			<menu_item_call label="Wiki" name="Wiki"/>
+			<menu_item_call label="Forums communautaires" name="Community Forums"/>
+			<menu_item_call label="Portail d'assistance" name="Support portal"/>
+			<menu_item_call label="Blogs de [SECOND_LIFE]" name="Second Life Blogs"/>-->
+			<menu_item_call name="whitelist_folders" label="Conseils de liste blanche"/>
+			<menu_item_check label="Consulter l'état de la grille" name="Grid Status"/>
+			<menu_item_call label="Signaler une infraction" name="Report Abuse"/>
+			<menu_item_call label="Signaler un problème" name="Report Bug"/>
+			<menu_item_call label="Collisions, coups et bousculades" name="Bumps, Pushes &amp;amp; Hits"/>
+			<menu_item_check label="Activer le bouton Sysinfo" name="Enable Sysinfo Button"/>
+		</menu>
 	</menu>
 	<menu label="Développeurs" name="Develop">
 		<menu label="Consoles" name="Consoles">

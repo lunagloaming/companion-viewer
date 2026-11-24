@@ -286,27 +286,6 @@
 	</menu>
 	<!-- Help Menu -->
 	<menu label="Kömək" name="Help">
-		<menu_item_check label="İstifadəçi interfeysi ipuclarını aktivləşdir" name="Enable Hints"/>
-		<menu_item_call label="Firestorm Viki" name="Firestorm Wiki"/>
-		<menu_item_call label="Problem həllinə kömək axtar" name="Troubleshooting"/>
-		<menu_item_call label="Firestorm dəstək qrupuna qoşulun" name="firestorm_support_group"/>
-		<menu_item_call label="Firestorm təlimatlarının təqviminə bax" name="Firestorm Classes Schedule"/>
-		<menu_item_call label="Firestorm Hadisələr Təqvimi" name="Firestorm Events Calendar"/>
-		<!-- <menu_item_call label="Second Life Help" name="Second Life Help"/> -->
-		<menu_item_call label="[CURRENT_GRID] kömək" name="current_grid_help"/>
-		<menu_item_call label="[CURRENT_GRID] haqqında" name="current_grid_about"/>
-		<!-- <menu_item_call label="Tutorial" name="Tutorial"/>
-		<menu_item_call label="Knowledge Base" name="Knowledge Base"/>
-		<menu_item_call label="Wiki" name="Wiki"/>
-		<menu_item_call label="Community Forums" name="Community Forums"/>
-		<menu_item_call label="Support portal" name="Support portal"/>
-		<menu_item_call label="[SECOND_LIFE] News" name="Second Life News"/>
-		<menu_item_call label="[SECOND_LIFE] Blogs" name="Second Life Blogs"/> -->
-		<menu_item_call label="Şəbəkə statusunun yoxlanışı (Grid Status)" name="Grid Status"/>
-		<menu_item_call label="Şikayət et" name="Report Abuse"/>
-		<menu_item_call label="Xəta haqqında xəbərdarlıq ver" name="Report Bug"/>
-		<menu_item_call label="Zərbələr, toqquşmalar və vurmaqlar" name="Bumps, Pushes &amp;amp; Hits"/>
-		<menu_item_check label="Sistem məlumatı düyməsini aktivləşdir" name="Enable Sysinfo Button"/>
 		<menu_item_call label="[APP_NAME] haqqında" name="About Second Life"/>
 	</menu>
 	<menu name="RLVa Main">
@@ -418,6 +397,29 @@
 		<menu_item_check label="(RLVa) Skript nəzarəti " name="RLV API"/>
 		<menu_item_call label="Sazlama seçimlərini göstər" name="Debug Settings"/>
 		<menu_item_check label="Sazlama menyusunu göstər" name="Debug Mode"/>
+		<menu label="Kömək" name="Advanced Help">
+			<menu_item_check label="İstifadəçi interfeysi ipuclarını aktivləşdir" name="Enable Hints"/>
+			<menu_item_call label="Firestorm Viki" name="Firestorm Wiki"/>
+			<menu_item_call label="Problem həllinə kömək axtar" name="Troubleshooting"/>
+			<menu_item_call label="Firestorm dəstək qrupuna qoşulun" name="firestorm_support_group"/>
+			<menu_item_call label="Firestorm təlimatlarının təqviminə bax" name="Firestorm Classes Schedule"/>
+			<menu_item_call label="Firestorm Hadisələr Təqvimi" name="Firestorm Events Calendar"/>
+			<!-- <menu_item_call label="Second Life Help" name="Second Life Help"/> -->
+			<menu_item_call label="[CURRENT_GRID] kömək" name="current_grid_help"/>
+			<menu_item_call label="[CURRENT_GRID] haqqında" name="current_grid_about"/>
+			<!-- <menu_item_call label="Tutorial" name="Tutorial"/>
+			<menu_item_call label="Knowledge Base" name="Knowledge Base"/>
+			<menu_item_call label="Wiki" name="Wiki"/>
+			<menu_item_call label="Community Forums" name="Community Forums"/>
+			<menu_item_call label="Support portal" name="Support portal"/>
+			<menu_item_call label="[SECOND_LIFE] News" name="Second Life News"/>
+			<menu_item_call label="[SECOND_LIFE] Blogs" name="Second Life Blogs"/> -->
+			<menu_item_call label="Şəbəkə statusunun yoxlanışı (Grid Status)" name="Grid Status"/>
+			<menu_item_call label="Şikayət et" name="Report Abuse"/>
+			<menu_item_call label="Xəta haqqında xəbərdarlıq ver" name="Report Bug"/>
+			<menu_item_call label="Zərbələr, toqquşmalar və vurmaqlar" name="Bumps, Pushes &amp;amp; Hits"/>
+			<menu_item_check label="Sistem məlumatı düyməsini aktivləşdir" name="Enable Sysinfo Button"/>
+		</menu>
 	</menu>
 	<menu label="Sazlama" name="Develop">
 		<menu label="Konsollar" name="Consoles">
