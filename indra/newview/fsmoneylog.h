@@ -33,8 +33,8 @@ class LLMessageSystem;
 // Appends one line to money_log.txt in the account's folder for every change of the balance:
 // time (UTC), change, balance after it, who it came from or went to, the object or item, and the
 // kind of transaction. The first balance of each session is logged too, as a starting point.
-// It runs for every MoneyBalanceReply, whatever the notification settings are. Nothing reads the
-// file; it's a record for the user.
+// It runs for every MoneyBalanceReply, whatever the notification settings are. SL Money (Help >
+// Global Accountant, fsglobalaccountant.h) reads the file: keep its format readable by it.
 namespace FSMoneyLog
 {
     void record(LLMessageSystem* msg);
