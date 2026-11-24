@@ -149,12 +149,12 @@
 		<menu_item_call label="Yinele" name="Redo"/>
 	</menu>
 	<menu label="Yardım" name="Help">
+		<menu_item_call label="KA Büyüklüğünü Varsayılana Ayarla" name="Set UI Size to Default"/>
+		<menu_item_call label="Pencere Büyüklüğünü Ayarla..." name="Set Window Size..."/>
 		<menu_item_call label="[APP_NAME] Hakkında" name="About Second Life"/>
 	</menu>
 	<menu label="Gelişmiş" name="Advanced">
 		<menu_item_call label="Dokuları Tekrar Kaydet" name="Rebake Texture"/>
-		<menu_item_call label="KA Büyüklüğünü Varsayılana Ayarla" name="Set UI Size to Default"/>
-		<menu_item_call label="Pencere Büyüklüğünü Ayarla..." name="Set Window Size..."/>
 		<menu_item_check label="Seçim Mesafesini Sınırla" name="Limit Select Distance"/>
 		<menu_item_check label="Kamera Kısıtlarını Devredışı Bırak" name="Disable Camera Distance"/>
 		<menu_item_check label="Yüksek Çöz. Anlık Görüntü" name="HighResSnapshot"/>

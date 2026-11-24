@@ -286,6 +286,8 @@
 	</menu>
 	<!-- Help Menu -->
 	<menu label="Kömək" name="Help">
+		<menu_item_call label="İnterfeysin əsas ölçüsünə qaytarılması" name="Set UI Size to Default"/>
+		<menu_item_call label="Pəncərə ölçüsünün təyin edilməsi..." name="Set Window Size..."/>
 		<menu_item_call label="[APP_NAME] haqqında" name="About Second Life"/>
 	</menu>
 	<menu name="RLVa Main">
@@ -317,8 +319,6 @@
 	<menu label="Əlavə" name="Advanced">
 		<menu_item_call label="Tekstur yeniləməsi edin (rebake)" name="Rebake Texture"/>
 		<menu_item_call label="Əlavələrin yenilənməsi" name="Refresh Attachments"/>
-		<menu_item_call label="İnterfeysin əsas ölçüsünə qaytarılması" name="Set UI Size to Default"/>
-		<menu_item_call label="Pəncərə ölçüsünün təyin edilməsi..." name="Set Window Size..."/>
 		<menu_item_check label="Seçim məsafəsini məhdudlaşdırın" name="Limit Select Distance"/>
 		<menu_item_check label="Kamera məhdudlaşdırmalarını söndürün" name="Disable Camera Distance"/>
 		<menu_item_check label="Yüksək həlləli görüntü" name="HighResSnapshot"/>

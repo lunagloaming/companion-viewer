@@ -332,6 +332,8 @@
 	</menu>
 	<!-- Help Menu -->
 	<menu label="Помощь" name="Help">
+		<menu_item_call label="Восстановить исходный размер интерфейса" name="Set UI Size to Default"/>
+		<menu_item_call label="Установить размер окна..." name="Set Window Size..."/>
 		<menu_item_call label="Информация о [APP_NAME]" name="About Second Life"/>
 	</menu>
 	<menu name="RLVa Main">
@@ -363,8 +365,6 @@
 	<menu label="Расширенное" name="Advanced">
 		<menu_item_call label="Перегрузить текстуры (rebake)" name="Rebake Texture"/>
 		<menu_item_call label="Обновить присоединения" name="Refresh Attachments"/>
-		<menu_item_call label="Восстановить исходный размер интерфейса" name="Set UI Size to Default"/>
-		<menu_item_call label="Установить размер окна..." name="Set Window Size..."/>
 		<menu_item_check label="Ограничить расстояние выбора" name="Limit Select Distance"/>
 		<menu_item_check label="Отключить ограничения камеры" name="Disable Camera Distance"/>
 		<menu_item_check label="Снимок высокого разрешения" name="HighResSnapshot"/>

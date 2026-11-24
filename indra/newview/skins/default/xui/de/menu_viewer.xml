@@ -295,6 +295,8 @@
 		<menu_item_call label="Nachricht des Tages" name="Firestorm MoTD"/>
 	</menu>
 	<menu label="Hilfe" name="Help">
+		<menu_item_call label="UI-Größe auf Standard setzen" name="Set UI Size to Default"/>
+		<menu_item_call label="Fenstergröße einstellen..." name="Set Window Size..."/>
 		<menu_item_call label="Info über [APP_NAME]" name="About Second Life"/>
 	</menu>
 	<menu label="RLVa" name="RLVa Main">
@@ -324,8 +326,6 @@
 	<menu label="Erweitert" name="Advanced">
 		<menu_item_call label="Textur neu laden" name="Rebake Texture"/>
 		<menu_item_call label="Anhänge aktualisieren" name="Refresh Attachments"/>
-		<menu_item_call label="UI-Größe auf Standard setzen" name="Set UI Size to Default"/>
-		<menu_item_call label="Fenstergröße einstellen..." name="Set Window Size..."/>
 		<menu_item_check label="Auswahldistanz einschränken" name="Limit Select Distance"/>
 		<menu_item_check label="Kamerabeschränkungen deaktivieren" name="Disable Camera Distance"/>
 		<menu_item_check label="Fotos in hoher Auflösung speichern" name="HighResSnapshot"/>

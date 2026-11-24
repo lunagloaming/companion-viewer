@@ -299,6 +299,8 @@
 		<!-- added Mar.15, 2015 -->
 	</menu>
 	<menu label="ヘルプ" name="Help">
+		<menu_item_call label="ＵＩサイズをデフォルトにする" name="Set UI Size to Default"/>
+		<menu_item_call label="ウィンドウサイズ設定…" name="Set Window Size..."/>
 		<menu_item_call label="[APP_NAME]について" name="About Second Life"/>
 	</menu>
 	<menu label="ＲＬＶａ" name="RLVa Main">
@@ -329,8 +331,6 @@
 	<menu label="高度な操作" name="Advanced">
 		<menu_item_call label="テクスチャをリベークする" name="Rebake Texture"/>
 		<menu_item_call label="装着物をリフレッシュ" name="Refresh Attachments"/>
-		<menu_item_call label="ＵＩサイズをデフォルトにする" name="Set UI Size to Default"/>
-		<menu_item_call label="ウィンドウサイズ設定…" name="Set Window Size..."/>
 		<menu_item_check label="オブジェクトの選択距離の制限" name="Limit Select Distance"/>
 		<menu_item_check label="カメラの距離制限を解除" name="Disable Camera Distance"/>
 		<menu_item_check label="高解像度スナップショット" name="HighResSnapshot"/>
