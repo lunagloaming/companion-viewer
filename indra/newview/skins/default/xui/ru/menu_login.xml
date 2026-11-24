@@ -7,21 +7,9 @@
 		<menu_item_call label="Выйти из [APP_NAME]" name="Quit"/>
 	</menu>
 	<menu label="Помощь" name="Help">
-		<menu_item_call label="Firestorm Wiki" name="Firestorm Wiki"/>
-		<menu_item_call label="Решение проблем" name="Troubleshooting"/>
-		<!--
-		<menu_item_call label="База знаний" name="Knowledge Base"/>
-		<menu_item_call label="Wiki Second Life" name="Wiki"/>
-		<menu_item_call label="Forum сообщества" name="Community Forums"/>
-		<menu_item_call label="Портал поддержки" name="Support portal"/>
-		<menu_item_call label="Блоги: [SECOND_LIFE]" name="Second Life Blogs"/>
-		 -->
-		<menu_item_call label="Сообщить об ошибке" name="Report Bug"/>
 		<menu_item_call label="Восстановить исходный размер интерфейса" name="Set UI Size to Default"/>
 		<menu_item_call label="Установить размер окна..." name="Set Window Size..."/>
 		<menu_item_call label="Информация о [APP_NAME]" name="About Second Life"/>
-		<menu_item_call label="Помощь для [CURRENT_GRID]" name="current_grid_help_login"/>
-		<menu_item_call label="Информация о [CURRENT_GRID]" name="current_grid_about_login"/>
 	</menu>
 	<menu_item_check label="Показать меню отладки" name="Show Debug Menu"/>
 	<menu label="Отладка" name="Debug">
@@ -44,6 +32,22 @@
 			<menu_item_check label="Предупреждения" name="Warning"/>
 			<menu_item_check label="Ошибки" name="Error"/>
 			<menu_item_check label="Нет" name="None"/>
+		</menu>
+		<menu label="Помощь" name="Login Help">
+			<menu_item_call label="Firestorm Wiki" name="Firestorm Wiki"/>
+			<menu_item_call label="Решение проблем" name="Troubleshooting"/>
+			<!--
+			<menu_item_call label="База знаний" name="Knowledge Base"/>
+			<menu_item_call label="Wiki Second Life" name="Wiki"/>
+			<menu_item_call label="Forum сообщества" name="Community Forums"/>
+			<menu_item_call label="Портал поддержки" name="Support portal"/>
+			<menu_item_call label="Блоги: [SECOND_LIFE]" name="Second Life Blogs"/>
+			 -->
+			<menu_item_call label="Сообщить об ошибке" name="Report Bug"/>
+		</menu>
+		<menu label="OpenSim" name="Login OpenSim">
+			<menu_item_call label="Помощь для [CURRENT_GRID]" name="current_grid_help_login"/>
+			<menu_item_call label="Информация о [CURRENT_GRID]" name="current_grid_about_login"/>
 		</menu>
 	</menu>
 </menu_bar>
