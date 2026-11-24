@@ -7,22 +7,9 @@
 		<menu_item_call label="[APP_NAME]-dan çıxış" name="Quit"/>
 	</menu>
 	<menu label="Kömək" name="Help">
-		<menu_item_call label="Firestorm Viki" name="Firestorm Wiki"/>
-		<menu_item_call label="Problem həll etmək" name="Troubleshooting"/>
-		<menu_item_call label="Necə etməliyəm" name="How To"/>
-		<!-- <menu_item_call label="Sürətli başlamaq" name="Quickstart"/>
-		<menu_item_call label="Bilmə mənbəyi" name="Knowledge Base"/>
-		<menu_item_call label="Second Life Viki" name="Wiki"/>
-		<menu_item_call label="İctimai Forumlar" name="Community Forums"/>
-		<menu_item_call label="Dəstək portalı" name="Support portal"/>
-		<menu_item_call label="Xəbərlər: [SECOND_LIFE]" name="Second Life News"/>
-		<menu_item_call label="Blogger: [SECOND_LIFE]" name="Second Life Blogs"/> -->
-		<menu_item_call label="Xəta bildir" name="Report Bug"/>
 		<menu_item_call label="İnterfeysin əsas ölçüsünə qaytarılması" name="Set UI Size to Default"/>
 		<menu_item_call label="Pəncərə ölçüsünü təyin et..." name="Set Window Size..."/>
 		<menu_item_call label="[APP_NAME] haqqında məlumat" name="About Second Life"/>
-		<menu_item_call label="[CURRENT_GRID] üçün kömək" name="current_grid_help_login"/>
-		<menu_item_call label="[CURRENT_GRID] haqqında məlumat" name="current_grid_about_login"/>
 	</menu>
 	<menu_item_check label="Sazlama menyunu göstər" name="Show Debug Menu"/>
 	<menu label="Sazlama" name="Debug">
@@ -39,6 +26,23 @@
 			<menu_item_check label="Xəbərdarlıq" name="Warning"/>
 			<menu_item_check label="Xəta" name="Error"/>
 			<menu_item_check label="Heçbiri" name="None"/>
+		</menu>
+		<menu label="Kömək" name="Login Help">
+			<menu_item_call label="Firestorm Viki" name="Firestorm Wiki"/>
+			<menu_item_call label="Problem həll etmək" name="Troubleshooting"/>
+			<menu_item_call label="Necə etməliyəm" name="How To"/>
+			<!-- <menu_item_call label="Sürətli başlamaq" name="Quickstart"/>
+			<menu_item_call label="Bilmə mənbəyi" name="Knowledge Base"/>
+			<menu_item_call label="Second Life Viki" name="Wiki"/>
+			<menu_item_call label="İctimai Forumlar" name="Community Forums"/>
+			<menu_item_call label="Dəstək portalı" name="Support portal"/>
+			<menu_item_call label="Xəbərlər: [SECOND_LIFE]" name="Second Life News"/>
+			<menu_item_call label="Blogger: [SECOND_LIFE]" name="Second Life Blogs"/> -->
+			<menu_item_call label="Xəta bildir" name="Report Bug"/>
+		</menu>
+		<menu label="OpenSim" name="Login OpenSim">
+			<menu_item_call label="[CURRENT_GRID] üçün kömək" name="current_grid_help_login"/>
+			<menu_item_call label="[CURRENT_GRID] haqqında məlumat" name="current_grid_about_login"/>
 		</menu>
 	</menu>
 </menu_bar>

@@ -7,14 +7,9 @@
 		<menu_item_call label="退出 [APP_NAME]" name="Quit" />
 	</menu>
 	<menu label="幫助" name="Help">
-		<menu_item_call label="除錯" name="Troubleshooting" />
-		<menu_item_call label="指南" name="How To" />
-		<menu_item_call label="報告問題" name="Report Bug" />
 		<menu_item_call label="以預設值設定UI大小" name="Set UI Size to Default" />
 		<menu_item_call label="設定視窗大小" name="Set Window Size..." />
 		<menu_item_call label="關於 [APP_NAME]" name="About Second Life" />
-		<menu_item_call label="[CURRENT_GRID] 幫助" name="current_grid_help_login" />
-		<menu_item_call label="關於 [CURRENT_GRID]" name="current_grid_about_login" />
 	</menu>
 	<menu_item_check label="顯示除錯選項" name="Show Debug Menu" />
 	<menu label="除錯" name="Debug">
@@ -43,5 +38,14 @@
 			<menu_item_check name="None" label="無" />
 		</menu>
 		<menu_item_call label="顯示通知控制台" name="Show Notifications Console" />
+		<menu label="幫助" name="Login Help">
+			<menu_item_call label="除錯" name="Troubleshooting" />
+			<menu_item_call label="指南" name="How To" />
+			<menu_item_call label="報告問題" name="Report Bug" />
+		</menu>
+		<menu label="OpenSim" name="Login OpenSim">
+			<menu_item_call label="[CURRENT_GRID] 幫助" name="current_grid_help_login" />
+			<menu_item_call label="關於 [CURRENT_GRID]" name="current_grid_about_login" />
+		</menu>
 	</menu>
 </menu_bar>

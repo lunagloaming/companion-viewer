@@ -5,7 +5,6 @@
 		<menu_item_call label="Afslut [APP_NAME]" name="Quit"/>
 	</menu>
 	<menu label="Hjælp" name="Help">
-		<menu_item_call label="[APP_NAME] hjælp" name="Second Life Help"/>
 		<menu_item_call label="Sæt UI størrelse til standard" name="Set UI Size to Default"/>
 		<menu_item_call label="Sæt vinduesstørrelse" name="Set Window Size..."/>
 		<menu_item_call label="Om [APP_NAME]" name="About Second Life"/>
@@ -21,5 +20,8 @@
 		<menu_item_call label="Web Content Floater Test" name="Web Content Floater Test"/>
 		<menu_item_check label="Vis gitter vælger" name="Show Grid Picker"/>
 		<menu_item_call label="Vis notifikationskonsol" name="Show Notifications Console"/>
+		<menu label="Hjælp" name="Login Help">
+			<menu_item_call label="[APP_NAME] hjælp" name="Second Life Help"/>
+		</menu>
 	</menu>
 </menu_bar>
