@@ -6,7 +6,7 @@ It is based on [Firestorm](https://www.firestormviewer.org), so everything Fires
 
 ## Download
 
-Nightly builds are on the [Releases](https://github.com/lunagloaming/companion-viewer/releases) page: `.deb`, `.rpm` and Arch packages for Linux, and a disk image for macOS. There are no Windows builds yet, and no release builds are published so far.
+Nightly builds are on the [Releases](https://github.com/lunagloaming/companion-viewer/releases) page: `.deb`, `.rpm` and Arch packages for Linux, a disk image for macOS, and an installer for 64-bit Windows. No release builds are published so far.
 
 Nightly builds follow Firestorm's development branch, so they also contain Firestorm's own unreleased changes. They are untested: expect bugs.
 
@@ -14,8 +14,9 @@ Nightly builds follow Firestorm's development branch, so they also contain Fires
 
 ### Its own name, look and settings
 
+- One build for Second Life and OpenSim: like Firestorm's OpenSim edition, it logs in to Second Life and to OpenSim grids, and it leaves out the licensed Havok physics library that Firestorm's Second Life edition includes.
 - Its own name and artwork, and an ocean-blue theme in place of Firestorm's orange (in the default Grey theme of the Firestorm skin).
-- It keeps its settings, chat logs and caches apart from Firestorm's: `~/.companionviewer` on Linux, `~/Library/Application Support/CompanionViewer` on macOS. A Firestorm install is never touched, and nothing is copied over from it automatically.
+- It keeps its settings, chat logs and caches apart from Firestorm's: `~/.companionviewer` on Linux, `~/Library/Application Support/CompanionViewer` on macOS, `%APPDATA%\CompanionViewer` on Windows. A Firestorm install is never touched, and nothing is copied over from it automatically.
 - Firestorm's online services are switched off: the message of the day, the Avatar Welcome Pack on first login, help and wiki links (including F1), Report Problem, and links to Firestorm's support and bug tracker. Where a grid's login page is hosted by Firestorm, a login page built into the viewer is shown instead.
 
 ### Different defaults
@@ -28,13 +29,15 @@ These are the starting settings of a new install. All of them can be changed in 
 - **Fewer pop-ups:** 73 alerts start switched off. These are hints, notices about something that has already happened, teleport and web page prompts, copy-to-clipboard notices, and confirmations for things that are easy to undo (closing IMs, quitting, deleting to the trash, hiding the interface). Alerts that guard against something hard to undo stay on. Turn any of them back on in Preferences > Notifications > Alerts.
 - **No invalid-keystroke tip or beep** when a text box refuses a character, or when you arrow past the end of a list.
 - **Toolbar** buttons sit on the right edge only. Help buttons are hidden.
+- **Help menu:** Global Accountant, Set UI Size to Default, Set Window Size... and About, the same on the login screen and once logged in. Firestorm's other Help items are under Advanced > Help (Ctrl+Alt+D shows the Advanced menu); on the login screen they are under Debug > Help, and a grid's own help and about pages under Debug > OpenSim.
 - **Login screen:** the grid list is hidden. Turn on "Allow login to other grids" in Preferences > Advanced to show it.
 - **Other:** RLVa is on; the default Bento idle animation plays; search includes all maturity levels; the L$ tracker records payments even while its window is closed; caches are 20 GB.
 
 ### Extra features
 
 - **Greeted column in the radar.** Tick the people you have greeted. The ticks last for the session, even if someone leaves and comes back, and are cleared at every login. People who come within chat range after you arrive are shown in cyan at the top of the list until they are ticked. Saying "welcome" in nearby chat ticks the people you name, even when their display names use fancy lookalike letters. The automatic ticking can be turned off in the radar's options menu. A record of each session is kept in `greetings_log.txt` in your account's folder.
-- **Money log.** Every change to your L$ balance is written to `money_log.txt` in your account's folder.
+- **Money log.** Every change to your L$ balance is written to `money_log.txt` in your account's folder: the time, the change, the balance after it, who it came from or went to, and what for.
+- **Global Accountant** (Help menu) opens SL Money, a small app that comes with the viewer and reads the money logs of every account you have logged in with on this computer. It lists each account's balance, largest first, with its Second Life profile picture and display name. Double-click an account to see its income and expenses, one row per avatar who paid it or was paid, with the number of payments, the total and the latest date; click a row to see each payment. It updates as the logs change, and only reads them. SL Money keeps running after the viewer quits, and choosing Global Accountant again brings its window back.
 
 ### Video memory and speed
 
@@ -58,6 +61,7 @@ Release builds are derived from Firestorm release `Firestorm_Release_7.2.5.81788
 - [Windows](doc/building_windows.md)
 - [Mac](doc/building_macos.md)
 - [Linux](doc/building_linux.md)
+- [SL Money](https://github.com/lunagloaming/companion-viewer/blob/companion-viewer-nightly/tools/slmoney/README.md), the Global Accountant app (Node.js and Electron)
 
 ## Community respect
 
