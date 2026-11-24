@@ -41,6 +41,7 @@
 #include "llwindow.h"
 #include "llfocusmgr.h"
 #include "lluictrlfactory.h"
+#include "llwindowedgedock.h"
 
 const S32 LEADING_PAD = 5;
 const S32 TITLE_HPAD = 8;
@@ -297,6 +298,12 @@ bool LLDragHandle::handleMouseUp(S32 x, S32 y, MASK mask)
     {
         // Release the mouse
         gFocusMgr.setMouseCapture( NULL );
+
+        // Dropped at a window edge: dock it there
+        if (LLFloater* floater = dynamic_cast<LLFloater*>(getParent()))
+        {
+            LLWindowEdgeDock::instance().endDrag(floater);
+        }
     }
 
     // Note: don't pass on to children
@@ -321,6 +328,21 @@ bool LLDragHandle::handleHover(S32 x, S32 y, MASK mask)
 
         // if dragging a docked floater we want to undock
         LLFloater * parent = dynamic_cast<LLFloater *>(getParent());
+
+        // Docked to a window edge: once dragged far enough, it comes loose at its old size under the mouse
+        if (parent && parent->isEdgeDocked() && !parent->isMinimized())
+        {
+            if (llabs(delta_x) < LLWindowEdgeDock::UNDOCK_SLOP && llabs(delta_y) < LLWindowEdgeDock::UNDOCK_SLOP)
+            {
+                return true;
+            }
+            LLWindowEdgeDock::instance().undockForDrag(parent, screen_x, screen_y);
+            mDragLastScreenX = screen_x;
+            mDragLastScreenY = screen_y;
+            mLastMouseScreenX = screen_x;
+            mLastMouseScreenY = screen_y;
+            return true;
+        }
         if (parent && parent->isDocked())
         {
             const S32 SLOP = 12;
@@ -370,6 +392,12 @@ bool LLDragHandle::handleHover(S32 x, S32 y, MASK mask)
         mDragLastScreenX += delta_x;
         mDragLastScreenY += delta_y;
 
+        // Near a window edge: show where it would dock
+        if (parent)
+        {
+            LLWindowEdgeDock::instance().updateDrag(parent, screen_x, screen_y);
+        }
+
         getWindow()->setCursor(UI_CURSOR_ARROW);
         LL_DEBUGS("UserInput") << "hover handled by " << getName() << " (active)" <<LL_ENDL;
         handled = true;
@@ -384,6 +412,20 @@ bool LLDragHandle::handleHover(S32 x, S32 y, MASK mask)
     // Note: don't pass on to children
 
     return handled;
+}
+
+bool LLDragHandle::handleRightMouseDown(S32 x, S32 y, MASK mask)
+{
+    // The title bar's menu: dock to a window edge, or undock
+    LLFloater* floater = dynamic_cast<LLFloater*>(getParent());
+    if (floater
+        && dynamic_cast<LLDragHandleTop*>(this)
+        && y >= getRect().getHeight() - floater->getHeaderHeight()
+        && LLWindowEdgeDock::instance().showMenu(floater, this, x, y))
+    {
+        return true;
+    }
+    return LLView::handleRightMouseDown(x, y, mask);
 }
 
 void LLDragHandle::setValue(const LLSD& value)

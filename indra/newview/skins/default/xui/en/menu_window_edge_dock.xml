@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<context_menu
+ layout="topleft"
+ name="Window Edge Dock Menu"
+ visible="false">
+  <menu_item_call
+   label="Dock to Top"
+   layout="topleft"
+   name="dock_top">
+    <menu_item_call.on_click
+     function="WindowEdgeDock.Dock"
+     parameter="top" />
+    <menu_item_call.on_enable
+     function="WindowEdgeDock.CanDock"
+     parameter="top" />
+  </menu_item_call>
+  <menu_item_call
+   label="Dock to Left"
+   layout="topleft"
+   name="dock_left">
+    <menu_item_call.on_click
+     function="WindowEdgeDock.Dock"
+     parameter="left" />
+    <menu_item_call.on_enable
+     function="WindowEdgeDock.CanDock"
+     parameter="left" />
+  </menu_item_call>
+  <menu_item_call
+   label="Dock to Right"
+   layout="topleft"
+   name="dock_right">
+    <menu_item_call.on_click
+     function="WindowEdgeDock.Dock"
+     parameter="right" />
+    <menu_item_call.on_enable
+     function="WindowEdgeDock.CanDock"
+     parameter="right" />
+  </menu_item_call>
+  <menu_item_call
+   label="Dock to Bottom"
+   layout="topleft"
+   name="dock_bottom">
+    <menu_item_call.on_click
+     function="WindowEdgeDock.Dock"
+     parameter="bottom" />
+    <menu_item_call.on_enable
+     function="WindowEdgeDock.CanDock"
+     parameter="bottom" />
+  </menu_item_call>
+  <menu_item_separator
+   layout="topleft" />
+  <menu_item_call
+   label="Undock"
+   layout="topleft"
+   name="undock">
+    <menu_item_call.on_click
+     function="WindowEdgeDock.Undock" />
+    <menu_item_call.on_enable
+     function="WindowEdgeDock.IsDocked" />
+  </menu_item_call>
+</context_menu>
