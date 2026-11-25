@@ -100,6 +100,15 @@ void LLWindowEdgeDock::addInsetView(LLView* view)
     }
 }
 
+void LLWindowEdgeDock::addTopInsetView(LLView* view)
+{
+    if (view)
+    {
+        mTopInsetViews.push_back(view->getHandle());
+        mInsetsDirty = true;
+    }
+}
+
 //-----------------------------------------------------------------------------
 // Saved layout
 //-----------------------------------------------------------------------------
@@ -948,6 +957,31 @@ void LLWindowEdgeDock::applyInsets()
         if (rect != view->getRect())
         {
             view->setShape(rect);
+        }
+    }
+
+    // The space left over, in the floater view, then in each top view's parent: the view keeps its height
+    if (gFloaterView)
+    {
+        LLRect space = getFrame();
+        space.mLeft += mDepths[EDGE_LEFT];
+        space.mRight -= mDepths[EDGE_RIGHT];
+        space.mTop -= mDepths[EDGE_TOP];
+        space.mBottom += mDepths[EDGE_BOTTOM];
+        for (const LLHandle<LLView>& handle : mTopInsetViews)
+        {
+            LLView* view = handle.get();
+            if (!view || !view->getParent())
+            {
+                continue;
+            }
+            LLRect in_parent;
+            gFloaterView->localRectToOtherView(space, &in_parent, view->getParent());
+            LLRect rect(in_parent.mLeft, in_parent.mTop, in_parent.mRight, in_parent.mTop - view->getRect().getHeight());
+            if (rect != view->getRect())
+            {
+                view->setShape(rect);
+            }
         }
     }
 
