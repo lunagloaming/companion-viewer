@@ -130,7 +130,7 @@
 		</panel>
 		<!-- ハードウェア設定 -->
 		<panel label="ハードウェア設定" name="Hardware Settings">
-			<check_box label="テクスチャの不可逆圧縮（要再起動）" tool_tip="ビデオメモリ内のテクスチャを圧縮することで、色の品質が低下する代わりに、より高解像度のテクスチャやより多くのテクスチャを読み込むことを可能にします。" name="texture compression"/>
+			<check_box name="texture compression"/>
 			<check_box label="ＨｉＤＰＩ表示対応を有効にする（Mac OSXのみ。要再起動）" tool_tip="高解像度描画のためのOpenGLを有効にします" name="use HiDPI"/>
 			<text name="af strength label">異方性フィルタリング：</text>
 			<combo_box label="異方性フィルタリング" name="anisotropic_filter">

@@ -44,7 +44,7 @@
 	<text name="HardwareText">
 		ハードウェア
 	</text>
-	<check_box label="テクスチャ圧縮の有効化 (再起動後に反映)" tool_tip="ビデオメモリ内のテクスチャを圧縮し、色の品質をある程度犠牲にして、より高解像度のテクスチャを読み込むようにします。" name="texture compression" control_name="RenderCompressTextures"/>
+	<check_box name="texture compression"/>
 	<check_box label="HiDPIディスプレイのサポートを有効にする（再起動後に反映）" tool_tip="ＯｐｅｎＧＬの高解像描画を有効化します。" name="use HiDPI"/>
 	<text name="af strength label">異方性フィルタリング：</text>
 	<combo_box label="異方性フィルタリング" name="anisotropic_filter">
