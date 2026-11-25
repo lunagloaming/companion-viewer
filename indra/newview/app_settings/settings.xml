@@ -24383,6 +24383,10 @@ Change of this parameter will affect the layout of buttons in notification toast
       <array>
         <string>preferences</string>
         <string>search_replace</string>
+        <string>animation_overrider</string>
+        <string>area_search</string>
+        <string>profile</string>
+        <string>preview_anim</string>
       </array>
     </map>
     <key>FSWindowEdgeDockByDragging</key>
