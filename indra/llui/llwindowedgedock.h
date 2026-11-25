@@ -75,6 +75,9 @@ public:
 
     // The views that leave the docked areas out. They must share gFloaterView's parent.
     void addInsetView(LLView* view);
+    // Views along the top of the space left over, keeping their own height, such as the navigation bar (location and
+    // favorites): they span the width between the side areas and sit below the top area. Any parent.
+    void addTopInsetView(LLView* view);
 
     bool canDock(LLFloater* floater, EEdge edge);
     void dock(LLFloater* floater, EEdge edge, S32 position = -1);
@@ -156,6 +159,7 @@ private:
     S32                     mDepths[EDGE_COUNT];        // the depths in use after the last arrange
     S32                     mAppliedInsets[EDGE_COUNT]; // what the inset views leave out now
     std::vector<LLHandle<LLView> > mInsetViews;
+    std::vector<LLHandle<LLView> > mTopInsetViews;
 
     bool                    mLoaded = false;
     bool                    mArranging = false;
