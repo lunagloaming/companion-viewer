@@ -26,6 +26,7 @@
 
 #include "llviewerprecompiledheaders.h"
 #include "llviewerwindow.h"
+#include "llwindowedgedock.h"
 
 
 // system library includes
@@ -2283,6 +2284,10 @@ void LLViewerWindow::initBase()
                 << "if this problem happens again, please validate your installation." << LL_ENDL;
     }
     gToolBarView->setShape(panel_holder->getLocalRect());
+
+    // Floaters docked to the window edges take their space from the world view and the toolbars
+    LLWindowEdgeDock::instance().addInsetView(mWorldViewPlaceholder.get());
+    LLWindowEdgeDock::instance().addInsetView(panel_holder);
     // Hide the toolbars for the moment: we'll make them visible after logging in world (see LLViewerWindow::initWorldUI())
     gToolBarView->setVisible(false);
 
@@ -3852,6 +3857,9 @@ void LLViewerWindow::updateUI()
         // animate layout stacks so we have up to date rect for world view
         LLLayoutStack::updateClass();
     }
+
+    // place floaters docked to the window edges and shrink the world view to leave them out
+    LLWindowEdgeDock::instance().update();
 
     // use full window for world view when not rendering UI
     bool world_view_uses_full_window = gAgentCamera.cameraMouselook() || !gPipeline.hasRenderDebugFeatureMask(LLPipeline::RENDER_DEBUG_FEATURE_UI);

@@ -1134,33 +1134,36 @@ LLScriptFloater* LLScriptFloater::show(const LLUUID& notification_id)
         floater->dockToChiclet(dialog_position == POS_DOCKED, dialog_position == POS_DOCKED);
     }
 
+    // The corners of the world view, which floaters docked to the window edges can move in
+    const LLRect world_rect = gViewerWindow->getWorldViewRectScaled();
+
     switch (dialog_position)
     {
         case POS_TOP_LEFT:
         {
-            pos.setOriginAndSize(leftPad,
-                                gViewerWindow->getWorldViewHeightScaled() - height - topPad,
+            pos.setOriginAndSize(world_rect.mLeft + leftPad,
+                                world_rect.mTop - height - topPad,
                                 width, height);
             break;
         }
         case POS_TOP_RIGHT:
         {
-            pos.setOriginAndSize(gViewerWindow->getWorldViewWidthScaled() - width - rightPad,
-                                gViewerWindow->getWorldViewHeightScaled() - height - topPad,
+            pos.setOriginAndSize(world_rect.mRight - width - rightPad,
+                                world_rect.mTop - height - topPad,
                                 width, height);
             break;
         }
         case POS_BOTTOM_LEFT:
         {
-            pos.setOriginAndSize(leftPad,
-                                bottomPad,
+            pos.setOriginAndSize(world_rect.mLeft + leftPad,
+                                world_rect.mBottom + bottomPad,
                                 width, height);
             break;
         }
         case POS_BOTTOM_RIGHT:
         {
-            pos.setOriginAndSize(gViewerWindow->getWorldViewWidthScaled() - width - rightPad,
-                                bottomPad,
+            pos.setOriginAndSize(world_rect.mRight - width - rightPad,
+                                world_rect.mBottom + bottomPad,
                                 width, height);
             break;
         }

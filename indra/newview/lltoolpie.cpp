@@ -666,8 +666,8 @@ bool LLToolPie::walkToClickedLocation()
     {
         // We do not handle hover in mouselook as we do in other modes, so
         // use croshair's position to do a pick
-        mPick = gViewerWindow->pickImmediate(gViewerWindow->getWorldViewRectScaled().getWidth() / 2,
-            gViewerWindow->getWorldViewRectScaled().getHeight() / 2,
+        mPick = gViewerWindow->pickImmediate(gViewerWindow->getWorldViewRectScaled().getCenterX(),
+            gViewerWindow->getWorldViewRectScaled().getCenterY(),
             false /* ignore transparent */,
             false /* ignore rigged */,
             false /* ignore particles */);
@@ -753,8 +753,8 @@ bool LLToolPie::teleportToClickedLocation()
         // We do not handle hover in mouselook as we do in other modes, so
         // use croshair's position to do a pick
         bool pick_rigged = false;
-        mHoverPick = gViewerWindow->pickImmediate(gViewerWindow->getWorldViewRectScaled().getWidth() / 2,
-                                                  gViewerWindow->getWorldViewRectScaled().getHeight() / 2,
+        mHoverPick = gViewerWindow->pickImmediate(gViewerWindow->getWorldViewRectScaled().getCenterX(),
+                                                  gViewerWindow->getWorldViewRectScaled().getCenterY(),
                                                   false,
                                                   pick_rigged);
     }

@@ -363,6 +363,11 @@ public:
     bool            isDocked() const { return mDocked; }
     virtual void    setDocked(bool docked, bool pop_on_undock = true);
 
+    // Docked to an edge of the viewer window (LLWindowEdgeDock), which is not the same as isDocked()
+    bool            isEdgeDocked() const { return mEdgeDocked; }
+    // Only LLWindowEdgeDock calls this. edge is an LLWindowEdgeDock::EEdge.
+    void            setEdgeDocked(bool docked, S32 edge);
+
     virtual void    setTornOff(bool torn_off) { mTornOff = torn_off; }
     bool isTornOff() const { return mTornOff; }
     void setOpenPositioning(LLFloaterEnums::EOpenPositioning pos) {mPositioning = pos;}
@@ -557,6 +562,10 @@ private:
     bool            mCanDock;
     bool            mDocked;
     bool            mTornOff;
+
+    bool            mEdgeDocked = false;
+    bool            mEdgeDockResizeBarVisible[4] = {};      // the resize controls shown before docking to an edge
+    bool            mEdgeDockResizeHandleVisible[4] = {};
 
     static LLMultiFloater* sHostp;
     static bool     sQuitting;
