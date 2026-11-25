@@ -43,7 +43,7 @@
 		Аппаратное оборудование
 	</text>
 	<check_box label="Анизотропная фильтрация (медленнее, если включено)" name="ani"/>
-	<check_box label="Разрешить сжатие текстур (требует перезагрузки)" name="texture compression" tool_tip="Сжатие текстур в видеопамяти, что позволяет загружать текстуры большего размера за счет некоторого падения качества цвета."/>
+	<check_box name="texture compression"/>
 	<check_box label="Включить поддержку HiDPI дисплея (нужен перезапуск)" name="use HiDPI" tool_tip="Разрешить OpenGL отображение с высоким разрешением."/>
 	<text name="antialiasing label">
 		Сглаживание:
