@@ -642,6 +642,12 @@
      name="FloaterUnfocusBorderColor"
      reference="Black_50" />
     <color
+     name="WindowEdgeDockBackgroundColor"
+     reference="DkGray" />
+    <color
+     name="WindowEdgeDockPreviewColor"
+     reference="EmphasisColor" />
+    <color
      name="FocusColor"
      reference="EmphasisColor" />
     <color

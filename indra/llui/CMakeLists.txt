@@ -117,6 +117,7 @@ set(llui_SOURCE_FILES
     llviewquery.cpp
     llviewereventrecorder.cpp
     llvirtualtrackball.cpp
+    llwindowedgedock.cpp
     llwindowshade.cpp
     llxuiparser.cpp
     llxyvector.cpp
@@ -243,6 +244,7 @@ set(llui_HEADER_FILES
     llviewereventrecorder.h
     llviewquery.h
     llvirtualtrackball.h
+    llwindowedgedock.h
     llwindowshade.h
     llxuiparser.h
     llxyvector.h

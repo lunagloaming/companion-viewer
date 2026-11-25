@@ -30,6 +30,7 @@
 #include "linden_common.h"
 #include "llviewereventrecorder.h"
 #include "llfloater.h"
+#include "llwindowedgedock.h"
 
 #include "llfocusmgr.h"
 
@@ -587,6 +588,12 @@ LLFloater::~LLFloater()
 
 void LLFloater::storeRectControl()
 {
+    // Docked to a window edge: the saved rect stays where it was free
+    if (mEdgeDocked)
+    {
+        return;
+    }
+
     // <FS:Zi> Do not store rect when attached to another floater
     //if (!mRectControl.empty())
     if (mTornOff && !mRectControl.empty())
@@ -683,6 +690,12 @@ void LLFloater::setVisible( bool visible )
     }
 
     storeVisibilityControl();
+
+    // Showing a floater that was docked to a window edge docks it again; hiding one frees its space
+    if (visible || (mEdgeDocked && LLWindowEdgeDock::instanceExists()))
+    {
+        LLWindowEdgeDock::instance().onFloaterVisibilityChanged(this, visible);
+    }
 }
 
 
@@ -791,6 +804,11 @@ void LLFloater::closeFloater(bool app_quitting)
 
     if (canClose())
     {
+        if (mEdgeDocked)
+        {
+            LLWindowEdgeDock::instance().onFloaterClosed(this, app_quitting);
+        }
+
         if (getHost())
         {
             ((LLMultiFloater*)getHost())->removeFloater(this);
@@ -1275,7 +1293,7 @@ void LLFloater::handleReshape(const LLRect& new_rect, bool by_user)
     const LLRect old_rect = getRect();
     LLView::handleReshape(new_rect, by_user);
 
-    if (by_user && !getHost())
+    if (by_user && !getHost() && !(mEdgeDocked && !isMinimized()))
     {
         LLFloaterView * floaterVp = dynamic_cast<LLFloaterView*>(getParent());
         if (floaterVp)
@@ -1382,6 +1400,12 @@ void LLFloater::handleReshape(const LLRect& new_rect, bool by_user)
         {
             mHasBeenDraggedWhileMinimized = true;
         }
+    }
+
+    // Resizing a floater docked to a window edge resizes its area or moves the divider beside it
+    if (by_user && mEdgeDocked && !isMinimized())
+    {
+        LLWindowEdgeDock::instance().onFloaterReshapedByUser(this, old_rect);
     }
 }
 
@@ -1514,6 +1538,11 @@ void LLFloater::setMinimized(bool minimize)
     make_ui_sound("UISndWindowClose");
     updateTitleButtons();
     applyTitle ();
+
+    if (mEdgeDocked)
+    {
+        LLWindowEdgeDock::instance().onFloaterMinimized(this);
+    }
 }
 
 void LLFloater::setFocus( bool b )
@@ -1635,6 +1664,11 @@ void LLFloater::setHost(LLMultiFloater* host)
     {
         mHostHandle = host->getHandle();
         mLastHostHandle = host->getHandle();
+
+        if (mEdgeDocked)
+        {
+            LLWindowEdgeDock::instance().onFloaterAttachedElsewhere(this);
+        }
     }
     else
     {
@@ -1977,6 +2011,11 @@ void LLFloater::setDocked(bool docked, bool pop_on_undock)
         {
             setMinimized(false);
             mPositioning = LLFloaterEnums::POSITIONING_RELATIVE;
+
+            if (mEdgeDocked)
+            {
+                LLWindowEdgeDock::instance().onFloaterAttachedElsewhere(this);
+            }
         }
 
         updateTitleButtons();
@@ -1984,6 +2023,45 @@ void LLFloater::setDocked(bool docked, bool pop_on_undock)
         storeDockStateControl();
     }
 
+}
+
+void LLFloater::setEdgeDocked(bool docked, S32 edge)
+{
+    if (docked && !mEdgeDocked)
+    {
+        for (S32 i = 0; i < 4; ++i)
+        {
+            mEdgeDockResizeBarVisible[i] = mResizeBar[i] && mResizeBar[i]->getVisible();
+            mEdgeDockResizeHandleVisible[i] = mResizeHandle[i] && mResizeHandle[i]->getVisible();
+        }
+    }
+    if (!docked && !mEdgeDocked)
+    {
+        return;
+    }
+    mEdgeDocked = docked;
+
+    // Docked, only the inner edge (the area's depth) and the edges between floaters resize
+    S32 outer_side = -1;
+    switch (edge)
+    {
+    case LLWindowEdgeDock::EDGE_TOP:    outer_side = LLResizeBar::TOP; break;
+    case LLWindowEdgeDock::EDGE_LEFT:   outer_side = LLResizeBar::LEFT; break;
+    case LLWindowEdgeDock::EDGE_RIGHT:  outer_side = LLResizeBar::RIGHT; break;
+    case LLWindowEdgeDock::EDGE_BOTTOM: outer_side = LLResizeBar::BOTTOM; break;
+    default: break;
+    }
+    for (S32 i = 0; i < 4; ++i)
+    {
+        if (mResizeBar[i])
+        {
+            mResizeBar[i]->setVisible(mEdgeDockResizeBarVisible[i] && !(docked && i == outer_side));
+        }
+        if (mResizeHandle[i])
+        {
+            mResizeHandle[i]->setVisible(mEdgeDockResizeHandleVisible[i] && !docked);
+        }
+    }
 }
 
 // static
@@ -2671,6 +2749,12 @@ void LLFloaterView::reshape(S32 width, S32 height, bool called_from_parent)
             continue;
         }
 
+        if (floaterp->isEdgeDocked() && !floaterp->isMinimized())
+        {
+            // placed by LLWindowEdgeDock, below
+            continue;
+        }
+
         if (!floaterp->isMinimized() && floaterp->getCanDrag())
         {
             LLRect old_rect = floaterp->getRect();
@@ -2713,6 +2797,8 @@ void LLFloaterView::reshape(S32 width, S32 height, bool called_from_parent)
             }
         }
     }
+
+    LLWindowEdgeDock::instance().onFloaterViewReshaped();
 }
 
 
@@ -3252,6 +3338,12 @@ void LLFloaterView::adjustToFitScreen(LLFloater* floater, bool allow_partial_out
         return;
     }
 
+    if (floater->isEdgeDocked() && !floater->isMinimized())
+    {
+        // LLWindowEdgeDock places it
+        return;
+    }
+
     if (floater->getDependee() &&
         floater->getDependee() == floater->getSnapTarget().get())
     {
@@ -3315,6 +3407,9 @@ void LLFloaterView::draw()
 {
     refresh();
 
+    // Behind the floaters docked to the window edges
+    LLWindowEdgeDock::instance().drawBackgrounds();
+
     // hide focused floater if in cycle mode, so that it can be drawn on top
     LLFloater* focused_floater = getFocusedFloater();
 
@@ -3335,6 +3430,8 @@ void LLFloaterView::draw()
     {
         LLView::draw();
     }
+
+    LLWindowEdgeDock::instance().drawDropPreview();
 }
 
 LLRect LLFloaterView::getSnapRect() const
@@ -3348,6 +3445,16 @@ LLRect LLFloaterView::getSnapRect() const
         snap_rect.mBottom += (mSnapOffsetBottom + mSnapOffsetChatBar);
         snap_rect.mLeft += mSnapOffsetLeft;
         snap_rect.mRight -= mSnapOffsetRight;
+
+        // Leave out the areas floaters are docked to (otherwise the toolbar view, which they shrink, does)
+        if (LLWindowEdgeDock::instanceExists())
+        {
+            const LLWindowEdgeDock& dock = LLWindowEdgeDock::instance();
+            snap_rect.mTop -= dock.getInset(LLWindowEdgeDock::EDGE_TOP);
+            snap_rect.mBottom += dock.getInset(LLWindowEdgeDock::EDGE_BOTTOM);
+            snap_rect.mLeft += dock.getInset(LLWindowEdgeDock::EDGE_LEFT);
+            snap_rect.mRight -= dock.getInset(LLWindowEdgeDock::EDGE_RIGHT);
+        }
     }
     else
     {
