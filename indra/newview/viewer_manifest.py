@@ -918,6 +918,10 @@ class Windows_x86_64_Manifest(ViewerManifest):
             path = path.replace('/', '\\')
             return path
 
+        def quoted(path):
+            # NSIS splits its arguments at spaces (SL Money's "SL Money.exe" has one)
+            return '"%s"' % path if ' ' in path else path
+
         result = ""
         dest_files = [pair[1] for pair in self.file_list if pair[0] and os.path.isfile(pair[1]) and not pair[1].endswith(".pdb") ] #<FS:ND/> Don't include pdb files.
         # sort deepest hierarchy first
@@ -930,11 +934,11 @@ class Windows_x86_64_Manifest(ViewerManifest):
             if installed_dir != out_path:
                 if install:
                     out_path = installed_dir
-                    result += 'SetOutPath ' + out_path + '\n'
+                    result += 'SetOutPath ' + quoted(out_path) + '\n'
             if install:
-                result += 'File ' + pkg_file + '\n'
+                result += 'File ' + quoted(pkg_file) + '\n'
             else:
-                result += 'Delete ' + wpath(os.path.join('$INSTDIR', rel_file)) + '\n'
+                result += 'Delete ' + quoted(wpath(os.path.join('$INSTDIR', rel_file))) + '\n'
 
         # at the end of a delete, just rmdir all the directories
         if not install:
@@ -948,7 +952,7 @@ class Windows_x86_64_Manifest(ViewerManifest):
             prev = None
             for d in deleted_dirs:
                 if d != prev:   # skip duplicates
-                    result += 'RMDir ' + wpath(os.path.join('$INSTDIR', os.path.normpath(d))) + '\n'
+                    result += 'RMDir ' + quoted(wpath(os.path.join('$INSTDIR', os.path.normpath(d)))) + '\n'
                 prev = d
 
         return result
