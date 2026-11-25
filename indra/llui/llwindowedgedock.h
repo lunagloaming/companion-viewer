@@ -46,8 +46,8 @@ class LLView;
 // holder) so the world view and the toolbars sit between the areas instead of
 // under them.
 //
-// Left and right areas run the full height; the top and bottom areas run
-// between them. Several floaters in one area share it: stacked top to bottom
+// The edge docked to first runs the full length of the window; the next one
+// runs the length that is left, and so on. Several floaters in one area share it: stacked top to bottom
 // at the sides, left to right at the top and bottom. Every floater can dock
 // unless it is on the exclusion list (FSWindowEdgeDockExcluded) or too big for
 // the edge. The layout is saved in FSWindowEdgeDockLayout.
@@ -138,7 +138,9 @@ private:
     S32 maxDepth(EEdge edge, const LLRect& frame) const;
 
     void arrange();
-    void computeAreaRects(const LLRect& frame, const S32 depths[EDGE_COUNT], LLRect rects[EDGE_COUNT]) const;
+    void computeAreaRects(const LLRect& frame, const S32 depths[EDGE_COUNT], const std::vector<EEdge>& order,
+                          LLRect rects[EDGE_COUNT]) const;
+    void updateOrder();
     void applyInsets();
     bool resizeInProgress() const;
     void setDockedState(LLFloater* floater, bool docked);
@@ -150,6 +152,7 @@ private:
     bool onMenuIsDocked();
 
     Area                    mAreas[EDGE_COUNT];
+    std::vector<EEdge>      mOrder;     // edges with docked floaters, in the order they were first docked to
     S32                     mDepths[EDGE_COUNT];        // the depths in use after the last arrange
     S32                     mAppliedInsets[EDGE_COUNT]; // what the inset views leave out now
     std::vector<LLHandle<LLView> > mInsetViews;

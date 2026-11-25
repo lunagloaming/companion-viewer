@@ -40,6 +40,8 @@
 #include "lluicolortable.h"
 #include "lluictrlfactory.h"
 
+#include <algorithm>
+
 namespace
 {
     // An area may take at most this share of the window across its edge, and a floater
@@ -128,6 +130,16 @@ void LLWindowEdgeDock::loadLayout()
         }
     }
 
+    const LLSD& order = layout["order"];
+    for (LLSD::array_const_iterator it = order.beginArray(); it != order.endArray(); ++it)
+    {
+        EEdge edge = edgeFromName(it->asString());
+        if (edge != EDGE_NONE && std::find(mOrder.begin(), mOrder.end(), edge) == mOrder.end())
+        {
+            mOrder.push_back(edge);
+        }
+    }
+
     const LLSD& floaters = layout["floaters"];
     for (LLSD::array_const_iterator it = floaters.beginArray(); it != floaters.endArray(); ++it)
     {
@@ -148,6 +160,7 @@ void LLWindowEdgeDock::loadLayout()
         }
         mAreas[edge].mEntries.push_back(entry);
     }
+    updateOrder();
 }
 
 void LLWindowEdgeDock::saveLayout()
@@ -175,7 +188,13 @@ void LLWindowEdgeDock::saveLayout()
             floaters.append(saved);
         }
     }
+    LLSD order = LLSD::emptyArray();
+    for (EEdge edge : mOrder)
+    {
+        order.append(EDGE_NAMES[edge]);
+    }
     layout["depths"] = depths;
+    layout["order"] = order;
     layout["floaters"] = floaters;
     group->setLLSD("FSWindowEdgeDockLayout", layout);
 }
@@ -249,6 +268,7 @@ void LLWindowEdgeDock::removeEntry(EEdge edge, size_t index, bool restore_free_r
     LLFloater* floater = entries[index].mFloater.get();
     LLRect free_rect = entries[index].mFreeRect;
     entries.erase(entries.begin() + index);
+    updateOrder();
 
     if (floater)
     {
@@ -444,6 +464,7 @@ void LLWindowEdgeDock::dock(LLFloater* floater, EEdge edge, S32 position)
         position = (S32)area.mEntries.size();
     }
     area.mEntries.insert(area.mEntries.begin() + position, entry);
+    updateOrder();
 
     LL_INFOS("WindowEdgeDock") << "Docked floater " << entry.mName << " (" << floater->getName() << ") to the "
                                << edgeName(edge) << " edge" << LL_ENDL;
@@ -495,6 +516,7 @@ void LLWindowEdgeDock::onFloaterVisibilityChanged(LLFloater* floater, bool visib
         {
             // Excluded since, or too big for the window now
             mAreas[edge].mEntries.erase(mAreas[edge].mEntries.begin() + (entry - &mAreas[edge].mEntries[0]));
+            updateOrder();
             saveLayout();
             return;
         }
@@ -654,14 +676,66 @@ void LLWindowEdgeDock::onFloaterReshapedByUser(LLFloater* floater, const LLRect&
 // Layout
 //-----------------------------------------------------------------------------
 
-void LLWindowEdgeDock::computeAreaRects(const LLRect& frame, const S32 depths[EDGE_COUNT], LLRect rects[EDGE_COUNT]) const
+void LLWindowEdgeDock::updateOrder()
 {
-    const S32 left = depths[EDGE_LEFT];
-    const S32 right = depths[EDGE_RIGHT];
-    rects[EDGE_LEFT] = LLRect(frame.mLeft, frame.mTop, frame.mLeft + left, frame.mBottom);
-    rects[EDGE_RIGHT] = LLRect(frame.mRight - right, frame.mTop, frame.mRight, frame.mBottom);
-    rects[EDGE_TOP] = LLRect(frame.mLeft + left, frame.mTop, frame.mRight - right, frame.mTop - depths[EDGE_TOP]);
-    rects[EDGE_BOTTOM] = LLRect(frame.mLeft + left, frame.mBottom + depths[EDGE_BOTTOM], frame.mRight - right, frame.mBottom);
+    // Edges no longer docked to drop out; newly docked ones go last
+    for (S32 e = 0; e < EDGE_COUNT; ++e)
+    {
+        const EEdge edge = (EEdge)e;
+        auto it = std::find(mOrder.begin(), mOrder.end(), edge);
+        if (mAreas[edge].mEntries.empty() && it != mOrder.end())
+        {
+            mOrder.erase(it);
+        }
+    }
+    for (S32 e = 0; e < EDGE_COUNT; ++e)
+    {
+        const EEdge edge = (EEdge)e;
+        if (!mAreas[edge].mEntries.empty() && std::find(mOrder.begin(), mOrder.end(), edge) == mOrder.end())
+        {
+            mOrder.push_back(edge);
+        }
+    }
+}
+
+void LLWindowEdgeDock::computeAreaRects(const LLRect& frame, const S32 depths[EDGE_COUNT], const std::vector<EEdge>& order,
+                                        LLRect rects[EDGE_COUNT]) const
+{
+    // Each area in turn takes a strip along its edge of what the areas before it left
+    LLRect remaining = frame;
+    for (S32 e = 0; e < EDGE_COUNT; ++e)
+    {
+        rects[e] = LLRect();
+    }
+    for (EEdge edge : order)
+    {
+        const S32 depth = depths[edge];
+        if (depth <= 0)
+        {
+            continue;
+        }
+        switch (edge)
+        {
+        case EDGE_LEFT:
+            rects[edge] = LLRect(remaining.mLeft, remaining.mTop, remaining.mLeft + depth, remaining.mBottom);
+            remaining.mLeft += depth;
+            break;
+        case EDGE_RIGHT:
+            rects[edge] = LLRect(remaining.mRight - depth, remaining.mTop, remaining.mRight, remaining.mBottom);
+            remaining.mRight -= depth;
+            break;
+        case EDGE_TOP:
+            rects[edge] = LLRect(remaining.mLeft, remaining.mTop, remaining.mRight, remaining.mTop - depth);
+            remaining.mTop -= depth;
+            break;
+        case EDGE_BOTTOM:
+            rects[edge] = LLRect(remaining.mLeft, remaining.mBottom + depth, remaining.mRight, remaining.mBottom);
+            remaining.mBottom += depth;
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void LLWindowEdgeDock::arrange()
@@ -675,7 +749,7 @@ void LLWindowEdgeDock::arrange()
 
     const LLRect frame = getFrame();
 
-    // Depths first: the side areas decide where the top and bottom ones start
+    // Depths first: the areas docked to earlier decide where the later ones start
     S32 depths[EDGE_COUNT];
     for (S32 e = 0; e < EDGE_COUNT; ++e)
     {
@@ -701,7 +775,7 @@ void LLWindowEdgeDock::arrange()
     }
 
     LLRect rects[EDGE_COUNT];
-    computeAreaRects(frame, depths, rects);
+    computeAreaRects(frame, depths, mOrder, rects);
 
     for (S32 e = 0; e < EDGE_COUNT; ++e)
     {
@@ -898,7 +972,7 @@ void LLWindowEdgeDock::update()
 void LLWindowEdgeDock::drawBackgrounds()
 {
     LLRect rects[EDGE_COUNT];
-    computeAreaRects(getFrame(), mDepths, rects);
+    computeAreaRects(getFrame(), mDepths, mOrder, rects);
 
     static LLUIColor background = LLUIColorTable::instance().getColor("WindowEdgeDockBackgroundColor", LLColor4(0.1f, 0.1f, 0.1f, 1.f));
     for (S32 e = 0; e < EDGE_COUNT; ++e)
@@ -969,14 +1043,28 @@ void LLWindowEdgeDock::updateDrag(LLFloater* floater, S32 screen_x, S32 screen_y
     gFloaterView->screenPointToLocal(screen_x, screen_y, &x, &y);
     const LLRect frame = getFrame();
 
-    // The nearest edge, if the mouse is close enough to it
-    const S32 distances[EDGE_COUNT] = { frame.mTop - y, x - frame.mLeft, frame.mRight - x, y - frame.mBottom };
+    // Over an area already in use: join it, beside the docked floater under the mouse
+    LLRect areas[EDGE_COUNT];
+    computeAreaRects(frame, mDepths, mOrder, areas);
     EEdge edge = EDGE_NONE;
-    for (S32 e = 0; e < EDGE_COUNT; ++e)
+    for (S32 e = 0; e < EDGE_COUNT && edge == EDGE_NONE; ++e)
     {
-        if (distances[e] < DROP_ZONE && (edge == EDGE_NONE || distances[e] < distances[edge]))
+        if (mDepths[e] > 0 && areas[e].pointInRect(x, y))
         {
             edge = (EEdge)e;
+        }
+    }
+
+    // Otherwise the nearest edge, if the mouse is close enough to it
+    if (edge == EDGE_NONE)
+    {
+        const S32 distances[EDGE_COUNT] = { frame.mTop - y, x - frame.mLeft, frame.mRight - x, y - frame.mBottom };
+        for (S32 e = 0; e < EDGE_COUNT; ++e)
+        {
+            if (distances[e] < DROP_ZONE && (edge == EDGE_NONE || distances[e] < distances[edge]))
+            {
+                edge = (EEdge)e;
+            }
         }
     }
     if (edge == EDGE_NONE || !canDock(floater, edge))
@@ -984,36 +1072,76 @@ void LLWindowEdgeDock::updateDrag(LLFloater* floater, S32 screen_x, S32 screen_y
         return;
     }
 
-    // The area as it would be with this floater in it
+    const std::vector<Entry>& entries = mAreas[edge].mEntries;
+    const bool horizontal = isHorizontal(edge);
+
+    if (mDepths[edge] > 0)
+    {
+        // The docked floater under the mouse (or the nearest one along the edge): the new one takes
+        // the half of it nearer the mouse, before it (above, or to the left) or after it
+        S32 target = -1;
+        S32 best_distance = S32_MAX;
+        for (size_t i = 0; i < entries.size(); ++i)
+        {
+            if (!isActive(entries[i]))
+                continue;
+            const LLRect rect = entries[i].mFloater.get()->getRect();
+            const S32 along = horizontal ? x : y;
+            const S32 start = horizontal ? rect.mLeft : rect.mBottom;
+            const S32 end = horizontal ? rect.mRight : rect.mTop;
+            const S32 distance = along < start ? start - along : (along > end ? along - end : 0);
+            if (distance < best_distance)
+            {
+                best_distance = distance;
+                target = (S32)i;
+            }
+        }
+        if (target < 0)
+        {
+            return;
+        }
+
+        const LLRect rect = entries[target].mFloater.get()->getRect();
+        LLRect half = areas[edge];
+        bool before;
+        if (horizontal)
+        {
+            before = x < rect.getCenterX();
+            half.mLeft = before ? rect.mLeft : rect.getCenterX();
+            half.mRight = before ? rect.getCenterX() : rect.mRight;
+        }
+        else
+        {
+            before = y > rect.getCenterY();
+            half.mTop = before ? rect.mTop : rect.getCenterY();
+            half.mBottom = before ? rect.getCenterY() : rect.mBottom;
+        }
+        mDropRect = half;
+        mDropPosition = before ? target : target + 1;
+        mDropEdge = edge;
+        return;
+    }
+
+    // An empty edge: the whole area it would get
     S32 depths[EDGE_COUNT];
     for (S32 e = 0; e < EDGE_COUNT; ++e)
     {
         depths[e] = mDepths[e];
     }
-    if (depths[edge] <= 0)
+    const S32 size = horizontal ? floater->getRect().getHeight() : floater->getRect().getWidth();
+    depths[edge] = llclamp(size, acrossSize(floater, edge), llmax(acrossSize(floater, edge), maxDepth(edge, frame)));
+    // It would be docked to after the edges in use
+    std::vector<EEdge> order;
+    for (EEdge other : mOrder)
     {
-        const S32 size = isHorizontal(edge) ? floater->getRect().getHeight() : floater->getRect().getWidth();
-        depths[edge] = llclamp(size, acrossSize(floater, edge), llmax(acrossSize(floater, edge), maxDepth(edge, frame)));
+        if (other != edge)
+            order.push_back(other);
     }
+    order.push_back(edge);
     LLRect rects[EDGE_COUNT];
-    computeAreaRects(frame, depths, rects);
+    computeAreaRects(frame, depths, order, rects);
     mDropRect = rects[edge];
-
-    // Where along the edge: before the first docked floater whose middle is past the mouse
-    const std::vector<Entry>& entries = mAreas[edge].mEntries;
     mDropPosition = (S32)entries.size();
-    for (size_t i = 0; i < entries.size(); ++i)
-    {
-        if (!isActive(entries[i]))
-            continue;
-        const LLRect rect = entries[i].mFloater.get()->getRect();
-        const bool past = isHorizontal(edge) ? x < rect.getCenterX() : y > rect.getCenterY();
-        if (past)
-        {
-            mDropPosition = (S32)i;
-            break;
-        }
-    }
     mDropEdge = edge;
 }
 
