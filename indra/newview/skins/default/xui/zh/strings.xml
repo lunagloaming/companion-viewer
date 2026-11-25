@@ -3459,8 +3459,6 @@ support@secondlife.com.
 	</string>
 	<string name="MBVideoDrvErr">
 		[APP_NAME] 無法執行，這可能因為你的顯示卡驅動程式安裝不當、版本過舊，或者你的硬體不受支援。請確定你安裝了最新的顯示卡驅動程式。如果已裝了最新驅動程式，請再重新安裝。
-
-如果你持續收到此訊息，請聯絡 [SUPPORT_SITE].
 	</string>
 	<string name="MBOutOfMemoryTitle">
 		記憶體不足

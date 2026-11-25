@@ -3185,8 +3185,6 @@ Uruchomione w oknie.
 	</string>
 	<string name="MBVideoDrvErr">
 		Aplikacja [APP_NAME] nie może zostać uruchomiona, ponieważ sterowniki Twojej karty wideo są niepoprawnie zainstalowane, niezaktualizowane lub przeznaczone dla nieobsługiwanego rodzaju sprzętu. Upewnij się, że Twoja karta wideo została zaktualizowana poprawnie, spróbuj zainstalować sterowniki ponownie.
-
-Jeżeli nadal otrzymujesz ten komunikat, skontaktuj się z [SUPPORT_SITE].
 	</string>
 	<string name="MBOutOfMemoryTitle">
 		Zabrakło pamięci
