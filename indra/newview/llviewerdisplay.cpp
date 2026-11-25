@@ -1934,7 +1934,8 @@ void render_ui_2d()
         S32 half_width = (gViewerWindow->getWorldViewWidthScaled() / 2);
         S32 half_height = (gViewerWindow->getWorldViewHeightScaled() / 2);
         gGL.scalef(LLUI::getScaleFactor().mV[VX], LLUI::getScaleFactor().mV[VY], 1.f);
-        gGL.translatef((F32)half_width, (F32)half_height, 0.f);
+        // around the world view's centre, which floaters docked to the window edges can move
+        gGL.translatef((F32)gViewerWindow->getWorldViewRectScaled().getCenterX(), (F32)gViewerWindow->getWorldViewRectScaled().getCenterY(), 0.f);
         F32 zoom = gAgentCamera.mHUDCurZoom;
         gGL.scalef(zoom,zoom,1.f);
         gGL.color4fv(LLColor4::white.mV);

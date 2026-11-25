@@ -1278,10 +1278,11 @@ void LLAgentCamera::updateLookAt(const S32 mouse_x, const S32 mouse_y)
         else if (cameraThirdPerson())
         {
             // range from -.5 to .5
+            const LLRect world_rect = gViewerWindow->getWorldViewRectScaled();
             F32 x_from_center =
-                ((F32) mouse_x / (F32) gViewerWindow->getWorldViewWidthScaled() ) - 0.5f;
+                ((F32) (mouse_x - world_rect.mLeft) / (F32) world_rect.getWidth() ) - 0.5f;
             F32 y_from_center =
-                ((F32) mouse_y / (F32) gViewerWindow->getWorldViewHeightScaled() ) - 0.5f;
+                ((F32) (mouse_y - world_rect.mBottom) / (F32) world_rect.getHeight() ) - 0.5f;
 
             // <FS:PP> Speed optimisation
             // frameCamera.yaw( - x_from_center * gSavedSettings.getF32("YawFromMousePosition") * DEG_TO_RAD);

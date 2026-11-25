@@ -95,7 +95,9 @@ bool RlvOverlayEffect::hitTest(const LLCoordGL& ptMouse) const
     if (!m_pImage)
         return false;
 
-    return (m_fBlockTouch) && (m_pImage->getMask(LLVector2((float)ptMouse.mX / gViewerWindow->getWorldViewWidthScaled(), (float)ptMouse.mY / gViewerWindow->getWorldViewHeightScaled())));
+    // The mouse is in window coordinates; the overlay covers the world view
+    const LLRect world_rect = gViewerWindow->getWorldViewRectScaled();
+    return (m_fBlockTouch) && (m_pImage->getMask(LLVector2((float)(ptMouse.mX - world_rect.mLeft) / world_rect.getWidth(), (float)(ptMouse.mY - world_rect.mBottom) / world_rect.getHeight())));
 }
 
 void RlvOverlayEffect::setImage(const LLUUID& idTexture)
