@@ -24779,6 +24779,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Value</key>
       <array>
         <string>preferences</string>
+        <string>search_replace</string>
       </array>
     </map>
     <key>FSWindowEdgeDockByDragging</key>
