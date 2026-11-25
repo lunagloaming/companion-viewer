@@ -259,6 +259,8 @@ public:
     // The GPU takes BC7 (BPTC) textures and can copy them level by level (OpenGL 4.3)
     static bool bc7Supported();
     bool isBC7() const { return mIsBC7; }
+    // A shrink failed once already: it isn't tried again, and the texture isn't dropped again (see LLViewerTextureList)
+    bool bc7ShrinkFailed() const { return mBC7ShrinkFailed; }
 private:
     bool setImageBC7(const FSImageBC7& bc7, const U8* raw_data);
     bool scaleDownBC7(S32 desired_discard);
@@ -266,6 +268,7 @@ private:
     bool mIsBC7 = false;
     bool mBC7AlphaIsOne = false; // an opaque BC7 texture: its alpha is sampled as 1 (GL_TEXTURE_SWIZZLE_A)
     U32 mBC7Format = 0;
+    bool mBC7ShrinkFailed = false; // kept when the texture is dropped and loaded again
 private:
     // </FS:Luna Witch>
 
