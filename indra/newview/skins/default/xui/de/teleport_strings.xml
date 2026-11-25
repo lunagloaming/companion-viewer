@@ -6,7 +6,6 @@
 		</message>
 		<message name="invalid_region_handoff">
 			Bei der Bearbeitung Ihres Regionswechsels ist ein Problem aufgetreten. Sie müssen eventuell neu anmelden, um die Region wechseln zu können.
-Falls diese Meldung weiterhin angezeigt wird, wenden Sie sich bitte an [SUPPORT_SITE].
 		</message>
 		<message name="blocked_tport">
 			Teleportieren ist zurzeit leider nicht möglich. Versuchen Sie es später noch einmal.

@@ -3152,7 +3152,6 @@ Ekran seçimlərində 32 bit rəng rejiminə qoyun.
 		8 bitlik alfa kanalına giriş olmadığı üçün [APP_NAME] tətbiqini başlatmaq mümkün deyil.  Bu problem adətən qrafik kartı drayveri ilə bağlı problemdən qaynaqlanır.
 Yeni video kart drayverlərini quraşdırın.
 Həmçinin monitorunuzu 32-bit True Color (İdarəetmə Paneli &gt; Ekran &gt; Seçimlər) təyin edin.
-Bu mesaj göstərilməyə davam edərsə, [SUPPORT_SITE] saytına daxil olun.
 	</string>
 	<string name="MBPixelFmtSetErr">
 		Piksel formatını təyin etmək mümkün deyil

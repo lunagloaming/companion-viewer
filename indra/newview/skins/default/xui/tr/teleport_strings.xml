@@ -3,11 +3,9 @@
 	<message_set name="errors">
 		<message name="invalid_tport">
 			Işınlama talebiniz işlenirken bir sorunla karşılaşıldı. Işınlanabilmek için yeniden oturum açmanız gerekebilir.
-Bu mesajı almaya devam ederseniz, lütfen [SUPPORT_SITE] bölümüne başvurun.
 		</message>
 		<message name="invalid_region_handoff">
 			Bölge değiştirme talebiniz işlenirken sorunla karşılaşıldı. Bölge geçebilmek için yeniden oturum açmanız gerekebilir.
-Bu mesajı almaya devam ederseniz, lütfen [SUPPORT_SITE] bölümüne başvurun.
 		</message>
 		<message name="blocked_tport">
 			Üzgünüz, ışınlama şu anda engellenmiş durumda. Bir dakika sonra tekrar deneyin.

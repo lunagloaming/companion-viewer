@@ -464,8 +464,8 @@
 				１つ以上のオプションが、不動産レベルで設定されています。
 			</panel.string>
 			<check_box label="誰でも訪問可（このオプションをオフにすると立入禁止ラインが作成されます）" name="public_access"/>
-			<check_box label="１８歳以上である必要があります。[ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="この区画にアクセスするには、１８歳以上でなければなりません。詳細につきましては、[SUPPORT_SITE]をご覧になってください。"/>
-			<check_box label="支払情報が登録されている必要があります。[ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="アカウントに支払情報が登録されていない場合、この区画にアクセスすることはできません。詳細につきましては、[SUPPORT_SITE]をご覧になってください。"/>
+			<check_box label="１８歳以上である必要があります。[ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="この区画にアクセスするには、１８歳以上でなければなりません。"/>
+			<check_box label="支払情報が登録されている必要があります。[ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="アカウントに支払情報が登録されていない場合、この区画にアクセスすることはできません。"/>
 			<check_box label="グループ「[GROUP]」のみアクセスを許可する。" name="GroupCheck" tool_tip="対象とするグループは「一般」タブで選択してください。"/>
 			<check_box label="入場許可を販売：" name="PassCheck" tool_tip="この区画への一時的なアクセスを許可します。"/>
 			<combo_box name="pass_combo">

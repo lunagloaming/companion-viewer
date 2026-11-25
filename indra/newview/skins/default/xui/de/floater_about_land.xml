@@ -479,8 +479,8 @@ Nur große Parzellen können in der Suche aufgeführt werden.
 				Eine oder mehrere dieser Optionen gelten auf Grundbesitzebene
 			</panel.string>
 			<check_box label="Zugang für jeden (Hinweis: Deaktivierung erzeugt Bannlinien)" name="public_access"/>
-			<check_box label="18 Jahre oder älter sind [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Um diese Parzelle besuchen zu können, müssen Einwohner mindestens 18 Jahre oder älter sein. Weitere Informationen finden Sie auf [SUPPORT_SITE]."/>
-			<check_box label="Zahlungsinformationen hinterlegt haben [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Um diese Parzelle besuchen zu können, müssen Einwohner Zahlungsinformationen hinterlegt haben. Weitere Informationen finden Sie auf [SUPPORT_SITE]."/>
+			<check_box label="18 Jahre oder älter sind [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Um diese Parzelle besuchen zu können, müssen Einwohner mindestens 18 Jahre oder älter sein."/>
+			<check_box label="Zahlungsinformationen hinterlegt haben [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Um diese Parzelle besuchen zu können, müssen Einwohner Zahlungsinformationen hinterlegt haben."/>
 			<check_box label="Gruppenzugang erlauben: [GROUP]" name="GroupCheck" tool_tip="Gruppe im Register „Allgemein“ festlegen."/>
 			<check_box label="Pässe verkaufen an:" name="PassCheck" tool_tip="Ermöglicht befristeten Zugang zu dieser Parzelle"/>
 			<combo_box name="pass_combo">

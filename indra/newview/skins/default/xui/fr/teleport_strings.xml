@@ -3,11 +3,9 @@
 	<message_set name="errors">
 		<message name="invalid_tport">
  Nous avons rencontré des problèmes en essayant de vous téléporter. Vous devrez peut-être vous reconnecter avant de pouvoir vous téléporter.
- Si ce message persiste, veuillez consulter la page [SUPPORT_SITE].
 		</message>
 		<message name="invalid_region_handoff">
  Nous avons rencontré des problèmes en essayant de vous téléporter. Vous devrez peut-être vous reconnecter avant de pouvoir traverser des régions.
- Si ce message persiste, veuillez consulter la page [SUPPORT_SITE].
 		</message>
 		<message name="blocked_tport">
  Désolé, la téléportation est bloquée actuellement. Veuillez réessayer dans un moment.

@@ -2969,7 +2969,6 @@ Por favor, en las configuraciones de tu ordenador ajusta el modo de color a 32-b
 		[APP_NAME] no puede ejecutarse porque no puede obtener un canal alpha de 8 bit. Generalmente, se debe a alguna cuestión de los drivers de la tarjeta de vídeo.
 Por favor, comprueba que tienes instalados los últimos drivers para tu tarjeta de vídeo.
 Comprueba también que tu monitor esta configurado para Color Verdadero (32-bit) en Panel de Control &gt; Apariencia y temas &gt; Pantalla.
-Si sigues recibiendo este mensaje, contacta con [SUPPORT_SITE].
 	</string>
 	<string name="MBPixelFmtSetErr">
 		No se puede configurar el formato de píxel

@@ -698,7 +698,7 @@
 		無法寫入檔案 [[FILE]]
 	</notification>
 	<notification name="UnsupportedHardware">
-		要告知你，你的電腦未達 [APP_NAME] 的最低系統需求。 你可能會發現電腦效能不佳。 很遺憾，[SUPPORT_SITE] 無法針對不支援的系統設定提供技術支援。
+		要告知你，你的電腦未達 [APP_NAME] 的最低系統需求。 你可能會發現電腦效能不佳。
 
 [MINSPECS]
 
@@ -1041,7 +1041,6 @@
 	</notification>
 	<notification name="invalid_region_handoff">
 		處理你跨越區域操作時發生問題。 如果想要跨越區域，你可能需要重新登入。
-如果你持續得到此訊息，請查閱 [SUPPORT_SITE]。
 	</notification>
 	<notification name="blocked_tport">
 		抱歉，當前禁止瞬間傳送。 請稍後再試。  如果你仍無法進行瞬間傳送，
@@ -1597,20 +1596,18 @@
 	<notification name="LoginPacketNeverReceived">
 		連線出現問題。 問題可能出在你的網路連線或 [CURRENT_GRID]。
 
-請檢查你的網路連線，幾分鐘后再試一次，或者點選幫助瀏覽 [SUPPORT_SITE]，或點選瞬間傳送試著回到你的家。
+請檢查你的網路連線，幾分鐘后再試一次，或點選瞬間傳送試著回到你的家。
 		<form name="form">
 			<button name="OK" text="確定"/>
-			<button name="Help" text="幫助"/>
 			<button name="Teleport" text="瞬間傳送"/>
 		</form>
 	</notification>
 	<notification name="LoginPacketNeverReceivedNoTP">
 		連線存在問題。可能是您的網際網路連線或[CURRENT_GRID]出現了問題。
 
-請檢查您的網際網路連線，然後重試，或點選幫助訪問[SUPPORT_SITE]。
+請檢查您的網際網路連線，然後重試。
 		<form name="form">
 			<button name="OK" text="確定"/>
-			<button name="Help" text="幫助"/>
 		</form>
 	</notification>
 	<notification name="LoginRemoveMultiGridUserData">
@@ -1856,7 +1853,6 @@ SHA1指紋：[MD5_DIGEST]
 	</notification>
 	<notification name="LoginFailedUnknown">
 		抱歉，登錄失敗，原因不明。
-如果你一直看到此訊息，請查閱 [SUPPORT_SITE]。
 		<usetemplate name="okbutton" yestext="退出"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -4345,7 +4341,7 @@ URL：[AUDIOURL]
 		- 你的系統記憶卡未達系統最低設定要求。
 	</global>
 	<global name="LLLeapUpdaterFailure">
-		啟動更新服務 [UPDATER_APP] 失敗。請檢查檢視器是否已正確安裝，並且具有運行所需的權限。如果您繼續遇到問題，請存取 [SUPPORT_SITE]。
+		啟動更新服務 [UPDATER_APP] 失敗。請檢查檢視器是否已正確安裝，並且具有運行所需的權限。
 	</global>
 	<global name="You can only set your 'Home Location' on your land or at a mainland Infohub.">
 	如果您擁有土地，您可以將其設定為您的家。
@@ -5390,8 +5386,7 @@ switch語句在沒有預設標籤情況下的行為不正確已被修正。
 [EWHAT]
 	</notification>
 	<notification name="NoHavok">
-		一些功能，如[FEATURE]，不包含在[APP_NAME]的這個版本中。如果您想使用[FEATURE]，請從以下鏈接下載包含Havok支援的[APP_NAME]版本：
-[DOWNLOAD_URL]
+		一些功能，如[FEATURE]，不包含在[APP_NAME]的這個版本中。
 		<form name="form">
 			<ignore name="ignore" text="無Havok警告"/>
 		</form>

@@ -3,11 +3,9 @@
 	<message_set name="errors">
 		<message name="invalid_tport">
 			處理你瞬間傳送要求時發生問題。 如果想要瞬間傳送，你可能需要重新登入。
-如果你持續得到此訊息，請查閱 [SUPPORT_SITE]。
 		</message>
 		<message name="invalid_region_handoff">
 			處理你跨越區域操作時發生問題。 如果想要跨越區域，你可能需要重新登入。
-如果你持續得到此訊息，請查閱 [SUPPORT_SITE]。
 		</message>
 		<message name="blocked_tport">
 			抱歉，當前禁止瞬間傳送。 請稍後再試。

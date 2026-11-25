@@ -19,8 +19,8 @@
 		<radio_item label="Разрешено только жителям и группам, перечисленных на вкладке доступа" name="estate_restricted_access"/>
 		<radio_item label="Доступ открыт для всех" name="estate_public_access"/>
 	</radio_group>
-	<check_box label="Должен быть 18 и старше" name="limit_age_verified" tool_tip="Доступ к этому землевладению имеют только жители 18 лет и старше. Более подробная информация находится здесь: [SUPPORT_SITE]."/>
-	<check_box label="Информация о платежах должна быть в файле" name="limit_payment" tool_tip="Для доступа к этому землевладению у жителя должна быть зарегистрирована информация об оплате.  Более подробная информация находится здесь: [SUPPORT_SITE]."/>
+	<check_box label="Должен быть 18 и старше" name="limit_age_verified" tool_tip="Доступ к этому землевладению имеют только жители 18 лет и старше."/>
+	<check_box label="Информация о платежах должна быть в файле" name="limit_payment" tool_tip="Для доступа к этому землевладению у жителя должна быть зарегистрирована информация об оплате."/>
 	<check_box label="Владельцы участков могут принимать более ограничетельные меры" name="parcel_access_override"/>
 	<check_box label="Разрешить голосовое общение" name="voice_chat_check"/>
 	<check_box label="Разрешить прямой телепорт" name="allow_direct_teleport"/>
