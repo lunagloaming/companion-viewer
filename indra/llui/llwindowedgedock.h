@@ -75,9 +75,10 @@ public:
 
     // The views that leave the docked areas out. They must share gFloaterView's parent.
     void addInsetView(LLView* view);
-    // Views along the top of the space left over, keeping their own height, such as the navigation bar (location and
-    // favorites): they span the width between the side areas and sit below the top area. Any parent.
-    void addTopInsetView(LLView* view);
+    // The navigation bar along the top of the window: docked areas start below its location row, which keeps the
+    // full width, and its favorites row narrows to the space between the side areas (an area docked to the top
+    // sits below it). Any of them may be null; rows that are hidden take no space.
+    void setNavigationBar(LLView* location_row, LLView* favorites_row, LLView* favorites);
 
     bool canDock(LLFloater* floater, EEdge edge);
     void dock(LLFloater* floater, EEdge edge, S32 position = -1);
@@ -141,8 +142,11 @@ private:
     S32 maxDepth(EEdge edge, const LLRect& frame) const;
 
     void arrange();
+    // world_out, if given: what is left for the world view (under the navigation bar, as ever, without a top area)
     void computeAreaRects(const LLRect& frame, const S32 depths[EDGE_COUNT], const std::vector<EEdge>& order,
-                          LLRect rects[EDGE_COUNT]) const;
+                          LLRect rects[EDGE_COUNT], LLRect* world_out = nullptr) const;
+    bool measureNavigationBar(); // true if the rows moved or were shown or hidden
+    void fitFavorites(const LLRect rects[EDGE_COUNT]);
     void updateOrder();
     void applyInsets();
     bool resizeInProgress() const;
@@ -159,7 +163,13 @@ private:
     S32                     mDepths[EDGE_COUNT];        // the depths in use after the last arrange
     S32                     mAppliedInsets[EDGE_COUNT]; // what the inset views leave out now
     std::vector<LLHandle<LLView> > mInsetViews;
-    std::vector<LLHandle<LLView> > mTopInsetViews;
+    LLHandle<LLView>        mLocationRow;
+    LLHandle<LLView>        mFavoritesRow;
+    LLHandle<LLView>        mFavorites;
+    S32                     mFavoritesMarginLeft = 0;   // its own margins in its row, without docked areas
+    S32                     mFavoritesMarginRight = 0;
+    S32                     mDockTop = S32_MAX;         // floater view coordinates: below the location row
+    S32                     mFavoritesBottom = S32_MAX; // and the bottom of the favorites row, where a top area starts
 
     bool                    mLoaded = false;
     bool                    mArranging = false;

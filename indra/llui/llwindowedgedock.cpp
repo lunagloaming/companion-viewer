@@ -100,12 +100,80 @@ void LLWindowEdgeDock::addInsetView(LLView* view)
     }
 }
 
-void LLWindowEdgeDock::addTopInsetView(LLView* view)
+void LLWindowEdgeDock::setNavigationBar(LLView* location_row, LLView* favorites_row, LLView* favorites)
 {
-    if (view)
+    mLocationRow = location_row ? location_row->getHandle() : LLHandle<LLView>();
+    mFavoritesRow = favorites_row ? favorites_row->getHandle() : LLHandle<LLView>();
+    mFavorites = favorites ? favorites->getHandle() : LLHandle<LLView>();
+    if (favorites && favorites->getParent())
     {
-        mTopInsetViews.push_back(view->getHandle());
-        mInsetsDirty = true;
+        mFavoritesMarginLeft = favorites->getRect().mLeft;
+        mFavoritesMarginRight = favorites->getParent()->getRect().getWidth() - favorites->getRect().mRight;
+    }
+    measureNavigationBar();
+    mLayoutDirty = true;
+}
+
+bool LLWindowEdgeDock::measureNavigationBar()
+{
+    // The bottom of each row in the floater view, if shown
+    auto bottom_of = [](const LLHandle<LLView>& handle)
+    {
+        LLView* row = handle.get();
+        if (!row || !gFloaterView || !row->isInVisibleChain() || row->getRect().getHeight() <= 0)
+        {
+            return S32_MAX;
+        }
+        LLRect in_floater_view;
+        row->localRectToOtherView(row->getLocalRect(), &in_floater_view, gFloaterView);
+        return in_floater_view.mBottom;
+    };
+    const S32 dock_top = bottom_of(mLocationRow);
+    S32 favorites_bottom = bottom_of(mFavoritesRow);
+    if (favorites_bottom == S32_MAX)
+    {
+        favorites_bottom = dock_top;
+    }
+    const bool changed = dock_top != mDockTop || favorites_bottom != mFavoritesBottom;
+    mDockTop = dock_top;
+    mFavoritesBottom = favorites_bottom;
+    return changed;
+}
+
+void LLWindowEdgeDock::fitFavorites(const LLRect rects[EDGE_COUNT])
+{
+    LLView* favorites = mFavorites.get();
+    LLView* parent = favorites ? favorites->getParent() : nullptr;
+    if (!parent || !gFloaterView)
+    {
+        return;
+    }
+
+    // Side areas that reach up beside the favorites row narrow it
+    const LLRect frame = getFrame();
+    S32 left = frame.mLeft;
+    S32 right = frame.mRight;
+    if (rects[EDGE_LEFT].notEmpty() && rects[EDGE_LEFT].mTop > mFavoritesBottom)
+    {
+        left = rects[EDGE_LEFT].mRight;
+    }
+    if (rects[EDGE_RIGHT].notEmpty() && rects[EDGE_RIGHT].mTop > mFavoritesBottom)
+    {
+        right = rects[EDGE_RIGHT].mLeft;
+    }
+    S32 parent_left = 0;
+    S32 parent_right = 0;
+    S32 unused = 0;
+    gFloaterView->localPointToOtherView(left, 0, &parent_left, &unused, parent);
+    gFloaterView->localPointToOtherView(right, 0, &parent_right, &unused, parent);
+
+    const S32 width = parent->getRect().getWidth();
+    LLRect rect = favorites->getRect();
+    rect.mLeft = llmax(mFavoritesMarginLeft, parent_left + mFavoritesMarginLeft);
+    rect.mRight = llmax(rect.mLeft + 1, llmin(width - mFavoritesMarginRight, parent_right - mFavoritesMarginRight));
+    if (rect != favorites->getRect())
+    {
+        favorites->setShape(rect);
     }
 }
 
@@ -708,10 +776,13 @@ void LLWindowEdgeDock::updateOrder()
 }
 
 void LLWindowEdgeDock::computeAreaRects(const LLRect& frame, const S32 depths[EDGE_COUNT], const std::vector<EEdge>& order,
-                                        LLRect rects[EDGE_COUNT]) const
+                                        LLRect rects[EDGE_COUNT], LLRect* world_out) const
 {
-    // Each area in turn takes a strip along its edge of what the areas before it left
+    // Each area in turn takes a strip along its edge of what the areas before it left. All of them start below the
+    // navigation bar's location row; a top area starts below its favorites row too, which stays visible above it.
     LLRect remaining = frame;
+    remaining.mTop = llmin(remaining.mTop, mDockTop);
+    bool top_area = false;
     for (S32 e = 0; e < EDGE_COUNT; ++e)
     {
         rects[e] = LLRect();
@@ -734,15 +805,29 @@ void LLWindowEdgeDock::computeAreaRects(const LLRect& frame, const S32 depths[ED
             remaining.mRight -= depth;
             break;
         case EDGE_TOP:
-            rects[edge] = LLRect(remaining.mLeft, remaining.mTop, remaining.mRight, remaining.mTop - depth);
-            remaining.mTop -= depth;
+        {
+            const S32 top = llmin(remaining.mTop, mFavoritesBottom);
+            rects[edge] = LLRect(remaining.mLeft, top, remaining.mRight, top - depth);
+            remaining.mTop = top - depth;
+            top_area = true;
             break;
+        }
         case EDGE_BOTTOM:
             rects[edge] = LLRect(remaining.mLeft, remaining.mBottom + depth, remaining.mRight, remaining.mBottom);
             remaining.mBottom += depth;
             break;
         default:
             break;
+        }
+    }
+
+    if (world_out)
+    {
+        // Without a top area, the world view runs up under the navigation bar, as it always has
+        *world_out = remaining;
+        if (!top_area)
+        {
+            world_out->mTop = frame.mTop;
         }
     }
 }
@@ -942,6 +1027,17 @@ void LLWindowEdgeDock::applyInsets()
 {
     mInsetsDirty = false;
 
+    if (!gFloaterView)
+    {
+        return;
+    }
+
+    // What is left for the world view, in the floater view; the inset views share its parent
+    const LLRect frame = getFrame();
+    LLRect rects[EDGE_COUNT];
+    LLRect world;
+    computeAreaRects(frame, mDepths, mOrder, rects, &world);
+
     for (const LLHandle<LLView>& handle : mInsetViews)
     {
         LLView* view = handle.get();
@@ -949,50 +1045,29 @@ void LLWindowEdgeDock::applyInsets()
         {
             continue;
         }
-        LLRect rect = view->getParent()->getLocalRect();
-        rect.mLeft += mDepths[EDGE_LEFT];
-        rect.mRight -= mDepths[EDGE_RIGHT];
-        rect.mTop -= mDepths[EDGE_TOP];
-        rect.mBottom += mDepths[EDGE_BOTTOM];
+        LLRect rect;
+        gFloaterView->localRectToOtherView(world, &rect, view->getParent());
         if (rect != view->getRect())
         {
             view->setShape(rect);
         }
     }
 
-    // The space left over, in the floater view, then in each top view's parent: the view keeps its height
-    if (gFloaterView)
-    {
-        LLRect space = getFrame();
-        space.mLeft += mDepths[EDGE_LEFT];
-        space.mRight -= mDepths[EDGE_RIGHT];
-        space.mTop -= mDepths[EDGE_TOP];
-        space.mBottom += mDepths[EDGE_BOTTOM];
-        for (const LLHandle<LLView>& handle : mTopInsetViews)
-        {
-            LLView* view = handle.get();
-            if (!view || !view->getParent())
-            {
-                continue;
-            }
-            LLRect in_parent;
-            gFloaterView->localRectToOtherView(space, &in_parent, view->getParent());
-            LLRect rect(in_parent.mLeft, in_parent.mTop, in_parent.mRight, in_parent.mTop - view->getRect().getHeight());
-            if (rect != view->getRect())
-            {
-                view->setShape(rect);
-            }
-        }
-    }
+    fitFavorites(rects);
 
-    for (S32 e = 0; e < EDGE_COUNT; ++e)
-    {
-        mAppliedInsets[e] = mDepths[e];
-    }
+    mAppliedInsets[EDGE_LEFT] = world.mLeft - frame.mLeft;
+    mAppliedInsets[EDGE_RIGHT] = frame.mRight - world.mRight;
+    mAppliedInsets[EDGE_TOP] = frame.mTop - world.mTop;
+    mAppliedInsets[EDGE_BOTTOM] = world.mBottom - frame.mBottom;
 }
 
 void LLWindowEdgeDock::update()
 {
+    // The navigation bar's rows can be shown and hidden at any time (Preferences, Hide UI)
+    if (measureNavigationBar())
+    {
+        mLayoutDirty = true;
+    }
     if (mLayoutDirty)
     {
         arrange();
