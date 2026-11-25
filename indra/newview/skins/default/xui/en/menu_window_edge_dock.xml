@@ -58,4 +58,16 @@
     <menu_item_call.on_enable
      function="WindowEdgeDock.IsDocked" />
   </menu_item_call>
+  <!-- Only while the Advanced menu is shown (Ctrl+Alt+D): adds the window to FSWindowEdgeDockExcluded -->
+  <menu_item_separator
+   layout="topleft"
+   visibility_control="UseDebugMenus" />
+  <menu_item_call
+   label="Exclude from Docking"
+   layout="topleft"
+   name="exclude"
+   visibility_control="UseDebugMenus">
+    <menu_item_call.on_click
+     function="WindowEdgeDock.Exclude" />
+  </menu_item_call>
 </context_menu>

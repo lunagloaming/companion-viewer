@@ -155,6 +155,7 @@ private:
 
     void onMenuDock(const LLSD& param);
     void onMenuUndock();
+    void onMenuExclude();
     bool onMenuCanDock(const LLSD& param);
     bool onMenuIsDocked();
 
