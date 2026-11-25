@@ -3318,8 +3318,6 @@ Falls diese Meldung weiterhin angezeigt wird, wenden Sie sich bitte an [SUPPORT_
 	</string>
 	<string name="MBVideoDrvErr">
 		[APP_NAME] kann nicht ausgeführt werden, da die Treiber Ihrer Videokarte entweder nicht richtig installiert oder veraltet sind, oder die entsprechende Hardware nicht unterstützt wird. Bitte vergewissern Sie sich, dass Sie die aktuellsten Treiber für die Videokarte installiert haben. Falls Sie die aktuellsten Treiber bereits installiert haben, installieren Sie diese bitte erneut.
-
-Falls diese Meldung weiterhin angezeigt wird, wenden Sie sich bitte an [SUPPORT_SITE].
 	</string>
 	<string name="MBOutOfMemoryTitle">Kein Arbeitsspeicher verfügbar</string>
 	<string name="MBOutOfMemoryErr">

@@ -2190,8 +2190,6 @@ Hvis du bliver ved med at modtage denne besked, kontakt [SUPPORT_SITE].
 	</string>
 	<string name="MBVideoDrvErr">
 		[APP_NAME] kan ikke afvikles da driverne til dit videokort ikke blev installeret korrekt, er forældede, eller du benytter hardware der ikke er supporteret. Undersøg venligst om du har installeret de nyeste drivere til dit grafikkort, og selv om du har de nyeste, prøv at geninstallere dem.
-
-Hvis du bliver ved med at modtage denne besked, kontakt venligst [SUPPORT_SITE].
 	</string>
 	<string name="5 O'Clock Shadow">
 		Skægstubbe

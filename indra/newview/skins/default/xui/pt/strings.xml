@@ -3122,7 +3122,6 @@ Executando em uma janela.
 	</string>
 	<string name="MBVideoDrvErr">
 		[APP_NAME] não pode ser executado porque os drivers da sua placa de vídeo estão instalados incorretamente, desatualizados, ou porque o hardware não é compatível. Verifique se você instalou os drivers mais recentes da placa de vídeo. Se já estiverem instalados, reinstale-os.
-Se esta mensagem continuar aparecendo, entre em contato com [SUPPORT_SITE].
 	</string>
 	<string name="MBOutOfMemoryTitle">Memória insuficiente</string>
 	<string name="MBOutOfMemoryErr">
