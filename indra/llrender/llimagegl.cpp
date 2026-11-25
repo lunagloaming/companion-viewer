@@ -2796,9 +2796,33 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
         return false;
     }
 
+    // What the texture really holds, asked of GL: copying levels it doesn't have, or from a texture
+    // that isn't BC7, fails, and then the same shrink was asked for again on every update
+    gGL.getTexUnit(0)->bindManual(mBindTarget, mTexName);
+    GLint source_format = 0;
+    glGetTexLevelParameteriv(mTarget, 0, GL_TEXTURE_INTERNAL_FORMAT, &source_format);
+    S32 levels_held = 0;
+    for (S32 level = 0; level <= (S32)mMipLevels; ++level)
+    {
+        GLint level_width = 0;
+        glGetTexLevelParameteriv(mTarget, level, GL_TEXTURE_WIDTH, &level_width);
+        if (level_width <= 0)
+        {
+            break;
+        }
+        ++levels_held;
+    }
+    gGL.getTexUnit(0)->unbind(mBindTarget);
+    if ((U32)source_format != mBC7Format)
+    {
+        // Uploaded again uncompressed since: the ordinary shrink takes it
+        mIsBC7 = false;
+        return scaleDown(desired_discard);
+    }
+
     // Levels of the current texture, and those from the first one kept
     const S32 skip = desired_discard - mCurrentDiscardLevel;
-    const S32 levels_now = llmax((S32)mMaxDiscardLevel - (S32)mCurrentDiscardLevel, 0) + 1;
+    const S32 levels_now = llmin(llmax((S32)mMaxDiscardLevel - (S32)mCurrentDiscardLevel, 0) + 1, levels_held);
     const S32 count = levels_now - skip;
     if (count <= 0)
     {
@@ -2837,9 +2861,13 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
     }
     gGL.getTexUnit(0)->unbind(mBindTarget);
 
-    if (glGetError() != GL_NO_ERROR)
+    const GLenum error = glGetError();
+    if (error != GL_NO_ERROR)
     {
-        LL_WARNS_ONCE("Texture") << "Shrinking a BC7 texture failed; keeping it as it was" << LL_ENDL;
+        LL_WARNS_ONCE("Texture") << "Shrinking a BC7 texture failed (GL error 0x" << std::hex << error << std::dec
+                                 << ", " << getWidth(mCurrentDiscardLevel) << "x" << getHeight(mCurrentDiscardLevel)
+                                 << " to " << width << "x" << height << ", copying " << count << " of " << levels_held
+                                 << " levels from level " << skip << ")" << LL_ENDL;
         LLImageGL::deleteTextures(1, &new_name);
         return false;
     }
