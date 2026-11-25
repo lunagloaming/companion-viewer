@@ -17,7 +17,7 @@
 		第二人生
 	</string>
 	<string name="SUPPORT_SITE">
-		Second Life支援網站
+		Companion Viewer 問題追蹤
 	</string>
 	<!-- Will be set in fsgridhandler.cpp / llviewernetwork.cpp -->
 	<string name="VIEWER_GENERATION">

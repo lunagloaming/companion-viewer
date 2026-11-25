@@ -10,8 +10,8 @@
 	<string name="APP_NAME">Companion Viewer</string>
 	<string name="CAPITALIZED_APP_NAME">COMPANION VIEWER</string>
 	<string name="SECOND_LIFE_GRID">Second Life Grid</string>
-	<string name="SUPPORT_SITE">Second Life Support Portal</string>
-	<string name="DOWNLOAD_URL">https://secondlife.com/support/downloads/</string>
+	<string name="SUPPORT_SITE">Companion Viewer issue tracker</string>
+	<string name="DOWNLOAD_URL">https://github.com/lunagloaming/companion-viewer/releases</string>
 	<string name="CURRENT_GRID"/> <!-- Will be set in fsgridhandler.cpp / llviewernetwork.cpp -->
 	<string name="VIEWER_GENERATION">Viewer [VERSION]</string>
 	<string name="SHORT_VIEWER_GENERATION">V[VERSION]</string>
