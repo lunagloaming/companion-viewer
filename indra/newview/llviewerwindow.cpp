@@ -2455,8 +2455,13 @@ void LLViewerWindow::initBase()
     // Floaters docked to the window edges take their space from the world view and the toolbars
     LLWindowEdgeDock::instance().addInsetView(mWorldViewPlaceholder.get());
     LLWindowEdgeDock::instance().addInsetView(panel_holder);
-    // and the navigation bar (location and favorites) along the top of what is left
-    LLWindowEdgeDock::instance().addTopInsetView(main_view->findChild<LLView>("navigation_bar"));
+    // Docked areas start below the navigation bar's location row; its favorites row narrows between them
+    if (LLView* navigation_bar = main_view->findChild<LLView>("navigation_bar"))
+    {
+        LLWindowEdgeDock::instance().setNavigationBar(navigation_bar->findChild<LLView>("navigation_bar_visibility_panel"),
+                                                      navigation_bar->findChild<LLView>("favorites_bar_visibility_panel"),
+                                                      navigation_bar->findChild<LLView>("favorite"));
+    }
     // Hide the toolbars for the moment: we'll make them visible after logging in world (see LLViewerWindow::initWorldUI())
     gToolBarView->setVisible(false);
 
