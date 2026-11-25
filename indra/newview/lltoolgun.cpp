@@ -171,8 +171,8 @@ void LLToolGun::draw()
         //  ( gViewerWindow->getWorldViewRectScaled().getWidth() - crosshair->getWidth() ) / 2,
         //  ( gViewerWindow->getWorldViewRectScaled().getHeight() - crosshair->getHeight() ) / 2);
         mCrosshairp->draw(
-            ( gViewerWindow->getWorldViewRectScaled().getWidth() - mCrosshairp->getWidth() ) / 2,
-            ( gViewerWindow->getWorldViewRectScaled().getHeight() - mCrosshairp->getHeight() ) / 2);
+            gViewerWindow->getWorldViewRectScaled().getCenterX() - mCrosshairp->getWidth() / 2,
+            gViewerWindow->getWorldViewRectScaled().getCenterY() - mCrosshairp->getHeight() / 2);
         // </FS:Ansariel> Performance tweak
     }
 }
