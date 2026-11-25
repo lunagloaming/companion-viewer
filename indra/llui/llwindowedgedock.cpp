@@ -1313,6 +1313,7 @@ bool LLWindowEdgeDock::showMenu(LLFloater* floater, LLView* spawning_view, S32 x
         LLUICtrl::CommitCallbackRegistry::ScopedRegistrar commit_registrar;
         commit_registrar.add("WindowEdgeDock.Dock", boost::bind(&LLWindowEdgeDock::onMenuDock, this, _2));
         commit_registrar.add("WindowEdgeDock.Undock", boost::bind(&LLWindowEdgeDock::onMenuUndock, this));
+        commit_registrar.add("WindowEdgeDock.Exclude", boost::bind(&LLWindowEdgeDock::onMenuExclude, this));
 
         LLUICtrl::EnableCallbackRegistry::ScopedRegistrar enable_registrar;
         enable_registrar.add("WindowEdgeDock.CanDock", boost::bind(&LLWindowEdgeDock::onMenuCanDock, this, _2));
@@ -1347,6 +1348,40 @@ void LLWindowEdgeDock::onMenuDock(const LLSD& param)
 void LLWindowEdgeDock::onMenuUndock()
 {
     if (LLFloater* floater = mMenuFloater.get())
+    {
+        undock(floater);
+    }
+}
+
+void LLWindowEdgeDock::onMenuExclude()
+{
+    // Adds the window to FSWindowEdgeDockExcluded, by the name it is registered under, and frees it if docked
+    LLFloater* floater = mMenuFloater.get();
+    LLControlGroup* group = settings();
+    if (!floater || floater->getInstanceName().empty() || !group || !group->controlExists("FSWindowEdgeDockExcluded"))
+    {
+        return;
+    }
+
+    const std::string& name = floater->getInstanceName();
+    LLSD excluded = group->getLLSD("FSWindowEdgeDockExcluded");
+    if (!excluded.isArray())
+    {
+        excluded = LLSD::emptyArray();
+    }
+    bool listed = false;
+    for (LLSD::array_const_iterator it = excluded.beginArray(); it != excluded.endArray() && !listed; ++it)
+    {
+        listed = it->asString() == name;
+    }
+    if (!listed)
+    {
+        excluded.append(name);
+        group->setLLSD("FSWindowEdgeDockExcluded", excluded);
+        LL_INFOS("WindowEdgeDock") << "Excluded floater " << name << " (" << floater->getName() << ") from docking" << LL_ENDL;
+    }
+
+    if (floater->isEdgeDocked())
     {
         undock(floater);
     }
