@@ -2697,7 +2697,7 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
     // Never reached: bc7Supported() is false on macOS, whose OpenGL.framework has no glCopyImageSubData to link.
     return false;
 #else
-    if (!mTexName)
+    if (!mTexName || mBC7ShrinkFailed)
     {
         return false;
     }
@@ -2743,13 +2743,14 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
     LLImageGL::generateTextures(1, &new_name);
     gGL.getTexUnit(0)->bindManual(mBindTarget, new_name);
     clear_glerror();
+    // All the levels and the level range first: glCopyImageSubData refuses (GL_INVALID_OPERATION) to copy
+    // into a texture that isn't complete, as one with only its first levels defined isn't
     for (S32 i = 0; i < count; ++i)
     {
         const S32 w = llmax(width >> i, 1);
         const S32 h = llmax(height >> i, 1);
         const S64 size = dataFormatBytes(mBC7Format, w, h);
         glCompressedTexImage2D(mTarget, i, mBC7Format, w, h, 0, (GLsizei)size, nullptr);
-        glCopyImageSubData(mTexName, mTarget, i + skip, 0, 0, 0, new_name, mTarget, i, 0, 0, 0, w, h, 1);
         if (i == 0)
         {
             alloc_tex_bytes(size, w, h);
@@ -2761,6 +2762,12 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
     }
     glTexParameteri(mTarget, GL_TEXTURE_BASE_LEVEL, 0);
     glTexParameteri(mTarget, GL_TEXTURE_MAX_LEVEL, count - 1);
+    for (S32 i = 0; i < count; ++i)
+    {
+        const S32 w = llmax(width >> i, 1);
+        const S32 h = llmax(height >> i, 1);
+        glCopyImageSubData(mTexName, mTarget, i + skip, 0, 0, 0, new_name, mTarget, i, 0, 0, 0, w, h, 1);
+    }
     if (mBC7AlphaIsOne)
     {
         glTexParameteri(mTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
@@ -2775,6 +2782,7 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
                                  << " to " << width << "x" << height << ", copying " << count << " of " << levels_held
                                  << " levels from level " << skip << ")" << LL_ENDL;
         LLImageGL::deleteTextures(1, &new_name);
+        mBC7ShrinkFailed = true;
         return false;
     }
 
