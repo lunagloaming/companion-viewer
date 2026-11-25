@@ -1,6 +1,6 @@
 {
   "name": "slmoney",
-  "productName": "SL Money",
+  "productName": "Global Accountant",
   "version": "1.0.0",
   "description": "L$ balances and transactions from Companion Viewer's money logs (read only)",
   "author": "Luna Gloaming",
@@ -20,6 +20,7 @@
   },
   "build": {
     "appId": "io.github.lunagloaming.slmoney",
+    "executableName": "slmoney",
     "files": [
       "main.js",
       "preload.js",

@@ -1,5 +1,5 @@
 'use strict';
-// SL Money: shows every account's L$ balance and transactions from the viewers' money logs.
+// Global Accountant: shows every account's L$ balance and transactions from the viewers' money logs.
 // Read only. The main process reads and watches the files; the page (renderer/) only displays.
 // Profile pictures of Second Life accounts come from world.secondlife.com, checked weekly.
 
@@ -195,7 +195,7 @@ function createWindow() {
     window = new BrowserWindow({
         width: 900,
         height: 640,
-        title: 'SL Money',
+        title: 'Global Accountant',
         icon: path.join(__dirname, 'build', 'icon.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),

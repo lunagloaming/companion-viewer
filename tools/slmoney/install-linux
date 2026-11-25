@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build SL Money for Linux and install it for this user: ~/Applications/slmoney and a menu
+# Build Global Accountant for Linux and install it for this user: ~/Applications/slmoney and a menu
 # entry (~/.local/share/applications/slmoney.desktop). Run again to update; quit it first.
 #
 #   tools/slmoney/install-linux
@@ -20,7 +20,7 @@ cp build/icon.png "$DEST/icon.png"
 cat > "$APPS/slmoney.desktop" <<DESKTOP
 [Desktop Entry]
 Type=Application
-Name=SL Money
+Name=Global Accountant
 Comment=L\$ balances and transactions from Companion Viewer's money logs
 Exec=$DEST/slmoney
 Icon=$DEST/icon.png
@@ -29,4 +29,4 @@ Categories=Office;Finance;
 StartupWMClass=slmoney
 DESKTOP
 command -v update-desktop-database >/dev/null && update-desktop-database "$APPS" || true
-echo "Installed to $DEST; start SL Money from the menu."
+echo "Installed to $DEST; start Global Accountant from the menu."

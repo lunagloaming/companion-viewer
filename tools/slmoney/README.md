@@ -1,4 +1,6 @@
-# SL Money
+# Global Accountant
+
+(`slmoney` is its file name: the folder, the program and the Linux menu entry.)
 
 A small Electron app that shows every viewer account's L$ balance, read from the
 money logs Companion Viewer writes (`<user data folder>/<account>/money_log.txt`,
@@ -44,19 +46,20 @@ Needs Node.js with npm. `npm ci` once, then:
 npm test              unit tests (src/ledger.test.js)
 npm start             run from the source
 ./install-linux       build and install for this user: ~/Applications/slmoney and a menu entry
-npm run dist:mac      dist/SL Money-<version>-universal.dmg (on a Mac; ad-hoc signed)
-npm run dist:win      dist/SL Money Setup <version>.exe (on Windows, or Linux with Wine)
+npm run dist:mac      dist/Global Accountant-<version>-universal.dmg (on a Mac; ad-hoc signed)
+npm run dist:win      dist/Global Accountant Setup <version>.exe (on Windows, or Linux with Wine)
 ```
 
 ### Packaged with the viewer
 
 `npm run bundle:linux`, `bundle:mac` or `bundle:win` builds just the program into
-`dist/` (`linux-unpacked`, `mac-universal/SL Money.app`, `win-unpacked`). When that is
+`dist/` (`linux-unpacked`, `mac-universal/Global Accountant.app`, `win-unpacked`). When that is
 there, the viewer's packaging (`fs_bundle_slmoney` in `indra/newview/fs_viewer_manifest.py`)
 copies it into the viewer: `slmoney/` beside the viewer on Linux and Windows,
-`Contents/Resources/SL Money.app` on macOS. Global Accountant looks there first, then for
-a separate install. Without it the viewer builds as usual and Global Accountant says SL
-Money is missing.
+`Contents/Resources/Global Accountant.app` on macOS. Help > Global Accountant looks there
+first, then for a separate install. Without it the viewer builds as usual and Help > Global
+Accountant says it is missing. On Windows the viewer's installer also adds it to the viewer's
+Start menu folder.
 
 The macOS app isn't signed with an Apple Developer ID: the first time, open it from
 **System Settings → Privacy & Security → Open Anyway**. The Windows installer isn't

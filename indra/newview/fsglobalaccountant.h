@@ -1,6 +1,6 @@
 /**
  * @file fsglobalaccountant.h
- * @brief Starts SL Money, the app that shows the money logs.
+ * @brief Starts Global Accountant (tools/slmoney), the app that shows the money logs.
  *
  * $LicenseInfo:firstyear=2026&license=viewerlgpl$
  * Phoenix Firestorm Viewer Source Code
@@ -28,10 +28,9 @@
 #ifndef FS_GLOBALACCOUNTANT_H
 #define FS_GLOBALACCOUNTANT_H
 
-// Help > Global Accountant: starts SL Money (companion-viewer/tools/slmoney), a separate app
+// Help > Global Accountant: starts the Global Accountant app (tools/slmoney), a separate program
 // that shows every account's balance, income and expenses from the money logs (fsmoneylog).
-// SL Money is packaged with the viewer (tools/slmoney); the viewer also looks where SL Money's
-// own installers put it, or at FSGlobalAccountantPath if that is set, and says so if it isn't there.
+// It is packaged with the viewer; the viewer also looks where its own installers put it, or at FSGlobalAccountantPath if that is set, and says so if it isn't there.
 namespace FSGlobalAccountant
 {
     void launch();

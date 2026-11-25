@@ -19,7 +19,7 @@ class FSViewerManifest:
 
         return "Phoenix-%(app_name)s_%(optimized)s-%(version_dashes)s" % substitution_strings
 
-    # <FS:Luna Witch> SL Money, which Help > Global Accountant starts, goes into the viewer's
+    # <FS:Luna Witch> Global Accountant (tools/slmoney), which Help > Global Accountant starts, goes into the viewer's
     # own folder when it has been built (npm run bundle:<platform> in tools/slmoney). Without
     # it the viewer builds as usual and Global Accountant looks for a separate install.
     def fs_bundle_slmoney(self, built, dst):
@@ -28,7 +28,7 @@ class FSViewerManifest:
         if os.path.exists(src):
             self.path(src, dst)
         else:
-            print("SL Money is not built (%s): not packaged" % src)
+            print("Global Accountant is not built (%s): not packaged" % src)
     # </FS:Luna Witch>
 
     def fs_is_opensim(self):

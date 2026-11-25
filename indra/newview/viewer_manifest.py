@@ -862,7 +862,7 @@ class Windows_x86_64_Manifest(ViewerManifest):
                 self.path("libvlccore.dll")
                 self.path("plugins/")
 
-        self.fs_bundle_slmoney('win-unpacked', 'slmoney') # <FS:Luna Witch/> SL Money for Help > Global Accountant
+        self.fs_bundle_slmoney('win-unpacked', 'slmoney') # <FS:Luna Witch/> Global Accountant (Help > Global Accountant)
 
         if not self.is_packaging_viewer():
             self.package_file = "copied_deps"
@@ -919,7 +919,7 @@ class Windows_x86_64_Manifest(ViewerManifest):
             return path
 
         def quoted(path):
-            # NSIS splits its arguments at spaces (SL Money's "SL Money.exe" has one)
+            # NSIS splits its arguments at spaces, and packaged files may have them
             return '"%s"' % path if ' ' in path else path
 
         result = ""
@@ -1472,9 +1472,9 @@ class Darwin_x86_64_Manifest(ViewerManifest):
         # script)
         #self.path(os.path.join(self.args['configuration'], self.channel() + ".app"), dst="")
         self.path(os.path.join(self.args['configuration'], "Firestorm.app"), dst="")
-        # <FS:Luna Witch/> SL Money for Help > Global Accountant, inside the viewer's bundle
-        self.fs_bundle_slmoney(os.path.join('mac-universal', 'SL Money.app'),
-                               os.path.join('Contents', 'Resources', 'SL Money.app'))
+        # <FS:Luna Witch/> Global Accountant (Help > Global Accountant), inside the viewer's bundle
+        self.fs_bundle_slmoney(os.path.join('mac-universal', 'Global Accountant.app'),
+                               os.path.join('Contents', 'Resources', 'Global Accountant.app'))
 
         pkgdir = os.path.join(self.args['build'], os.pardir, 'packages')
         relpkgdir = os.path.join(pkgdir, "lib", "release")
@@ -2319,7 +2319,7 @@ class LinuxManifest(ViewerManifest):
                 self.path("*.crt")
         # </FS:TJ>
 
-        self.fs_bundle_slmoney('linux-unpacked', 'slmoney') # <FS:Luna Witch/> SL Money for Help > Global Accountant
+        self.fs_bundle_slmoney('linux-unpacked', 'slmoney') # <FS:Luna Witch/> Global Accountant (Help > Global Accountant)
 
     def package_finish(self):
         # a standard map of strings for replacing in the templates
