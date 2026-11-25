@@ -1,6 +1,6 @@
 /**
  * @file fsglobalaccountant.cpp
- * @brief Starts SL Money, the app that shows the money logs.
+ * @brief Starts Global Accountant (tools/slmoney), the app that shows the money logs.
  *
  * $LicenseInfo:firstyear=2026&license=viewerlgpl$
  * Phoenix Firestorm Viewer Source Code
@@ -46,7 +46,8 @@ namespace
     }
 
     // The copy packaged with the viewer first (fs_bundle_slmoney in fs_viewer_manifest.py),
-    // then where SL Money's own installers put it, the user's own folder first.
+    // then where its own installers put it, the user's own folder first.
+    // Builds before it was renamed (SL Money) are looked for last.
     std::vector<std::string> candidates()
     {
         std::string custom = gSavedSettings.getString("FSGlobalAccountantPath");
@@ -58,13 +59,19 @@ namespace
         const std::string viewer = gDirUtilp->getAppRODataDir(); // the install folder; Contents/Resources on macOS
         std::vector<std::string> paths;
 #if LL_WINDOWS
-        paths.push_back(viewer + sep + "slmoney" + sep + "SL Money.exe");
+        paths.push_back(viewer + sep + "slmoney" + sep + "slmoney.exe");
         if (!env("LOCALAPPDATA").empty())
         {
+            paths.push_back(env("LOCALAPPDATA") + "\\Programs\\slmoney\\slmoney.exe");
             paths.push_back(env("LOCALAPPDATA") + "\\Programs\\slmoney\\SL Money.exe");
         }
 #elif LL_DARWIN
-        paths.push_back(viewer + sep + "SL Money.app");
+        paths.push_back(viewer + sep + "Global Accountant.app");
+        if (!env("HOME").empty())
+        {
+            paths.push_back(env("HOME") + "/Applications/Global Accountant.app");
+        }
+        paths.push_back("/Applications/Global Accountant.app");
         if (!env("HOME").empty())
         {
             paths.push_back(env("HOME") + "/Applications/SL Money.app");
@@ -91,7 +98,7 @@ namespace
 #elif LL_LINUX
         // The viewer's start script points LD_LIBRARY_PATH at the viewer's own libraries and keeps
         // the original in SAVED_LD_LIBRARY_PATH (as launch_url.sh does for the browser): give
-        // SL Money the original, so it doesn't load the viewer's libraries.
+        // Global Accountant the original, so it doesn't load the viewer's libraries.
         params.executable = "/usr/bin/env";
         if (getenv("SAVED_LD_LIBRARY_PATH"))
         {

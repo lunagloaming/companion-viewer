@@ -597,6 +597,14 @@ CreateShortCut	"$SMPROGRAMS\$INSTSHORTCUT\$INSTSHORTCUT.lnk" \
 				# <FS:Ansariel> Remove VMP
 				#"$INSTDIR\$VIEWER_EXE" "$SHORTCUT_LANG_PARAM" "$INSTDIR\$VIEWER_EXE"
 
+# <FS:Luna Witch> Global Accountant (tools/slmoney), when it was packaged with the viewer.
+# The uninstaller removes it with the rest of the folder.
+${If} ${FileExists} "$INSTDIR\slmoney\slmoney.exe"
+	CreateShortCut	"$SMPROGRAMS\$INSTSHORTCUT\Global Accountant.lnk" \
+					"$INSTDIR\slmoney\slmoney.exe"
+${EndIf}
+# </FS:Luna Witch>
+
 
 WriteINIStr		"$SMPROGRAMS\$INSTSHORTCUT\SL Create Account.url" \
 				"InternetShortcut" "URL" \
