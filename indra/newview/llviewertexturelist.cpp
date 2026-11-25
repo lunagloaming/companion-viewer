@@ -1234,7 +1234,17 @@ F32 LLViewerTextureList::updateImagesCreateTextures(F32 max_time)
             LLImageGL* img = image->getGLTexture();
             if (img && img->getHasGLTexture())
             {
-                img->scaleDown(image->getDesiredDiscardLevel());
+                // <FS:Luna Witch> A BC7 texture that can't be shrunk where it is (see LLImageGL::scaleDownBC7) is
+                // dropped and loads again at the size wanted. Otherwise it was asked to shrink again on every
+                // update, tens of thousands of times a minute, and the budget stayed over its target.
+                //img->scaleDown(image->getDesiredDiscardLevel());
+                const S32 desired_discard = image->getDesiredDiscardLevel();
+                if (!img->scaleDown(desired_discard) && img->isBC7()
+                    && llmin(desired_discard, (S32)img->getMaxDiscardLevel()) > img->getDiscardLevel())
+                {
+                    image->destroyTexture();
+                }
+                // </FS:Luna Witch>
             }
 
             image->mDownScalePending = false;
