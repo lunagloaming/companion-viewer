@@ -1559,8 +1559,6 @@ Running in window.
 	<string name="MBGLContextActErr">Can't activate GL rendering context</string>
 	<string name="MBVideoDrvErr">
 		[APP_NAME] is unable to run because your video card drivers did not install properly, are out of date, or are for unsupported hardware. Please make sure you have the latest video card drivers and even if you do have the latest, try reinstalling them.
-
-If you continue to receive this message, contact the [SUPPORT_SITE].
 	</string>
     <string name="MBOutOfMemoryTitle">Out Of Memory</string>
     <string name="MBOutOfMemoryErr">

@@ -3145,8 +3145,6 @@ Se il messaggio persiste, contattare [SUPPORT_SITE].
 	</string>
 	<string name="MBVideoDrvErr">
 		[APP_NAME] Non riesce ad avviarsi perchè i driver della scheda video non sono stati installati correttamente, non sono aggiornati, o sono per un hardware non supportato. Assicurati di avere i driver della scheda video più recenti e anche se li hai installati, prova a installarli di nuovo.
-
-Se il messaggio persiste, contattare [SUPPORT_SITE].
 	</string>
 	<string name="MBOutOfMemoryTitle">
 		Fuori memoria
