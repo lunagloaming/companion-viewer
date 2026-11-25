@@ -2192,10 +2192,14 @@ void LLFloaterPreference::refreshEnabledState()
     // (RenderCompressTextures) is left to Debug Settings
     //if (!LLFeatureManager::getInstance()->isFeatureAvailable("RenderCompressTextures"))
     if (!LLImageGL::bc7Supported())
-    // </FS:Luna Witch>
     {
-        getChildView("texture compression")->setEnabled(false);
+        // Not selectable, and shown unticked, where the graphics card can't do BC7: it would do nothing here.
+        // Only the box is changed, not the setting.
+        LLUICtrl* texture_compression = getChild<LLUICtrl>("texture compression");
+        texture_compression->setEnabled(false);
+        texture_compression->setValue(false);
     }
+    // </FS:Luna Witch>
 
     // anti-aliasing
     LLUICtrl* fsaa_ctrl = getChild<LLUICtrl>("fsaa");
