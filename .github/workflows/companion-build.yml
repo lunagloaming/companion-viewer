@@ -1,0 +1,521 @@
+# Builds Companion Viewer for Linux, macOS and Windows and publishes it as a GitHub release.
+#
+# Nightly: tag Companion_Nightly_<version> on companion-viewer-nightly, published as a
+#          prerelease; only the newest nightly release is kept.
+# Release: tag Companion_Release_<version> on companion-viewer-release, published as the
+#          latest release; the newest three are kept.
+#
+# <version> is indra/newview/VIEWER_VERSION_FS.txt plus the commit count
+# (.github/companion/version.sh), e.g. Companion_Release_7.2.5.81937.
+#
+# Start a build in any of these ways:
+#   - push a correctly named tag (the build number must be the commit's count);
+#   - Actions > Companion build > Run workflow, kind nightly or release: tags the branch tip
+#     and builds it (nothing happens if that commit already has its tag);
+#   - gh workflow run companion-build.yml -f kind=nightly
+#   - the same with -f tag=<existing tag> to build and publish that tag again.
+#
+# The builds are ReleaseFS_open (OpenSim support, no Havok, no KDU), sound through OpenAL
+# (no FMOD), not code-signed. Global Accountant (tools/slmoney) is built first so each
+# platform's packaging includes it; if it fails to build, the viewer is published without it.
+
+name: Companion build
+
+on:
+  push:
+    tags:
+      - "Companion_Nightly_*"
+      - "Companion_Release_*"
+  workflow_dispatch:
+    inputs:
+      kind:
+        description: What to build from its branch tip (ignored when a tag is given)
+        type: choice
+        options: [nightly, release]
+        default: nightly
+      tag:
+        description: An existing Companion_Nightly_/Companion_Release_ tag to build and publish again (optional)
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: companion-build-${{ github.event_name == 'push' && github.ref_name || inputs.tag || inputs.kind }}
+  cancel-in-progress: false
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  AUTOBUILD_ADDRSIZE: "64"
+  AUTOBUILD_VARIABLES_FILE: ${{ github.workspace }}/build-variables/variables
+  BUILD_VARIABLES_COMMIT: c17312d38377c003977cf5b6dcc83c6042eba194
+  NFPM_VERSION: "2.49.0"
+  NFPM_SHA256: 2afaa5ffb5e3493402e31e7c67a5a1fb42133e3f66fc315ca0051934125561c7
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.plan.outputs.skip }}
+      kind: ${{ steps.plan.outputs.kind }}
+      tag: ${{ steps.plan.outputs.tag }}
+      version: ${{ steps.plan.outputs.version }}
+      commit: ${{ steps.plan.outputs.commit }}
+      channel_args: ${{ steps.plan.outputs.channel_args }}
+      file_label: ${{ steps.plan.outputs.file_label }}
+      app_name: ${{ steps.plan.outputs.app_name }}
+    steps:
+      - name: Check out what to build
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'push' && github.ref || (inputs.tag != '' && format('refs/tags/{0}', inputs.tag)) || (inputs.kind == 'release' && 'companion-viewer-release' || 'companion-viewer-nightly') }}
+          # The build number is the commit count, so the whole history is needed.
+          fetch-depth: 0
+
+      - name: Work out the tag and version
+        id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          PUSHED_TAG: ${{ github.ref_name }}
+          INPUT_KIND: ${{ inputs.kind }}
+          INPUT_TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$*"; exit 1; }
+          if [ "$EVENT" = push ]; then
+            tag="$PUSHED_TAG"; mode=pushed
+          elif [ -n "$INPUT_TAG" ]; then
+            tag="$INPUT_TAG"; mode=again
+          else
+            tag=""; mode=new
+          fi
+          if [ -n "$tag" ]; then
+            case "$tag" in
+              Companion_Nightly_*) kind=nightly ;;
+              Companion_Release_*) kind=release ;;
+              *) fail "$tag is neither a Companion_Nightly_ nor a Companion_Release_ tag" ;;
+            esac
+          else
+            kind="$INPUT_KIND"
+          fi
+          read -r version expected branch < <(bash .github/companion/version.sh "$kind" HEAD)
+          commit="$(git rev-parse HEAD)"
+          if [ -n "$tag" ]; then
+            [ "$tag" = "$expected" ] || fail "$tag doesn't match its commit: that commit's tag would be $expected"
+            git merge-base --is-ancestor HEAD "origin/$branch" || fail "$tag is not on $branch"
+            if [ "$mode" = pushed ] && gh release view "$tag" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+              fail "$tag is already published; to publish it again, run the workflow with tag=$tag"
+            fi
+          else
+            tag="$expected"
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+              echo "::notice::Nothing new: the tip of $branch already has its tag, $tag"
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$tag" -m "Companion Viewer $kind $version"
+            # A tag pushed with the workflow's own token doesn't start another run.
+            git push origin "refs/tags/$tag"
+          fi
+          if [ "$kind" = nightly ]; then
+            channel_args="--chan Nightly"; file_label=CompanionViewer-Nightly; app_name="Companion Viewer Nightly"
+          else
+            channel_args=""; file_label=CompanionViewer; app_name="Companion Viewer"
+          fi
+          {
+            echo "skip=false"
+            echo "kind=$kind"
+            echo "tag=$tag"
+            echo "version=$version"
+            echo "commit=$commit"
+            echo "channel_args=$channel_args"
+            echo "file_label=$file_label"
+            echo "app_name=$app_name"
+          } >> "$GITHUB_OUTPUT"
+          echo "### Building $tag ($commit)" >> "$GITHUB_STEP_SUMMARY"
+
+  linux:
+    needs: prepare
+    if: needs.prepare.outputs.skip != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      KIND: ${{ needs.prepare.outputs.kind }}
+      CHANNEL_ARGS: ${{ needs.prepare.outputs.channel_args }}
+    steps:
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          swap-storage: false
+
+      - name: Install GCC 14 and the build dependencies
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3; do
+            timeout 60 sudo add-apt-repository -y -n ppa:ubuntu-toolchain-r/test && break
+            [ "$attempt" = 3 ] && exit 1
+            sleep 10
+          done
+          sudo apt-get -o Acquire::Retries=3 update
+          sudo apt-get -o Acquire::Retries=3 install -y gcc-14 g++-14 \
+            python3-setuptools pkg-config ninja-build mesa-common-dev \
+            libgl1-mesa-dev libglu1-mesa-dev libosmesa6-dev \
+            libxinerama-dev libxrandr-dev libxcursor-dev libxfixes-dev libxft-dev \
+            libpulse-dev libunwind-dev libpipewire-0.3-dev libdbus-1-dev \
+            libglib2.0-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
+            libvlc-dev libwayland-dev libfreetype6-dev libfontconfig1-dev rsync
+          sudo apt-get clean
+          echo "CC=gcc-14" >> "$GITHUB_ENV"
+          echo "CXX=g++-14" >> "$GITHUB_ENV"
+
+      - name: Check out the tag's commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          fetch-depth: 0
+
+      - name: Check out the build variables
+        uses: actions/checkout@v7
+        with:
+          repository: FirestormViewer/fs-build-variables
+          ref: ${{ env.BUILD_VARIABLES_COMMIT }}
+          path: build-variables
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install autobuild
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          echo "PYTHON=$(command -v python)" >> "$GITHUB_ENV"
+
+      - name: Build Global Accountant
+        continue-on-error: true
+        run: |
+          cd tools/slmoney
+          if ! { npm ci --no-audit --no-fund && npm run bundle:linux; }; then
+            rm -rf dist
+            exit 1
+          fi
+
+      - name: Configure
+        run: |
+          # A fresh build folder sometimes fails to find a library the first time.
+          for attempt in 1 2 3; do
+            # shellcheck disable=SC2086
+            autobuild configure -A 64 -c ReleaseFS_open -- $CHANNEL_ARGS --no-package -DLL_TESTS:BOOL=OFF && exit 0
+            echo "Configure attempt $attempt failed"
+          done
+          exit 1
+
+      - name: Build
+        run: |
+          # shellcheck disable=SC2086
+          autobuild build -A 64 -c ReleaseFS_open --no-configure -- $CHANNEL_ARGS --no-package -DLL_TESTS:BOOL=OFF
+
+      - name: Make the packages
+        run: |
+          set -euo pipefail
+          packaged=build-linux-x86_64/newview/packaged
+          built="$(python -c 'import json,sys; print(json.load(open(sys.argv[1]))["Version"])' "$packaged/build_data.json")"
+          [ "$built" = "$VERSION" ] || { echo "::error::Built $built, not $VERSION"; exit 1; }
+          curl -sSLf -o "$RUNNER_TEMP/nfpm.tar.gz" \
+            "https://github.com/goreleaser/nfpm/releases/download/v$NFPM_VERSION/nfpm_${NFPM_VERSION}_Linux_x86_64.tar.gz"
+          echo "$NFPM_SHA256  $RUNNER_TEMP/nfpm.tar.gz" | sha256sum -c -
+          tar -xzf "$RUNNER_TEMP/nfpm.tar.gz" -C "$RUNNER_TEMP" nfpm
+          NFPM="$RUNNER_TEMP/nfpm" bash .github/companion/package-linux.sh "$packaged" "$KIND" "$VERSION" dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: linux
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  macos:
+    needs: prepare
+    if: needs.prepare.outputs.skip != 'true'
+    runs-on: macos-15
+    timeout-minutes: 360
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      CHANNEL_ARGS: ${{ needs.prepare.outputs.channel_args }}
+      FILE_LABEL: ${{ needs.prepare.outputs.file_label }}
+      APP_NAME: ${{ needs.prepare.outputs.app_name }}
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - name: Bash 4+ and GNU sed
+        run: |
+          set -euo pipefail
+          brew install --formula bash gnu-sed
+          echo "$(brew --prefix bash)/bin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix gnu-sed)/libexec/gnubin" >> "$GITHUB_PATH"
+
+      - name: Make room (other Xcodes and the mobile SDKs)
+        run: |
+          set -euo pipefail
+          developer="$(xcode-select --print-path)"
+          selected="$(cd "$developer/../.." && pwd -P)"
+          for xcode in /Applications/Xcode*.app; do
+            [ "$(cd "$xcode" && pwd -P)" = "$selected" ] || sudo rm -rf "$xcode"
+          done
+          for p in iPhoneOS iPhoneSimulator AppleTVOS AppleTVSimulator WatchOS WatchSimulator XROS XRSimulator; do
+            sudo rm -rf "$developer/Platforms/$p.platform"
+          done
+          echo "DEVELOPER_DIR=$developer" >> "$GITHUB_ENV"
+          xcodebuild -version
+          df -h .
+
+      - name: Check out the tag's commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          fetch-depth: 0
+
+      - name: Check out the build variables
+        uses: actions/checkout@v7
+        with:
+          repository: FirestormViewer/fs-build-variables
+          ref: ${{ env.BUILD_VARIABLES_COMMIT }}
+          path: build-variables
+
+      - name: Deployment target no lower than the SDK's minimum
+        # The viewer's CMake raises its deployment target to the SDK's minimum but leaves the
+        # variables' -mmacosx-version-min alone, and clang then fails with -Woverriding-option.
+        run: |
+          set -euo pipefail
+          sdk_min="$(/usr/libexec/PlistBuddy -c 'Print :SupportedTargets:macosx:MinimumDeploymentTarget' \
+            "$(xcrun --sdk macosx --show-sdk-path)/SDKSettings.plist")"
+          current="$(sed -n 's/^LL_BUILD_DARWIN_DEPLOY_TARGET="\(.*\)"/\1/p' build-variables/variables)"
+          target="$(printf '%s\n%s\n' "$current" "$sdk_min" | sort -V | tail -1)"
+          sed -i "s/^LL_BUILD_DARWIN_DEPLOY_TARGET=.*/LL_BUILD_DARWIN_DEPLOY_TARGET=\"$target\"/" build-variables/variables
+          echo "Deployment target: $target (variables $current, SDK minimum $sdk_min)"
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install autobuild
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          echo "PYTHON=$(command -v python)" >> "$GITHUB_ENV"
+
+      - name: Build Global Accountant
+        continue-on-error: true
+        run: |
+          cd tools/slmoney
+          if ! { npm ci --no-audit --no-fund && npm run bundle:mac; }; then
+            rm -rf dist
+            exit 1
+          fi
+
+      - name: Configure
+        run: |
+          for attempt in 1 2 3; do
+            # shellcheck disable=SC2086
+            autobuild configure -A 64 -c ReleaseFS_open -- $CHANNEL_ARGS --no-package -DLL_TESTS:BOOL=OFF && exit 0
+            echo "Configure attempt $attempt failed"
+          done
+          exit 1
+
+      - name: Build
+        run: |
+          # shellcheck disable=SC2086
+          autobuild build -A 64 -c ReleaseFS_open --no-configure -- $CHANNEL_ARGS --no-package -DLL_TESTS:BOOL=OFF
+
+      - name: Make the DMG
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apps=(build-darwin-*/newview/Release/CompanionViewer.app)
+          [ ${#apps[@]} -eq 1 ] || { echo "::error::Expected one CompanionViewer.app, found ${#apps[@]}"; exit 1; }
+          app="${apps[0]}"
+          built="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$app/Contents/Info.plist")"
+          [ "$built" = "$VERSION" ] || { echo "::error::Built $built, not $VERSION"; exit 1; }
+          stage="$RUNNER_TEMP/dmg"
+          mkdir -p "$stage" dist
+          ditto "$app" "$stage/$APP_NAME.app"
+          # The linker's debug map lists the absolute paths of the objects it linked; strip it,
+          # as release packaging does.
+          grep -rlF "$GITHUB_WORKSPACE/" "$stage/$APP_NAME.app" | while read -r f; do strip -S "$f" || true; done
+          # An app without a seal is called "damaged" once downloaded: give it an ad-hoc signature.
+          codesign --force --deep --sign - "$stage/$APP_NAME.app"
+          codesign --verify --deep --strict "$stage/$APP_NAME.app"
+          ln -s /Applications "$stage/Applications"
+          hdiutil create -quiet -volname "$APP_NAME" -srcfolder "$stage" -fs HFS+ -format UDZO -ov \
+            "dist/$FILE_LABEL-$VERSION.dmg"
+          ls -la dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: macos
+          path: dist/*.dmg
+          if-no-files-found: error
+          retention-days: 7
+
+  windows:
+    needs: prepare
+    if: needs.prepare.outputs.skip != 'true'
+    runs-on: windows-2022
+    timeout-minutes: 360
+    env:
+      VERSION: ${{ needs.prepare.outputs.version }}
+      CHANNEL_ARGS: ${{ needs.prepare.outputs.channel_args }}
+      FILE_LABEL: ${{ needs.prepare.outputs.file_label }}
+      AUTOBUILD_VSVER: "170"
+    steps:
+      - name: Check out the tag's commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          fetch-depth: 0
+
+      - name: Check out the build variables
+        uses: actions/checkout@v7
+        with:
+          repository: FirestormViewer/fs-build-variables
+          ref: ${{ env.BUILD_VARIABLES_COMMIT }}
+          path: build-variables
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install autobuild
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          echo "PYTHON=$(command -v python)" >> "$GITHUB_ENV"
+
+      - name: Build Global Accountant
+        shell: bash
+        continue-on-error: true
+        run: |
+          cd tools/slmoney
+          if ! { npm ci --no-audit --no-fund && npm run bundle:win; }; then
+            rm -rf dist
+            exit 1
+          fi
+
+      - name: Configure
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            # shellcheck disable=SC2086
+            autobuild configure -A 64 -c ReleaseFS_open -- $CHANNEL_ARGS --package -DLL_TESTS:BOOL=OFF && exit 0
+            echo "Configure attempt $attempt failed"
+          done
+          exit 1
+
+      - name: Build
+        shell: bash
+        run: |
+          # shellcheck disable=SC2086
+          autobuild build -A 64 -c ReleaseFS_open --no-configure -- $CHANNEL_ARGS --package -DLL_TESTS:BOOL=OFF
+
+      - name: Find and check the installer
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          release_folder=(build-vc*-64/newview/Release)
+          installers=(build-vc*-64/newview/Release/*Setup.exe)
+          [ ${#installers[@]} -eq 1 ] || { echo "::error::Expected one installer, found ${#installers[@]}: ${installers[*]}"; exit 1; }
+          built="${installers[0]}"
+          case "$(basename "$built")" in
+            *"${VERSION##*.}"*) ;;
+            *) echo "::error::$built is not build ${VERSION##*.}"; exit 1 ;;
+          esac
+          fmod=("${release_folder[0]}"/fmod*.dll)
+          [ ${#fmod[@]} -eq 0 ] || { echo "::error::FMOD is in the build: ${fmod[*]}"; exit 1; }
+          mkdir -p dist
+          cp "$built" "dist/$FILE_LABEL-$VERSION-Setup.exe"
+          ls -la dist
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: windows
+          path: dist/*-Setup.exe
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [prepare, linux, macos, windows]
+    if: always() && needs.prepare.result == 'success' && needs.prepare.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    env:
+      KIND: ${{ needs.prepare.outputs.kind }}
+      TAG: ${{ needs.prepare.outputs.tag }}
+      VERSION: ${{ needs.prepare.outputs.version }}
+      COMMIT: ${{ needs.prepare.outputs.commit }}
+      APP_NAME: ${{ needs.prepare.outputs.app_name }}
+      RESULTS: ${{ needs.linux.result }} ${{ needs.macos.result }} ${{ needs.windows.result }}
+    steps:
+      - name: Check out the tag's commit
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.prepare.outputs.commit }}
+          fetch-depth: 0
+
+      - name: Fetch Firestorm's branches (to tell its commits from ours)
+        run: git fetch -q --no-tags https://github.com/FirestormViewer/phoenix-firestorm.git '+refs/heads/*:refs/remotes/upstream/*'
+
+      - uses: actions/download-artifact@v7
+        # Nothing to download when every platform failed; the next step says so.
+        continue-on-error: true
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Publish
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$*"; exit 1; }
+          mkdir -p dist
+          if [ "$KIND" = release ] && [ "$RESULTS" != "success success success" ]; then
+            fail "A release needs all three platforms (linux, macos, windows: $RESULTS); nothing published"
+          fi
+          [ -n "$(ls -A dist)" ] || fail "No platform built; nothing published"
+
+          if [ "$KIND" = nightly ]; then
+            prefixes='["Companion_Nightly_", "nightly-"]'
+          else
+            prefixes='["Companion_Release_"]'
+          fi
+          releases="$(gh release list -R "$GITHUB_REPOSITORY" --limit 200 --json tagName,createdAt)"
+          same_kind="$(jq -c --argjson p "$prefixes" --arg tag "$TAG" \
+            '[.[] | select(.tagName as $t | any($p[]; . as $x | $t | startswith($x))) | select(.tagName != $tag)] | sort_by(.createdAt) | reverse' \
+            <<< "$releases")"
+          prev="$(jq -r '.[0].tagName // empty' <<< "$same_kind")"
+          if [ -n "$prev" ] && ! git rev-parse -q --verify "refs/tags/$prev" >/dev/null; then
+            git fetch -q origin "refs/tags/$prev:refs/tags/$prev" || prev=""
+          fi
+
+          bash .github/companion/release-notes.sh "$KIND" "$VERSION" "$COMMIT" dist "$prev" > notes.md
+          (cd dist && sha256sum -- * > SHA256SUMS)
+          cat notes.md dist/SHA256SUMS
+
+          if gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Publishing $TAG again: removing its release first (the tag stays)"
+            gh release delete "$TAG" -R "$GITHUB_REPOSITORY" --yes
+          fi
+          if [ "$KIND" = nightly ]; then flags=(--prerelease --latest=false); else flags=(--latest); fi
+          gh release create "$TAG" -R "$GITHUB_REPOSITORY" --verify-tag "${flags[@]}" \
+            --title "$APP_NAME $VERSION ($(date -u '+%Y-%m-%d'))" --notes-file notes.md dist/*
+          echo "Published https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG" >> "$GITHUB_STEP_SUMMARY"
+
+          # Keep one nightly, three releases.
+          keep=1; [ "$KIND" = release ] && keep=3
+          jq -r --argjson keep "$((keep - 1))" '.[$keep:][].tagName' <<< "$same_kind" | while read -r old; do
+            echo "Removing $old"
+            gh release delete "$old" -R "$GITHUB_REPOSITORY" --yes --cleanup-tag || echo "::warning::Could not remove $old"
+          done
