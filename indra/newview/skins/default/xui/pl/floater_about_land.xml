@@ -419,8 +419,8 @@ teksturę:
 				Jedna lub więcej z tych opcji ustawiona jest z poziomu Majątku
 			</panel.string>
 			<check_box label="Każdy może odwiedzać (brak zaznaczenia = widoczne linie zakazu)" name="public_access"/>
-			<check_box label="Osoba musi mieć 18+ lat [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Zbanuj Rezydentów, którzy mają mniej niż 18 lat. Odwiedź [SUPPORT_SITE], aby uzyskać więcej informacji."/>
-			<check_box label="Osoba musi mieć dane płatnicze w systemie LL [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Zbanuj Rezydentów niezarejestrowanych w systemie płatniczym Linden Lab. Odwiedź [SUPPORT_SITE], aby uzyskać więcej informacji."/>
+			<check_box label="Osoba musi mieć 18+ lat [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Zbanuj Rezydentów, którzy mają mniej niż 18 lat."/>
+			<check_box label="Osoba musi mieć dane płatnicze w systemie LL [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Zbanuj Rezydentów niezarejestrowanych w systemie płatniczym Linden Lab."/>
 			<check_box label="Umożliwiaj wejście bez ograniczeń grupie [GROUP]" name="GroupCheck" tool_tip="Ustaw Grupę w głównej zakładce."/>
 			<check_box label="Sprzedaj przepustki:" name="PassCheck" tool_tip="Otwórz tymczasowy dostęp do tej działki"/>
 			<combo_box name="pass_combo">

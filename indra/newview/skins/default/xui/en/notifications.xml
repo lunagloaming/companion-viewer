@@ -1999,7 +1999,7 @@ Unable to write file [[FILE]]
    icon="alertmodal.tga"
    name="UnsupportedHardware"
    type="alertmodal">
-Just so you know, your computer may not meet [APP_NAME]&apos;s minimum system requirements. You may experience poor performance. Unfortunately, the [SUPPORT_SITE] can't provide technical support for unsupported system configurations.
+Just so you know, your computer may not meet [APP_NAME]&apos;s minimum system requirements. You may experience poor performance.
 
 [MINSPECS]
 
@@ -2826,7 +2826,6 @@ Teleport attempts are limited to 6 per minute. If you are having trouble, wait o
    name="invalid_region_handoff"
    type="alertmodal">
 Problem encountered processing your region crossing. You may need to log back in before you can cross regions.
-If you continue to get this message, please check the [SUPPORT_SITE].
   <tag>fail</tag>
   </notification>
   <notification
@@ -4136,21 +4135,13 @@ Forgetting the logged-in user requires you to log out.
    <tag>fail</tag>
 We&apos;re having trouble connecting. There may be a problem with your Internet connection or the [CURRENT_GRID].
 
-You can either check your Internet connection and try again in a few minutes, click Help to view the [SUPPORT_SITE], or click Teleport to attempt to teleport home.
-    <url option="1" name="url">
-
-			https://support.secondlife.com/
-    </url>
+You can either check your Internet connection and try again in a few minutes, or click Teleport to attempt to teleport home.
     <form name="form">
       <button
        default="true"
        index="0"
        name="OK"
        text="OK"/>
-      <button
-       index="1"
-       name="Help"
-       text="Help"/>
       <button
        index="2"
        name="Teleport"
@@ -4165,20 +4156,13 @@ You can either check your Internet connection and try again in a few minutes, cl
     <tag>fail</tag>
 We&apos;re having trouble connecting. There may be a problem with your Internet connection or the [CURRENT_GRID].
 
-You can either check your Internet connection and try again in a few minutes or click Help to view the [SUPPORT_SITE].
-    <url option="1" name="url">
-			https://support.secondlife.com/
-    </url>
+Check your Internet connection and try again in a few minutes.
     <form name="form">
       <button
        default="true"
        index="0"
        name="OK"
        text="OK"/>
-      <button
-       index="1"
-       name="Help"
-       text="Help"/>
     </form>
   </notification>
 
@@ -4724,7 +4708,6 @@ Proceed?
    name="LoginFailedUnknown"
    type="alertmodal">
 Sorry, login failed for an unrecognized reason.
-If you continue to get this message, please check the [SUPPORT_SITE].
     <tag>confirm</tag>
     <usetemplate
      name="okbutton"
@@ -11193,7 +11176,7 @@ Do you wish to continue?
   </global>
   
   <global name="LLLeapUpdaterFailure">
-Failed to launch updater service [UPDATER_APP]. Please verify the viewer is installed correctly and has the necessary permissions to run. If you continue to experience issues, please visit the [SUPPORT_SITE].
+Failed to launch updater service [UPDATER_APP]. Please verify the viewer is installed correctly and has the necessary permissions to run.
   </global>
 
 <!-- these are alert strings from server. the name needs to match entire the server string, and needs to be changed
@@ -13919,8 +13902,7 @@ Error in the regular expression:
     icon="alertmodal.tga"
 	name="NoHavok"
 	type="alertmodal">
-	Some functions like [FEATURE] are not included in this version of [APP_NAME]. If you would like to use [FEATURE], please download a version of [APP_NAME] containing Havok support from
-[DOWNLOAD_URL]
+	Some functions like [FEATURE] are not included in this version of [APP_NAME].
 	<form name="form">
 		<ignore name="ignore"
 		text="No Havok Warning"/>

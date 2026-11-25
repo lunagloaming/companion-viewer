@@ -679,7 +679,7 @@ Obiekt może znajdować się zbyt daleko albo został usunięty.
 		Nie można zapisać pliku [[FILE]]
 	</notification>
 	<notification name="UnsupportedHardware">
-		Niestety Twój komputer nie spełnia minimalnych wymogów sprzętowych dla poprawnego działania [APP_NAME]. Możesz odczuwać bardzo niską wydajność operacyjną. Niestety, portal pomocy [SUPPORT_SITE] nie jest w stanie zapewnić wsparcia technicznego dla Twojego systemu.
+		Niestety Twój komputer nie spełnia minimalnych wymogów sprzętowych dla poprawnego działania [APP_NAME]. Możesz odczuwać bardzo niską wydajność operacyjną.
 
 [MINSPECS]
 
@@ -1014,7 +1014,6 @@ Nowe zapytanie: [FINALQUERY]
 	</notification>
 	<notification name="invalid_region_handoff">
 		Niestety, pojawił się błąd podczas próby przedostania się na drugi region. Proponujemy wylogowanie się i spróbowanie przedostania się na drugi region ponownie.
-Jeżeli nadal otrzymujesz tę wiadomość proponujemy odwiedzić stronę [SUPPORT_SITE].
 	</notification>
 	<notification name="blocked_tport">
 		Przepraszamy, teleportacja jest chwilowo niedostępna. Spróbuj jeszcze raz. Jeśli nadal nie możesz się teleportować wyloguj się i ponownie zaloguj.
@@ -1554,18 +1553,16 @@ Jeżeli używasz [CURRENT_GRID] po raz pierwszy to musisz stworzyć konto żeby 
 	<notification name="LoginPacketNeverReceived">
 		Problemy z połączeniem. Problem może być spowodowany Twoim połączeniem z Internetem albo może istnieć po stronie [CURRENT_GRID].
 
-Możesz sprawdzić swoje połączenie z Internetem i spróbować ponownie za kilka minut, połączyć się ze stroną pomocy technicznej ([SUPPORT_SITE]) lub wybrać Teleportuj, by teleportować się do swojego miejsca startu.
+Możesz sprawdzić swoje połączenie z Internetem i spróbować ponownie za kilka minut lub wybrać Teleportuj, by teleportować się do swojego miejsca startu.
 		<form name="form">
-			<button name="Help" text="Pomoc"/>
 			<button name="Teleport" text="Teleportuj"/>
 		</form>
 	</notification>
 	<notification name="LoginPacketNeverReceivedNoTP">
 		Problemy z połączeniem. Problem może być spowodowany Twoim połączeniem z Internetem albo może istnieć po stronie [CURRENT_GRID].
 
-Możesz sprawdzić swoje połączenie z Internetem i spróbować ponownie za kilka minut lub połączyć się ze stroną pomocy technicznej [SUPPORT_SITE].
+Sprawdź swoje połączenie z Internetem i spróbuj ponownie za kilka minut.
 		<form name="form">
-			<button name="Help" text="Pomoc"/>
 		</form>
 	</notification>
 	<notification name="LoginRemoveMultiGridUserData">
@@ -1809,7 +1806,6 @@ Kontynuować?
 	</notification>
 	<notification name="LoginFailedUnknown">
 		Przepraszamy, ale nie udało się zalogować - powód jest nieznany.
-Jeśli ciągle widzisz tę wiadomość sprawdź [SUPPORT_SITE].
 		<usetemplate name="okbutton" yestext="Wyjdź"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -4170,7 +4166,7 @@ Czy chcesz kontynuować?
 		- Pamięć Twojego systemu nie spełnia minimalnych wymagań.
 	</global>
 	<global name="LLLeapUpdaterFailure">
-		Nie udało się uruchomić usługi aktualizatora [UPDATER_APP]. Sprawdź, czy przeglądarka jest poprawnie zainstalowana i czy ma niezbędne uprawnienia do uruchomienia. Jeśli nadal będziesz mieć problemy, odwiedź [SUPPORT_SITE].
+		Nie udało się uruchomić usługi aktualizatora [UPDATER_APP]. Sprawdź, czy przeglądarka jest poprawnie zainstalowana i czy ma niezbędne uprawnienia do uruchomienia.
 	</global>
 	<global name="You can only set your 'Home Location' on your land or at a mainland Infohub.">
 		Jeśli jesteś właścicielem działki, to możesz ustawić na niej miejsce startu.
@@ -5194,8 +5190,7 @@ Poprzedni symulator: [OLDVERSION]
 [EWHAT]
 	</notification>
 	<notification name="NoHavok">
-		Niektóre funkcje, takie jak [FEATURE], nie są obsługiwane przez [APP_NAME] w obecnej wersji. Jeśli chcesz używać '[FEATURE]', to prosimy o pobranie [APP_NAME] w wersji ze wsparciem dla Havoka z:
-[DOWNLOAD_URL]
+		Niektóre funkcje, takie jak [FEATURE], nie są obsługiwane przez [APP_NAME] w obecnej wersji.
 		<form name="form">
 			<ignore name="ignore" text="Ostrzeżenie o braku Havoka"/>
 		</form>

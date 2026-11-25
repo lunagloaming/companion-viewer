@@ -19,8 +19,8 @@
 		<radio_item label="Yalnız giriş pəncərəsində qeyd olunan sakinlərə və qruplara icazə verilir" name="estate_restricted_access"/>
 		<radio_item label="Giriş hər kəs üçün açıqdır" name="estate_public_access"/>
 	</radio_group>
-	<check_box label="18 və yuxarı olmalıdır" name="limit_age_verified" tool_tip="Bu mülkiyyətə giriş 18 yaşdan az olan sakinlər üçün məhduddur. Daha ətraflı məlumatı burada tapa bilərsiniz: [SUPPORT_SITE]."/>
-	<check_box label="Ödəniş məlumatları faylda olmalıdır" name="limit_payment" tool_tip="Sakinlər bu mülkiyyətə daxil olmaq üçün qeydiyyatdan keçmiş ödəniş məlumatlarına malik olmalıdırlar. Daha ətraflı məlumatı burada tapa bilərsiniz: [SUPPORT_SITE]."/>
+	<check_box label="18 və yuxarı olmalıdır" name="limit_age_verified" tool_tip="Bu mülkiyyətə giriş 18 yaşdan az olan sakinlər üçün məhduddur."/>
+	<check_box label="Ödəniş məlumatları faylda olmalıdır" name="limit_payment" tool_tip="Sakinlər bu mülkiyyətə daxil olmaq üçün qeydiyyatdan keçmiş ödəniş məlumatlarına malik olmalıdırlar."/>
 	<check_box label="Torpaq sahibləri daha məhdudlaşdırıcı tədbirlər görə bilər" name="parcel_access_override"/>
 	<check_box label="Səsli söhbətə icazə verin" name="voice_chat_check"/>
 	<check_box label="Birbaşa teleporta icazə verin" name="allow_direct_teleport"/>

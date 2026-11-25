@@ -2177,7 +2177,6 @@ Gå venligst til din computers skærmopsætning og sæt "color mode" til 32-bit.
 		[APP_NAME] kan ikke køre, da den ikke kan finde en "8 bit alpha channel".  Normalt skyldes dette et problem med en video driver.
 Venligst undersøg om du har de nyeste drivere til dit videokort installeret.
 Din skærm skal også være sat op til at køre "True Color (32-bit)"  i din displayopsætning.
-Hvis du bliver ved med at modtage denne besked, kontakt [SUPPORT_SITE].
 	</string>
 	<string name="MBPixelFmtSetErr">
 		Kan ikke sætte "pixel format"

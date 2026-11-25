@@ -2036,7 +2036,7 @@ Only large parcels can be listed in search.
              layout="topleft"
              left_delta="20"
              name="limit_age_verified"
-             tool_tip="Residents must be age 18 or older to access this parcel. See the [SUPPORT_SITE] for more information."
+             tool_tip="Residents must be age 18 or older to access this parcel."
              top_pad="4"
              width="278" />
             <check_box
@@ -2046,7 +2046,7 @@ Only large parcels can be listed in search.
              layout="topleft"
              left_delta="0"
              name="limit_payment"
-             tool_tip="Residents must have payment information on file to access this parcel.  See the [SUPPORT_SITE] for more information."
+             tool_tip="Residents must have payment information on file to access this parcel."
              top_pad="4"
              width="278" />
             <check_box

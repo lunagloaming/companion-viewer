@@ -3132,7 +3132,6 @@ Vai alle impostazioni dello schermo del tuo computer e imposta il colore in moda
 		[APP_NAME] non funziona poichè è impossibile trovare un canale alpha a 8 bit.  Questo problema normalmente deriva dai driver della scheda video.
 Assicurati di avere installato i driver della scheda video più recenti.
 Assicurati anche che il monitor sia impostato a True Color (32 bit) nel Pannello di controllo &gt; Schermo &gt; Impostazioni.
-Se il messaggio persiste, contattare [SUPPORT_SITE].
 	</string>
 	<string name="MBPixelFmtSetErr">
 		Impossibile impostare il formato pixel
@@ -3157,7 +3156,7 @@ Se il tuo computer ha poca RAM, chiudi tutte le applicazioni pesanti prima di es
 	<string name="MBMissingFile">
 		[APP_NAME] non è riuscita ad accedere ad alcuni file necessari e verrà pertanto chiusa.
 
-Reinstallare il browser da [DOWNLOAD_URL] e contattare [SUPPORT_SITE] se il problema persiste dopo la reinstallazione.
+Reinstallare [APP_NAME].
 	</string>
 	<string name="5 O'Clock Shadow">
 		Barba leggera

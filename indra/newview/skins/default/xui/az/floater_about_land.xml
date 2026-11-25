@@ -438,8 +438,8 @@ Yalnız daha böyük kvadrata malik olan sahələr axtarışda çıxa bilər.
             <text name="Only Allow">
                 Yalnız aşağıdakı istifadəçilərə girişə icazə verin:
             </text>
-            <check_box label="Ödəniş məlumatı var [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Sakinlərin bu sahəyə daxil olmaq üçün ödəniş məlumatı olmalıdır. Ətraflı məlumatı burada tapa bilərsiniz: [SUPPORT_SITE]."/>
-            <check_box label="18 yaşa və yuxarıya çatıb [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Bu sahəyə giriş 18 yaşdan aşağı olan sakinlər üçün məhdudlaşdırılır. Ətraflı məlumatı burada tapa bilərsiniz: [SUPPORT_SITE]." />
+            <check_box label="Ödəniş məlumatı var [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Sakinlərin bu sahəyə daxil olmaq üçün ödəniş məlumatı olmalıdır."/>
+            <check_box label="18 yaşa və yuxarıya çatıb [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Bu sahəyə giriş 18 yaşdan aşağı olan sakinlər üçün məhdudlaşdırılır." />
             <check_box label="Qrup girişinə icazə verin: [GROUP]" name="GroupCheck" tool_tip="Qrupu 'Ümumi' pəncərəsində təyin edin."/>
             <check_box label="İcazənamənin satışı:" name="PassCheck" tool_tip="Bu sahəyə müvəqqəti girişə icazə verin" />
             <combo_box name="pass_combo">

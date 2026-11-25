@@ -19,10 +19,10 @@
 		<radio_item label="只允許處在「準入」索引標籤的居民和群組" name="estate_restricted_access" />
 		<radio_item label="任何人都可造訪" name="estate_public_access" />
 	</radio_group>
-	<check_box label="必須滿18歲" name="limit_age_verified" tool_tip="居民必須年滿 18 歲才能進入這領地。 參閱 [SUPPORT_SITE] 取得進一步資訊。" />
-	<check_box label="須具備預留的付款資訊" name="limit_payment" tool_tip="居民必須提供付款資訊才能進入這領地。  參閱 [SUPPORT_SITE] 取得進一步資訊。" />
+	<check_box label="必須滿18歲" name="limit_age_verified" tool_tip="居民必須年滿 18 歲才能進入這領地。" />
+	<check_box label="須具備預留的付款資訊" name="limit_payment" tool_tip="居民必須提供付款資訊才能進入這領地。" />
 	<check_box label="地塊所有者可能施加更多限制" name="parcel_access_override" />
-	<check_box label="不能是指令碼化的代理（機器人）" name="limit_bots" tool_tip="存取此區域的居民不能是指令碼化的代理（機器人）。更多資訊請查閱 [SUPPORT_SITE]。" />
+	<check_box label="不能是指令碼化的代理（機器人）" name="limit_bots" tool_tip="存取此區域的居民不能是指令碼化的代理（機器人）。" />
 	<check_box label="允許語音聊天" name="voice_chat_check" />
 	<check_box label="允許直接瞬間傳送" name="allow_direct_teleport" />
 	<button label="應用" name="apply_btn" />

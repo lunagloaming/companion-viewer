@@ -2971,7 +2971,6 @@ Lütfen bilgisayarınızın ekran ayarlarına gidin ve renk modunu 32 bit olarak
 		[APP_NAME] çalışamıyor çünkü 8 bit bir alfa kanalı alamıyor.  Bunun nedeni genellikle video kartı sürücü sorunlarıdır.
 Lütfen en yeni video sürücülerinin yüklü olduğuna emin olun.
 Ayrıca Denetim Masaları &gt; Ekran &gt; Ayarlar içerisinde ekranınız için Gerçek Renk (32 bit) ayarı yapıldığına emin olun.
-Bu iletiyi almaya devam ederseniz, lütfen [SUPPORT_SITE] bölümüne başvurun.
 	</string>
 	<string name="MBPixelFmtSetErr">
 		Piksel formatı ayarlanamıyor

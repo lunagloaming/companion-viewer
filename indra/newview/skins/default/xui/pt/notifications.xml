@@ -769,7 +769,7 @@ O objeto pode estar fora do alcance ou excluído.
 		Arquivo [[FILE]] não pode ser gravado
 	</notification>
 	<notification name="UnsupportedHardware">
-		Infelizmente, seu computador não atende aos requisitos mínimos de [APP_NAME]. Isso pode fazer com que o programa não funcione muito bem. Infelizmente, nosso [SUPPORT_SITE] não pode ajudá-lo com configurações de sistema não suportadas.
+		Infelizmente, seu computador não atende aos requisitos mínimos de [APP_NAME]. Isso pode fazer com que o programa não funcione muito bem.
 
 [MINSPECS]
 
@@ -1087,7 +1087,6 @@ Nenhuma pesquisa foi realizada.
 	</notification>
 	<notification name="invalid_region_handoff">
 		Ocorreu um problema ao processar a alteração da sua região. Pode ser necessário fazer login novamente para mudar de região.
-Se você continuar vendo esta mensagem, entre em contato com [SUPPORT_SITE].
 	</notification>
 	<notification name="blocked_tport">
 		Infelizmente, o teletransporte atualmente não é possível. Tente novamente mais tarde.
@@ -1624,26 +1623,24 @@ Se esta for a primeira vez que você usa [CURRENT_GRID], você deve primeiro cri
 	<notification name="LoginPacketNeverReceived">
 		Existem problemas com a conexão. Pode haver um problema com sua conexão com a Internet ou com o [CURRENT_GRID].
 
-Verifique sua conexão com a Internet e tente novamente ou clique em Ajuda para ir para [SUPPORT_SITE] ou clique em Teletransportar para se teletransportar para casa.
+Verifique sua conexão com a Internet e tente novamente ou clique em Teletransportar para se teletransportar para casa.
 		<url name="url">
 			https://support.secondlife.com/
 		</url>
 		<form name="form">
 			<button name="OK" text="OK"/>
-			<button name="Help" text="Ajuda"/>
 			<button name="Teleport" text="Teleportar"/>
 		</form>
 	</notification>
 	<notification name="LoginPacketNeverReceivedNoTP">
 		Existem problemas com a conexão. Pode haver um problema com sua conexão com a Internet ou com o [CURRENT_GRID].
 
-Verifique sua conexão com a Internet e tente novamente ou clique em Ajuda para acessar [SUPPORT_SITE].
+Verifique sua conexão com a Internet e tente novamente.
 		<url name="url">
 			https://support.secondlife.com/
 		</url>
 		<form name="form">
 			<button name="OK" text="OK"/>
-			<button name="Help" text="Ajuda"/>
 		</form>
 	</notification>
 	<notification name="WelcomeChooseSex">
@@ -1887,7 +1884,7 @@ Continuar?
 		<usetemplate canceltext="Agora não" name="yesnocancelbuttons" notext="Pular" yestext="Instalar"/>
 	</notification>
 	<notification name="LoginFailedUnknown">
-		Infelizmente, o registro falhou por motivos desconhecidos. Se você continuar vendo esta mensagem, visite [SUPPORT_SITE].
+		Infelizmente, o registro falhou por motivos desconhecidos.
 		<usetemplate name="okbutton" yestext="Fechar"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -4265,13 +4262,9 @@ Você gostaria de continuar?
 	</notification>
 	<global name="UnsupportedShaderRequirements">
 		Seu computador não atende aos requisitos de hardware de [APP_NAME]. [APP_NAME] requer suporte de shader OpenGL 2.0 ou superior. Se a sua placa gráfica suportar esse recurso, instale os drivers, service packs e patches mais recentes para o seu sistema operacional.
-
-Se o problema persistir, consulte [SUPPORT_SITE] para obter mais assistência.
 	</global>
 	<global name="UnsupportedGLRequirements">
 		Seu computador não atende aos requisitos de hardware de [APP_NAME]. [APP_NAME] requer uma placa gráfica OpenGL com suporte a múltiplas texturas. Se a sua placa gráfica suportar esse recurso, instale os drivers, service packs e patches mais recentes para o seu sistema operacional.
-
-Se o problema persistir, consulte [SUPPORT_SITE] para obter mais assistência.
 	</global>
 	<global name="UnsupportedCPUAmount">
 		796
@@ -5669,8 +5662,7 @@ Erro na expressão regular:
 	</notification>
 
 	<notification name="NoHavok">
-Alguns recursos como [FEATURE] não estão incluídos nesta versão de [APP_NAME]. Se você quiser usar [FEATURE], baixe uma versão de [APP_NAME] com suporte Havok aqui:
-[DOWNLOAD_URL]
+Alguns recursos como [FEATURE] não estão incluídos nesta versão de [APP_NAME].
 		<form name="form">
 			<ignore name="ignore" text="Aviso de ausência de Havok"/>
 		</form>

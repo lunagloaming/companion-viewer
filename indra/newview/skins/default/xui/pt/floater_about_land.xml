@@ -478,8 +478,8 @@ Somente lotes grandes podem ser listados na busca.
 				Uma ou mais opções estão bloqueadas no nível da sim
 			</panel.string>
 			<check_box label="Acesso público (desmarcar ativa linha de banimento)" name="public_access"/>
-			<check_box label="Deve ter 18+ [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Residentes devem ter 18+ anos para entrar. Veja [SUPPORT_SITE]."/>
-			<check_box label="Deve ter informações de pagamento cadastradas [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Residentes precisam ter pagamento cadastrado para entrar. Veja [SUPPORT_SITE]."/>
+			<check_box label="Deve ter 18+ [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Residentes devem ter 18+ anos para entrar."/>
+			<check_box label="Deve ter informações de pagamento cadastradas [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Residentes precisam ter pagamento cadastrado para entrar."/>
 			<check_box label="Permitir grupo [GROUP] sem restrições" name="GroupCheck" tool_tip="Defina o grupo na aba Geral."/>
 			<check_box label="Vender passes para:" name="PassCheck" tool_tip="Libera acesso temporário ao lote"/>
 			<combo_box name="pass_combo">

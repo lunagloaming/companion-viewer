@@ -6,7 +6,6 @@
 		</message>
 		<message name="invalid_region_handoff">
 			Bölgə sərhədini keçərkən bir problem yarandı. Sərhədi keçməzdən əvvəl yenidən daxil olmağınız tələb oluna bilər.
-Bu xəbər təkrarlanarsa, [SUPPORT_SITE] saytını ziyarət edin.
 		</message>
 		<message name="blocked_tport">
 			Teləportasiya hal-hazırda bloklanıb. Bir az sonra yenidən cəhd edin.

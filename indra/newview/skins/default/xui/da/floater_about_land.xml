@@ -463,7 +463,7 @@ Kun større parceller kan vises i søgning.
 				Blokér adgang for::
 			</text>
 			<check_box label="Beboere der ikke har givet betalings oplysninger til Linden Lab [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Blokér for uidentificerede beboere."/>
-			<check_box label="Alders verifikation [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Blokér for beboere som ikke er alders-verificerede. Se [SUPPORT_SITE] for mere information."/>
+			<check_box label="Alders verifikation [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Blokér for beboere som ikke er alders-verificerede."/>
 			<check_box label="Tillad adgang til gruppen: [GROUP]" name="GroupCheck" tool_tip="Vælg gruppe under fanen &apos;generelt&apos;."/>
 			<check_box label="Sælg adgang til:" name="PassCheck" tool_tip="Tillader midlertidig adgang til denne parcel"/>
 			<combo_box name="pass_combo">

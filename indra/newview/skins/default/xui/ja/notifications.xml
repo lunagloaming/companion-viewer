@@ -718,7 +718,7 @@ L$が不足しているので、このグループに参加することができ
 	</notification>
 	<notification name="UnsupportedHardware">
 		お使いのコンピュータは、[APP_NAME]の最小システム要件を満たしていません。
-このためパフォーマンスが低下する場合があります。恐れ入りますが[SUPPORT_SITE]は、サポートされていないシステム構成に対する技術的サポートを提供できません。
+このためパフォーマンスが低下する場合があります。
 
 詳細について、[_URL] を確認しますか？
 		<usetemplate ignoretext="使用中のコンピューターのハードウェアがサポートされていないとき" notext="いいえ" yestext="はい" name="okcancelignore"/>
@@ -1097,7 +1097,6 @@ L$が不足しているので、このグループに参加することができ
 	</notification>
 	<notification name="invalid_region_handoff">
 		リージョン間の移動時に問題が発生しました。ログインし直す必要があるかもしれません。
-このメッセージが何度も出る場合は、[SUPPORT_SITE]をご確認ください。
 	</notification>
 	<notification name="blocked_tport">
 		申し訳ございません。テレポートは現在ブロックされています。お手数ですが、しばらくしてから再度お試しください。
@@ -1656,20 +1655,18 @@ https://wiki.secondlife.com/wiki/Adding_Spelling_Dictionaries
 	<notification name="LoginPacketNeverReceived">
 		接続に時間がかかっております。お使いのインターネット接続か、[CURRENT_GRID]の問題と考えられます。
 
-インターネット接続を確認してから数分後に再接続するか、ヘルプをクリックして [SUPPORT_SITE]をご覧になるか、テレポートをクリックしてホームに移動してみてください。
+インターネット接続を確認してから数分後に再接続するか、テレポートをクリックしてホームに移動してみてください。
 		<form name="form">
 			<button text="ＯＫ" name="OK"/>
-			<button text="ヘルプ" name="Help"/>
 			<button text="テレポート" name="Teleport"/>
 		</form>
 	</notification>
 	<notification name="LoginPacketNeverReceivedNoTP">
 		接続に問題があります。お使いのインターネット接続か、[CURRENT_GRID]の問題と考えられます。
 
-インターネット接続を確認してから数分後に再接続するか、ヘルプをクリックして [SUPPORT_SITE]をご覧になるか、テレポートをクリックしてホームに移動してみてください。
+インターネット接続を確認してから数分後に再接続してください。
 		<form name="form">
 			<button text="ＯＫ" name="OK"/>
-			<button text="ヘルプ" name="Help"/>
 		</form>
 	</notification>
 	<notification name="LoginRemoveMultiGridUserData">
@@ -1918,7 +1915,6 @@ https://secondlife.com/support/downloads/
 	</notification>
 	<notification name="LoginFailedUnknown">
 		申し訳ありませんが、不明な理由によってログインに失敗しました。
-このメッセージが何度も出る場合は、[SUPPORT_SITE] をご確認ください。
 		<usetemplate yestext="終了" name="okbutton"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -4313,7 +4309,7 @@ UDP：3478, 3479, 5060, 5062, 6250, 12000-32000
 		－あなたのシステムメモリは、必須動作環境の条件を満たしていません。
 	</global>
 	<global name="LLLeapUpdaterFailure">
-		アップデーターサービス[UPDATER_APP]の起動に失敗しました。ビューアが正しくインストールされ、実行に必要な権限があることを確認してください。引き続き問題が発生する場合は、[SUPPORT_SITE]をご覧ください。
+		アップデーターサービス[UPDATER_APP]の起動に失敗しました。ビューアが正しくインストールされ、実行に必要な権限があることを確認してください。
 	</global>
 	<global name="You can only set your 'Home Location' on your land or at a mainland Infohub.">
 		自分の土地を持っている場合、そこを「ホーム」に設定できます。持っていない場合は、マップから「情報ハブ」をお探しください。
@@ -5402,8 +5398,7 @@ http://opensimulator.org/wiki/inventory を使用して問題を修正できま�
 [EWHAT]
 	</notification>
 	<notification name="NoHavok">
-		[FEATURE] などの一部の機能は、このバージョンの[APP_NAME]には含まれていません。[FEATURE]を使用する場合は、Havokサポートを含むバージョンの[APP_NAME]をダウンロードしてください：
-[DOWNLOAD_URL]
+		[FEATURE] などの一部の機能は、このバージョンの[APP_NAME]には含まれていません。
 		<form name="form">
 			<ignore text="Havokが動作しない" name="ignore"/>
 		</form>

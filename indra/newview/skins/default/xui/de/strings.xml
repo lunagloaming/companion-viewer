@@ -3305,7 +3305,6 @@ Klicken Sie öffnen Sie auf Ihrem Computer die Einstellungen für die Anzeige un
 		[APP_NAME] kann nicht ausgeführt werden, da kein 8-Bit-Alpha-Kanal verfügbar ist.  Dies geschieht normalerweise bei Problemen mit dem Treiber der Video-Karte.
 Bitte vergewissern Sie sich, dass Sie die aktuellsten Treiber für Ihre Videokarte installiert haben.
 Vergewissern Sie sich außerdem, dass Ihr Bildschirm auf True Color (32-Bit) eingestellt ist (Systemsteuerung &gt; Anzeige &gt; Einstellungen).
-Falls diese Meldung weiterhin angezeigt wird, wenden Sie sich bitte an [SUPPORT_SITE].
 	</string>
 	<string name="MBPixelFmtSetErr">
 		Pixel-Format kann nicht eingestellt werden.
@@ -3328,7 +3327,7 @@ Falls wenig Arbeitsspeicher auf Ihrem Computers verfügbar ist, beenden Sie ande
 	<string name="MBMissingFile">
 		[APP_NAME] konnte einige der benötigten Dateien nicht finden oder auf sie zugreifen und muss daher beendet werden.
 
-Bitte installieren Sie den Viewer von [DOWNLOAD_URL] erneut und wenden Sie sich an [SUPPORT_SITE] falls das Problem nach einer Neuinstallation weiterhin besteht.
+Bitte installieren Sie [APP_NAME] erneut.
 	</string>
 	<string name="5 O'Clock Shadow">
 		Bartschatten
