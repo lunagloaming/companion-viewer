@@ -30,6 +30,7 @@
 #include "llcheckboxctrl.h"
 #include "llcombobox.h"
 #include "llfeaturemanager.h"
+#include "llimagegl.h"
 #include "llfloaterpreference.h"
 #include "llfloaterreg.h"
 #include "llnotificationsutil.h"
@@ -378,7 +379,11 @@ void LLFloaterPreferenceGraphicsAdvanced::refreshEnabledState()
         getChildView("vbo")->setEnabled(false);
     }
 
-    if (!LLFeatureManager::getInstance()->isFeatureAvailable("RenderCompressTextures"))
+    // <FS:Luna Witch> The checkbox switches BC7 compression (FSTextureCompressBC7); Firestorm's driver compression
+    // (RenderCompressTextures) is left to Debug Settings
+    //if (!LLFeatureManager::getInstance()->isFeatureAvailable("RenderCompressTextures"))
+    if (!LLImageGL::bc7Supported())
+    // </FS:Luna Witch>
     {
         getChildView("texture compression")->setEnabled(false);
     }

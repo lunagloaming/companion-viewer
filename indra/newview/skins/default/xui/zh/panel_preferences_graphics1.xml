@@ -116,7 +116,7 @@
 			<text name="tc label">
 				啟用有損紋理壓縮（S3TC）:
 			</text>
-			<check_box label="啟用無失真紋理壓縮（需要重新啟動）" name="texture compression" tool_tip="在視訊記憶體中啟用紋理壓縮可以載入更高解析度的紋理並支援更多紋理的情況下，記憶體使用效率更高。" />
+			<check_box name="texture compression" />
 			<check_box label="啟用HiDPI螢幕支援（僅適用於Mac OSX；需要重新啟動）" name="use HiDPI" tool_tip="啟用OpenGL以支援高解析度顯示。" />
 			<text name="antialiasing label" tool_tip="在某些硬體上更改此設定可能需要重新啟動。">
 				反鋸齒（建議重新啟動）：

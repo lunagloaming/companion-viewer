@@ -36,7 +36,7 @@
 		Hardware
 	</text>
 	<check_box label="Filtro anisotropico (rallenta quando è attivato)" name="ani"/>
-	<check_box label="Attiva compressione texture (richiede riavvio)" name="texture compression" tool_tip="Comprime le texture nella memoria video, consentendo il caricamento di texture a risoluzione maggiore al prezzo di una perdita di qualità del colore."/>
+	<check_box name="texture compression"/>
 	<check_box label="Abilita assistenza per display HiDPI (richiede riavvio)" name="use HiDPI" tool_tip="Abilita OpenGL per disegni ad alta risoluzione."/>
 	<text name="antialiasing label">
 		Antialiasing:

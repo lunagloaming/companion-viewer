@@ -46,6 +46,7 @@
 #include "lldirpicker.h"
 #include "lleventtimer.h"
 #include "llfeaturemanager.h"
+#include "llimagegl.h"
 #include "llfocusmgr.h"
 //#include "llfirstuse.h"
 #include "llfloaterreg.h"
@@ -2187,7 +2188,11 @@ void LLFloaterPreference::onUpdatePopupFilter()
 
 void LLFloaterPreference::refreshEnabledState()
 {
-    if (!LLFeatureManager::getInstance()->isFeatureAvailable("RenderCompressTextures"))
+    // <FS:Luna Witch> The checkbox switches BC7 compression (FSTextureCompressBC7); Firestorm's driver compression
+    // (RenderCompressTextures) is left to Debug Settings
+    //if (!LLFeatureManager::getInstance()->isFeatureAvailable("RenderCompressTextures"))
+    if (!LLImageGL::bc7Supported())
+    // </FS:Luna Witch>
     {
         getChildView("texture compression")->setEnabled(false);
     }

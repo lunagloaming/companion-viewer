@@ -11031,7 +11031,7 @@ Change of this parameter will affect the layout of buttons in notification toast
   <key>RenderCompressTextures</key>
   <map>
     <key>Comment</key>
-    <string>Enable texture compression on OpenGL 3.0 and later implementations (EXPERIMENTAL, requires restart)</string>
+    <string>Firestorm's lossy texture compression, in Debug Settings only: the graphics driver compresses every texture it uploads (usually to DXT), with no check of what is lost. Preferences switches BC7 compression (FSTextureCompressBC7) instead. With both on, the driver also compresses the textures BC7 leaves uncompressed to keep their quality. Requires restart.</string>
     <key>Persist</key>
     <integer>1</integer>
     <key>Type</key>
