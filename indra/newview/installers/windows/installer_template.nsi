@@ -606,15 +606,10 @@ ${EndIf}
 # </FS:Luna Witch>
 
 
-WriteINIStr		"$SMPROGRAMS\$INSTSHORTCUT\SL Create Account.url" \
-				"InternetShortcut" "URL" \
-				"https://join.secondlife.com/"
-WriteINIStr		"$SMPROGRAMS\$INSTSHORTCUT\SL Your Account.url" \
-				"InternetShortcut" "URL" \
-				"https://www.secondlife.com/account/"
-WriteINIStr		"$SMPROGRAMS\$INSTSHORTCUT\LSL Scripting Language Help.url" \
-				"InternetShortcut" "URL" \
-                "http://wiki.secondlife.com/wiki/LSL_Portal"
+# No web links to Second Life in the Start menu; remove the ones older installs made.
+Delete "$SMPROGRAMS\$INSTSHORTCUT\SL Create Account.url"
+Delete "$SMPROGRAMS\$INSTSHORTCUT\SL Your Account.url"
+Delete "$SMPROGRAMS\$INSTSHORTCUT\LSL Scripting Language Help.url"
 CreateShortCut	"$SMPROGRAMS\$INSTSHORTCUT\Uninstall $INSTSHORTCUT.lnk" \
 				'"$INSTDIR\uninst.exe"' ''
 
