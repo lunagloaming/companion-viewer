@@ -26,7 +26,7 @@
 		Begræns adgang til konti bekræftet med:
 	</text>
 	<check_box label="Beboere med betalingsoplysninger" name="limit_payment" tool_tip="Blokér for uidentificerede beboere"/>
-	<check_box label="Beboere der er godkendt som voksne" name="limit_age_verified" tool_tip="Blokér for beboere som ikke er blevet aldersverificeret. Se [SUPPORT_SITE] for mere information."/>
+	<check_box label="Beboere der er godkendt som voksne" name="limit_age_verified" tool_tip="Blokér for beboere som ikke er blevet aldersverificeret."/>
 	<check_box label="Tillad stemme chat" name="voice_chat_check"/>
 	<button label="?" name="voice_chat_help"/>
 	<check_box label="Tillad direkte teleport" name="allow_direct_teleport"/>

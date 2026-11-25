@@ -3219,7 +3219,6 @@ Accédez aux paramètres d&apos;affichage de votre ordinateur et réglez le mode
 		[APP_NAME] ne peut pas s&apos;exécuter, car il n&apos;y pas de canal alpha 8 bits accessible.  En général, ceci vient de problèmes avec le pilote de la carte vidéo.
 Assurez-vous d&apos;avoir installé le pilote de carte vidéo le plus récent possible.
 Assurez-vous aussi que votre écran est réglé sur True Color (32 bits) sous Panneau de configuration &gt; Affichage &gt; Paramètres.
-Si ce message persiste, veuillez aller sur la page [SUPPORT_SITE].
 	</string>
 	<string name="MBPixelFmtSetErr">
 		Impossible de trouver le format pixel approprié
@@ -3244,7 +3243,7 @@ Si la mémoire vive de votre ordinateur est faible, quittez les applications lou
 	<string name="MBMissingFile">
 		[APP_NAME] n'a pas pu accéder ou trouver certains des fichiers dont il a besoin et sera fermé.
 
-Veuillez réinstaller la le clientuse à partir de [DOWNLOAD_URL] et contacter [SUPPORT_SITE] si le problème persiste après la réinstallation.
+Veuillez réinstaller [APP_NAME].
 	</string>
 	<string name="5 O'Clock Shadow">
 		Ombre de 5 heures

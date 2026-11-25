@@ -447,8 +447,8 @@
             <text name="Only Allow">
                 Разрешить доступ только пользователям, которые:
             </text>
-            <check_box label="Имеют платежную информацию [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Для доступа к этому участку у жителя должна быть платежная информация. Более подробная информация находится здесь: [SUPPORT_SITE]."/>
-            <check_box label="Достигли 18 лет и выше [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Доступ к этому участку имеют только жители 18 лет и старше. Более подробная информация находится здесь: [SUPPORT_SITE]." />
+            <check_box label="Имеют платежную информацию [ESTATE_PAYMENT_LIMIT]" name="limit_payment" tool_tip="Для доступа к этому участку у жителя должна быть платежная информация."/>
+            <check_box label="Достигли 18 лет и выше [ESTATE_AGE_LIMIT]" name="limit_age_verified" tool_tip="Доступ к этому участку имеют только жители 18 лет и старше." />
             <check_box label="Разрешить доступ группе: [GROUP]" name="GroupCheck" tool_tip="Установите группу во вкладке 'Общие'."/>
             <check_box label="Продажа пропуска:" name="PassCheck" tool_tip="Разрешить временный доступ на данный участок" />
             <combo_box name="pass_combo">

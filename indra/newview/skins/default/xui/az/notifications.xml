@@ -651,7 +651,7 @@ Obyekt əhatə dairəsindən kənarda ola və ya silinə bilər.
 		[[FILE]] faylını yazmaq mümkün deyil
 	</notification>
 	<notification name="UnsupportedHardware">
-		Məlumat: Kompüteriniz [APP_NAME] proqramının minimum sistem tələblərinə uyğun deyil. Bu, performansın azalması ilə nəticələnə bilər. Təəssüf ki, [SUPPORT_SITE] dəstəklənməyən sistem konfiqurasiyaları üçün texniki dəstək vermir.
+		Məlumat: Kompüteriniz [APP_NAME] proqramının minimum sistem tələblərinə uyğun deyil. Bu, performansın azalması ilə nəticələnə bilər.
 
 [MINSPECS]
 
@@ -955,7 +955,6 @@ Axtarıldı: [FINALQUERY]
 	</notification>
 	<notification name="invalid_region_handoff">
 		Regionun sərhədindən keçməkdə problem yaranıb. Sərhədi keçmək üçün proqrama yenidən daxil olmanız lazım ola bilər.
-Bu mesaj təkrarlanırsa, [SUPPORT_SITE] saytına daxil olun.
 	</notification>
 	<notification name="blocked_tport">
 		Teleportasiya hal hazırda bloklanıb. Zəhmət olmasa bir az sonra yenə cəhd edin.  Hələ də teleport edə bilmirsinizsə, problemi həll etmək üçün proqramdan çıxın və yenidən daxil olun.
@@ -1475,23 +1474,21 @@ Siz [APP_NAME] tətbiqindən normal istifadə edə bilərsiniz, digər istifadə
 	<notification name="LoginPacketNeverReceived">
 		Bağlantı ilə problemi var idi. İnternet bağlantınızla bağlı problem ola bilər və ya [CURRENT_GRID] müvəqqəti olaraq əlçatan deyil.
 
-Siz internet bağlantınızı yoxlaya və bir neçə dəqiqədən sonra yenidən qoşulmağa cəhd edə bilərsiniz, [SUPPORT_SITE] səhifəsinə getmək üçün «Kömək» düyməsini və ya ev məkanınıza teleportasiya etmək üçün «Teleport» düyməsini basa bilərsiniz.
+Siz internet bağlantınızı yoxlaya və bir neçə dəqiqədən sonra yenidən qoşulmağa cəhd edə bilərsiniz və ya ev məkanınıza teleportasiya etmək üçün «Teleport» düyməsini basa bilərsiniz.
 		<url name="url">
 			http://secondlife.com/support/
 		</url>
 		<form name="form">
 			<button name="OK" text="OK"/>
-			<button name="Help" text="Kömək"/>
 			<button name="Teleport" text="Teleport"/>
 		</form>
 	</notification>
 	<notification name="LoginPacketNeverReceivedNoTP">
 		Bağlantı ilə problemi var idi. İnternet bağlantınızla bağlı problem ola bilər və ya [CURRENT_GRID] müvəqqəti olaraq əlçatan deyil.
 
-Siz internet bağlantınızı yoxlaya və bir neçə dəqiqədən sonra yenidən qoşulmağa cəhd edə bilərsiniz və [SUPPORT_SITE] səhifəsinə getmək üçün «Kömək» düyməsini basa bilərsiniz.
+Siz internet bağlantınızı yoxlaya və bir neçə dəqiqədən sonra yenidən qoşulmağa cəhd edə bilərsiniz.
 		<form name="form">
 			<button name="OK" text="OK"/>
-			<button name="Help" text="Kömək"/>
 		</form>
 	</notification>
 	<notification name="LoginRemoveMultiGridUserData">
@@ -1688,7 +1685,7 @@ Davam edilsin?
 		<usetemplate canceltext="İndi yox" name="yesnocancelbuttons" notext="Burax" yestext="Quraşdır"/>
 	</notification>
 	<notification name="LoginFailedUnknown">
-		Üzr istəyirik, naməlum səbəbdən daxil olmaq alınmadı. Bu mesaj davam edərsə, [SUPPORT_SITE] veb saytına daxil olun.
+		Üzr istəyirik, naməlum səbəbdən daxil olmaq alınmadı.
 		<usetemplate name="okbutton" yestext="Çıxış"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -3957,7 +3954,7 @@ Davam edilsin?
 		- Kompüterinizin sistem yaddaşı minimum tələblərə cavab vermir.
 	</global>
 	<global name="LLLeapUpdaterFailure">
-		[UPDATER_APP] yeniləyici xidmətini işə salmaq alınmadı. İzləyicinin düzgün quraşdırıldığını və işləmək üçün lazımi icazələrə malik olduğunu yoxlayın. Problemlərlə üzləşməyə davam etsəniz, [SUPPORT_SITE] saytına daxil olun.
+		[UPDATER_APP] yeniləyici xidmətini işə salmaq alınmadı. İzləyicinin düzgün quraşdırıldığını və işləmək üçün lazımi icazələrə malik olduğunu yoxlayın.
 	</global>
 	<global name="Siz yalnız öz torpağınızda və ya qitə Infohub-da &quot;Ev&quot; məkanınızı təyin edə bilərsiniz.">
 		Torpaq sahəsiniz varsa, onu evinizə çevirə bilərsiniz.
@@ -4957,8 +4954,7 @@ Cari simulyator: [NEWVERSION]
 [EWHAT]
 	</notification>
 	<notification name="NoHavok">
-		[FEATURE] kimi bəzi funksiyalar [APP_NAME] tətbiqinin bu versiyasına daxil edilməyib. [FEATURE] istifadə etmək istəyirsinizsə, aşağıdakı ünvandan Havok dəstəyini ehtiva edən [APP_NAME] versiyasını endirin.
-[DOWNLOAD_URL]
+		[FEATURE] kimi bəzi funksiyalar [APP_NAME] tətbiqinin bu versiyasına daxil edilməyib.
 		<form name="form">
 			<ignore name="ignore" text="Havok xəbərdarlığı"/>
 		</form>

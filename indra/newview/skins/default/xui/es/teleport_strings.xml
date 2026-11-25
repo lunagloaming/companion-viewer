@@ -3,11 +3,9 @@
 	<message_set name="errors">
 		<message name="invalid_tport">
 			Ha habido un problema al procesar tu petición de teleporte. Debes volver a iniciar sesión antes de poder teleportarte de nuevo.
-Si sigues recibiendo este mensaje, por favor, acude al [SUPPORT_SITE].
 		</message>
 		<message name="invalid_region_handoff">
 			Ha habido un problema al procesar tu paso a otra región. Debes volver a iniciar sesión para poder pasar de región a región.
-Si sigues recibiendo este mensaje, por favor, acude al [SUPPORT_SITE].
 		</message>
 		<message name="blocked_tport">
 			Lo sentimos, en estos momentos los teleportes están bloqueados. Vuelve a intentarlo en un momento. Si sigues sin poder teleportarte, desconéctate y vuelve a iniciar sesión para solucionar el problema.

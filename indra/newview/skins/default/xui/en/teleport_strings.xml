@@ -6,7 +6,6 @@
 		</message>
 		<message name="invalid_region_handoff">
 			Problem encountered processing your region crossing. You may need to log back in before you can cross regions.
-If you continue to get this message, please check the [SUPPORT_SITE].
 		</message>
 		<message name="blocked_tport">
 			Sorry, teleport is currently blocked. Try again in a moment.

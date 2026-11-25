@@ -627,7 +627,7 @@ L&apos;oggetto potrebbe essere troppo lontano oppure essere stato cancellato.
 		Non è stato possibile scrivere il file [[FILE]]
 	</notification>
 	<notification name="UnsupportedHardware">
-		Il computer non dispone dei requisiti minimi di sistema per [APP_NAME]. Il funzionamento può pertanto risultare ridotto. Purtroppo la pagina [SUPPORT_SITE] non può fornire assistenza tecnica in caso di problemi dovuti a configurazioni di sistema non compatibili.
+		Il computer non dispone dei requisiti minimi di sistema per [APP_NAME]. Il funzionamento può pertanto risultare ridotto.
 
 Visitare [_URL] per ulteriori informazioni?
 		<usetemplate ignoretext="L&apos;hardware di questo computer non è supportato" name="okcancelignore" notext="No" yestext="Si"/>
@@ -933,11 +933,9 @@ Ho cercato: [FINALQUERY]
 	</notification>
 	<notification name="invalid_tport">
 		C&apos;è stato un problema nell&apos;elaborare la richiesta di teleport. Potresti dover effettuare nuovamente l&apos;accesso prima di poter usare il teleport.
-Se si continua a visualizzare questo messaggio, consulta la pagina [SUPPORT_SITE].
 	</notification>
 	<notification name="invalid_region_handoff">
 		Si è verificato un problema nel tentativo di attraversare regioni. È possibile che per potere attraversare le regioni, tu debba effettuare nuovamente l&apos;accesso.
-Se si continua a visualizzare questo messaggio, consulta la pagina [SUPPORT_SITE].
 	</notification>
 	<notification name="blocked_tport">
 		Spiacenti, il teleport è bloccato al momento. Prova di nuovo tra pochi istanti. Se ancora non potrai teleportarti, per favore scollegati e ricollegati per risolvere il problema.
@@ -1430,9 +1428,8 @@ Se questa è la prima volta che usi [CURRENT_GRID], devi creare un account prima
 	<notification name="LoginPacketNeverReceived">
 		Ci sono problemi di connessione. È possibile che ci siano problemi con la tua connessione Internet oppure sulla [CURRENT_GRID].
 
-Controlla la tua connessione e riprova fra qualche minuto, oppure clicca su Aiuto per visualizzare la pagina [SUPPORT_SITE], oppure clicca su Teleport per tentare il teleport a casa tua.
+Controlla la tua connessione e riprova fra qualche minuto, oppure clicca su Teleport per tentare il teleport a casa tua.
 		<form name="form">
-			<button name="Help" text="Aiuto"/>
 			<button name="Teleport" text="Teleport"/>
 		</form>
 	</notification>
@@ -1663,7 +1660,6 @@ Vuoi procedere?
 	</notification>
 	<notification name="LoginFailedUnknown">
 		L'accesso è fallito per un motivo sconosciuto.
-Se il messaggio si ripresenta, controllare su [SUPPORT_SITE].
 		<usetemplate name="okbutton" yestext="Esci"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -3958,8 +3954,6 @@ Continuare?
 	</notification>
 	<global name="UnsupportedGLRequirements">
 		Non sembra che tu abbia i requisiti hardware adeguati per [APP_NAME]. [APP_NAME] richiede una scheda grafica OpenGL con supporto multitexture. Se ne hai una in dotazione, accertati di avere i driver, i service pack e i patch più recenti per la scheda grafica e per il sistema operativo.
-
-Se continui ad avere problemi, visita la pagina [SUPPORT_SITE].
 	</global>
 	<global name="UnsupportedGPU">
 		- La tua scheda grafica non soddisfa i requisiti minimi.
@@ -4961,8 +4955,7 @@ Simulatore precedente: [OLDVERSION]
 [EWHAT]
 	</notification>
 	<notification name="NoHavok">
-		Alcune funzioni come [FEATURE] non sono incluse in questa versione di [APP_NAME]. Se desideri utilizzare [FEATURE], scarica una versione di [APP_NAME] contenente il supporto Havok da
-[DOWNLOAD_URL]
+		Alcune funzioni come [FEATURE] non sono incluse in questa versione di [APP_NAME].
 		<form name="form">
 			<ignore name="ignore" text="Avviso sul supporto Havok mancante"/>
 		</form>

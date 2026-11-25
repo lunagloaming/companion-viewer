@@ -247,7 +247,7 @@ Indtast venligst navn på region i Start lokation feltet eller vælg &quot;Min s
 		<usetemplate name="okbutton" yestext="OK"/>
 	</notification>
 	<notification name="UnsupportedHardware">
-		Din computer opfylder ikke minimumskravene til [APP_NAME]. Du kan risikere nedsat hastighed. Desværre kan [SUPPORT_SITE] ikke tilbyde teknisk support til konfigurationer der ikke er understøttet.
+		Din computer opfylder ikke minimumskravene til [APP_NAME]. Du kan risikere nedsat hastighed.
 
 Besøg [_URL] for yderligere information?
 		<usetemplate ignoretext="Din computer hardware understøttes ikke" name="okcancelignore" notext="No" yestext="Yes"/>
@@ -312,11 +312,9 @@ Gå til [_URL] for information om køb af L$?
 	</notification>
 	<notification name="invalid_tport">
 		Der opstod et problem ved din teleport. Det kan være nødvendigt at logge ind igen, før du kan teleporte.
-Hvis du bliver ved med at få denne fejl, check venligst [SUPPORT_SITE].
 	</notification>
 	<notification name="invalid_region_handoff">
 		Der opstod et problem ved skift til ny region. Det kan være nødvendigt at logge ind igen, før du kan skifte til andre regioner.
-Hvis du bliver ved med at få denne fejl, check venligst [SUPPORT_SITE].
 	</notification>
 	<notification name="blocked_tport">
 		Beklager, teleport er blokeret lige nu. Prøv igen senere.
@@ -479,7 +477,7 @@ Hvis det er første gang du bruger [CURRENT_GRID], skal du først oprette en kon
 	<notification name="LoginPacketNeverReceived">
 		Der er problemer med at koble på.  Der kan være et problem med din Internet forbindelse eller [CURRENT_GRID].
 
-Du kan enten checke din Internet forbindelse og prøve igen om lidt, klikke på Hjælp for at se [SUPPORT_SITE] siden, eller klikke på Teleport for at forsøge at teleportere hjem.
+Du kan enten checke din Internet forbindelse og prøve igen om lidt, eller klikke på Teleport for at forsøge at teleportere hjem.
 	</notification>
 	<notification name="CantTeleportToGrid">
 		Kunne ikke teleportere til [SLURL] da den er på et andet net ([GRID]) end det nuværende net ([CURRENT_GRID]).  Luk venligst din klient og prøv igen.
@@ -1885,8 +1883,6 @@ Klik hvorsomhelst i verden for at rotere din visning
 	</notification>
 	<global name="UnsupportedGLRequirements">
 		Det ser ikke ud til at din hardware opfylder minimumskravene til [APP_NAME]. [APP_NAME] kræver et OpenGL grafikkort som understøter &apos;multitexture&apos;. Check eventuelt om du har de nyeste drivere for grafikkortet, og de nyeste service-packs og patches til dit operativsystem.
-
-Hvis du bliver ved med at have problemer, besøg venligst [SUPPORT_SITE].
 	</global>
 	<global name="You can only set your &apos;Home Location&apos; on your land or at a mainland Infohub.">
 		Hvis du selv ejer land, kan du benytte det til hjemme lokation.

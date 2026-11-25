@@ -19,9 +19,9 @@
 		<radio_item label="Consenti accesso solo ai residenti e ai gruppi elencati nella scheda Accesso" name="estate_restricted_access"/>
 		<radio_item label="Accesso libero" name="estate_public_access" />
 	</radio_group>
-	<check_box label="Deve avere almeno 18 anni" name="limit_age_verified" tool_tip="Per poter visitare questa proprietà immobiliare gli utenti devono avere almeno 18 anni. Visita il [SUPPORT_SITE] per maggiori informazioni."/>
-	<check_box label="Deve avere le informazioni di pagamento" name="limit_payment" tool_tip="Per poter visitare questa proprietà immobiliare gli utenti devono aver fornito informazioni di pagamento a Linden Lab.  Visita il [SUPPORT_SITE] per maggiori informazioni."/>
-	<check_box label="Non deve essere un agente scriptato (bot)" name="limit_bots" tool_tip="Gli agenti scriptati (bot) non possono accedere a questa proprietà immobiliare. Visita il [SUPPORT_SITE] per maggiori informazioni." />
+	<check_box label="Deve avere almeno 18 anni" name="limit_age_verified" tool_tip="Per poter visitare questa proprietà immobiliare gli utenti devono avere almeno 18 anni."/>
+	<check_box label="Deve avere le informazioni di pagamento" name="limit_payment" tool_tip="Per poter visitare questa proprietà immobiliare gli utenti devono aver fornito informazioni di pagamento a Linden Lab."/>
+	<check_box label="Non deve essere un agente scriptato (bot)" name="limit_bots" tool_tip="Gli agenti scriptati (bot) non possono accedere a questa proprietà immobiliare." />
 	<check_box label="I proprietari dei lotti possono restringere i permessi" name="parcel_access_override"/>
 	<check_box label="Permetti la chat vocale" name="voice_chat_check"/>
 	<check_box label="Permetti il teleport diretto" name="allow_direct_teleport"/>

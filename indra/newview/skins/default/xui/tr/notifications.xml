@@ -688,7 +688,7 @@ Nesne aralık dışında ya da silinmiş olabilir.
 		[[FILE]] dosyası yazılamıyor.
 	</notification>
 	<notification name="UnsupportedHardware">
-		Bilgisayarınızın [APP_NAME] uygulamasının minimum sistem gereksinimlerini karşılamadığını bildirmek durumundayız. Performans düşüklüğü yaşayabilirsiniz. Ne yazık ki, [SUPPORT_SITE] desteklenmeyen sistem yapılandırmaları için teknik destek verememektedir.
+		Bilgisayarınızın [APP_NAME] uygulamasının minimum sistem gereksinimlerini karşılamadığını bildirmek durumundayız. Performans düşüklüğü yaşayabilirsiniz.
 
 Daha fazla bilgi için [_URL] adresini ziyaret etmek ister misiniz?
 		<url name="url">
@@ -960,11 +960,9 @@ Arama yapılan sorgu: [FINALQUERY]
 	</notification>
 	<notification name="invalid_tport">
 		Işınlama talebiniz işlenirken bir sorunla karşılaşıldı. Işınlanabilmek için yeniden oturum açmanız gerekebilir.
-Bu iletiyi almaya devam ederseniz, lütfen [SUPPORT_SITE] bölümüne başvurun.
 	</notification>
 	<notification name="invalid_region_handoff">
 		Bölge değiştirme talebiniz işlenirken sorunla karşılaşıldı. Bölge değiştirmek için yeniden oturum açmanız gerekebilir.
-Bu iletiyi almaya devam ederseniz, lütfen [SUPPORT_SITE] bölümüne başvurun.
 	</notification>
 	<notification name="blocked_tport">
 		Üzgünüz, ışınlama şu anda engellenmiş durumda. Bir dakika sonra tekrar deneyin.  Hala ışınlanamıyorsanız, sorunu çözmek için lütfen çıkış yapıp oturumu tekrar açın.
@@ -1447,13 +1445,12 @@ Yeni bir ana konum ayarlamak isteyebilirsiniz.
 	<notification name="LoginPacketNeverReceived">
 		Bağlantıda sorun yaşıyoruz. İnternet bağlantınızda ya da [CURRENT_GRID] uygulamasında bir problem olabilir.
 
-İnternet bağlantınızı kontrol edip bir kaç dakika sonra yeniden bağlanmayı deneyebilir, [SUPPORT_SITE] sayfasına gitmek için Yardım&apos;ı tıklatabilir ya da ana konumunuza ışınlanmak için Işınla&apos;yı tıklatabilirsiniz.
+İnternet bağlantınızı kontrol edip bir kaç dakika sonra yeniden bağlanmayı deneyebilir ya da ana konumunuza ışınlanmak için Işınla&apos;yı tıklatabilirsiniz.
 		<url name="url">
 			http://secondlife.com/support/
 		</url>
 		<form name="form">
 			<button name="OK" text="Tamam"/>
-			<button name="Help" text="Yardım"/>
 			<button name="Teleport" text="Işınla"/>
 		</form>
 	</notification>
@@ -1641,7 +1638,7 @@ Devam edilsin mi?
 		<usetemplate canceltext="Şimdi Değil" name="yesnocancelbuttons" notext="Atla" yestext="Yükle"/>
 	</notification>
 	<notification name="LoginFailedUnknown">
-		Üzgünüz, oturum açma bilinmeyen bir nedenden dolayı başarısız oldu. Bu mesajı almaya devam ederseniz, lütfen [SUPPORT_SITE] bölümüne başvurun.
+		Üzgünüz, oturum açma bilinmeyen bir nedenden dolayı başarısız oldu.
 		<usetemplate name="okbutton" yestext="Çık"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -3751,8 +3748,6 @@ Devam etmek istiyor musunuz?
 	</notification>
 	<global name="UnsupportedGLRequirements">
 		[APP_NAME] uygulaması için gerekli donanım gereksinimlerine sahip olmadığınız görünüyor. [APP_NAME] çoklu doku desteği sunan bir OpenGL grafik kartı gerektiriyor. Eğer grafik kartınız bu özellikteyse, grafik kartınızın en son sürücülerine ve işletim sisteminiz için gerekli Service Pack ve yamalara sahip olup olmadığınızı kontrol etmeyi deneyebilirsiniz.
-
-Sorun yaşamaya devam ederseniz, lütfen [SUPPORT_SITE] bölümünü ziyaret edin.
 	</global>
 	<global name="UnsupportedCPUAmount">
 		796

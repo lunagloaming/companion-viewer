@@ -6,7 +6,6 @@
 		</message>
 		<message name="invalid_region_handoff">
 			Przepraszamy, ale pojawił się błąd podczas próby zmiany regionu. Aby ponowić próbę przejścia na drugi region, wyloguj się i zaloguj ponownie.
-Jeżeli nadal otrzymujesz komunikat o błędzie podczas przejścia na drugi region, sprawdź [SUPPORT_SITE].
 		</message>
 		<message name="blocked_tport">
 			Przepraszamy, teleportacja jest chwilowo niedostępna. Spróbuj jeszcze raz.

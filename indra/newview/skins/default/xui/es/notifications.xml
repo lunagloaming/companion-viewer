@@ -638,7 +638,7 @@ El objeto debe de haber sido borrado o estar fuera de alcance (&apos;out of rang
 		No se ha podido escribir el archivo [[FILE]]
 	</notification>
 	<notification name="UnsupportedHardware">
-		Debes saber que tu ordenador no cumple los requisitos mínimos para la utilización de [APP_NAME]. Puede que experimentes un rendimiento muy bajo. Desafortunadamente, [SUPPORT_SITE] no puede dar asistencia técnica a sistemas con una configuración no admitida.
+		Debes saber que tu ordenador no cumple los requisitos mínimos para la utilización de [APP_NAME]. Puede que experimentes un rendimiento muy bajo.
 
 ¿Ir a [_URL] para más información?
 		<url name="url" option="0">
@@ -942,11 +942,9 @@ por lo que no se ha hecho la búsqueda.
 	</notification>
 	<notification name="invalid_tport">
 		Ha habido un problema al procesar tu petición de teleporte. Debes volver a iniciar sesión antes de poder teleportarte de nuevo.
-Si sigues recibiendo este mensaje, por favor acude al [SUPPORT_SITE].
 	</notification>
 	<notification name="invalid_region_handoff">
 		Ha habido un problema al procesar tu paso a otra región. Debes volver a iniciar sesión para poder pasar de región a región.
-Si sigues recibiendo este mensaje, por favor acude al [SUPPORT_SITE].
 	</notification>
 	<notification name="blocked_tport">
 		Lo sentimos, en estos momentos los teleportes están bloqueados. Vuelve a intentarlo en un momento. Si sigues sin poder teleportarte, desconéctate y vuelve a iniciar sesión para solucionar el problema.
@@ -1453,13 +1451,12 @@ Si es la primera vez que usas [CURRENT_GRID], debes crear una cuenta para poder 
 	<notification name="LoginPacketNeverReceived">
 		Tenemos problemas de conexión. Puede deberse a un problema de tu conexión a Internet o de [CURRENT_GRID].
 
-Puedes revisar tu conexión a Internet y volver a intentarlo en unos minutos, pulsar Ayuda para conectarte a [SUPPORT_SITE], o pulsar Teleporte para intentar teleportarte a tu Base.
+Puedes revisar tu conexión a Internet y volver a intentarlo en unos minutos, o pulsar Teleporte para intentar teleportarte a tu Base.
 		<url name="url">
 			https://support.secondlife.com/
 		</url>
 		<form name="form">
 			<button name="OK" text="Aceptar"/>
-			<button name="Help" text="Ayuda"/>
 			<button name="Teleport" text="Teleporte"/>
 		</form>
 	</notification>
@@ -1649,7 +1646,7 @@ Haz clic en OK para instalar.
 		<usetemplate canceltext="Ahora no" name="yesnocancelbuttons" notext="Saltear" yestext="Instalar"/>
 	</notification>
 	<notification name="LoginFailedUnknown">
-		Lo sentimos, error en el inicio de sesión, motivo desconocido. Si sigues recibiendo este mensaje, por favor, acude al [SUPPORT_SITE].
+		Lo sentimos, error en el inicio de sesión, motivo desconocido.
 		<usetemplate name="okbutton" yestext="Salir"/>
 	</notification>
 	<notification name="DeedObjectToGroup">
@@ -3857,8 +3854,6 @@ Algunos linksets seleccionados no pueden configurarse como '[REQUESTED_TYPE]' po
 	</notification>
 	<global name="UnsupportedGLRequirements">
 		Parece que no tienes el hardware apropiado para [APP_NAME]. [APP_NAME] requiere una tarjeta gráfica OpenGL que admita texturas múltiples (&apos;multitexture support&apos;). Si la tienes, comprueba que tienes los últimos controladores para tu tarjeta gráfica, así como los últimos parches y &apos;service packs&apos; para tu sistema operativo.
-
-Si los problemas persisten, por favor, acude a [SUPPORT_SITE].
 	</global>
 	<global name="UnsupportedCPUAmount">
 		796
@@ -4923,8 +4918,7 @@ Simulador anterior: [OLDVERSION]
 [EWHAT]
 	</notification>
 	<notification name="NoHavok">
-		Algunas funciones como [FEATURE] no están incluídas en [APP_NAME] para OpenSimulator. Si quieres usar [FEATURE], por favor descarga [APP_NAME] para Second Life de
-[DOWNLOAD_URL]
+		Algunas funciones como [FEATURE] no están incluídas en [APP_NAME] para OpenSimulator.
 		<form name="form">
 			<ignore name="ignore" text="Alerta de No Havok"/>
 		</form>
