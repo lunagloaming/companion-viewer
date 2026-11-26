@@ -905,6 +905,8 @@ bool move_inv_category_world_to_agent(const LLUUID& object_id,
 // Can be called multiple times on the same menu (e.g. if multiple items
 // are selected).  If "append" is false, then only common enabled items
 // are set as enabled.
+bool fs_hide_wear_where_add_exists(); // <FS:Luna Witch/>
+void fs_hide_replace_outfit(menuentry_vec_t& items); // <FS:Luna Witch/>
 void hide_context_entries(LLMenuGL& menu,
                           const menuentry_vec_t &entries_to_show,
                           const menuentry_vec_t &disabled_entries);

@@ -86,7 +86,7 @@
     <menu_item_call.on_click
      function="Object.AttachToAvatar" />
     <menu_item_call.on_visible
-     function="Object.EnableWear" />
+     function="Object.VisibleWearBesideAdd" />
   </menu_item_call>  
   <menu_item_call
    label="Add"

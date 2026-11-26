@@ -13633,6 +13633,10 @@ void initialize_menus()
     enable.add("Object.EnableFavorites", boost::bind(&enable_object_favorite, _2));
     enable.add("Object.EnableDelete", boost::bind(&enable_object_delete));
     enable.add("Object.EnableWear", boost::bind(&object_is_wearable));
+    // <FS:Luna Witch> Wear (replace) is hidden where Add is offered, unless FSShowWearWhereAddExists
+    enable.add("Object.ShowWearBesideAdd", [](LLUICtrl*, const LLSD&) { return gSavedSettings.getBOOL("FSShowWearWhereAddExists"); });
+    enable.add("Object.VisibleWearBesideAdd", [](LLUICtrl*, const LLSD&) { return object_is_wearable() && gSavedSettings.getBOOL("FSShowWearWhereAddExists"); });
+    // </FS:Luna Witch>
 
     enable.add("Object.EnableStandUp", boost::bind(&enable_object_stand_up));
     enable.add("Object.EnableSit", boost::bind(&enable_object_sit, _1));

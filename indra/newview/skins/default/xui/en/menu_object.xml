@@ -228,6 +228,8 @@
           function="Object.AttachToAvatar" />
       <menu_item_call.on_enable
           function="Object.EnableWear" />
+      <menu_item_call.on_visible
+          function="Object.ShowWearBesideAdd" />
     </menu_item_call>
     <menu_item_call
         enabled="false"
