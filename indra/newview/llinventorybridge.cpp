@@ -812,10 +812,34 @@ void disable_context_entries_if_present(LLMenuGL& menu,
         }
     }
 }
+// <FS:Luna Witch> Add, not Wear (replace), wherever both are offered, unless FSShowWearWhereAddExists
+bool fs_hide_wear_where_add_exists()
+{
+    static LLCachedControl<bool> show_wear(gSavedSettings, "FSShowWearWhereAddExists");
+    return !show_wear;
+}
+
+void fs_hide_replace_outfit(menuentry_vec_t& items)
+{
+    if (fs_hide_wear_where_add_exists() && std::find(items.begin(), items.end(), "Add To Outfit") != items.end())
+    {
+        items.erase(std::remove_if(items.begin(), items.end(),
+            [](const std::string& item) { return item == "Replace Outfit" || item == "Wear Items"; }), items.end());
+    }
+}
+// </FS:Luna Witch>
+
 void hide_context_entries(LLMenuGL& menu,
-                          const menuentry_vec_t &entries_to_show,
+                          const menuentry_vec_t &entries_to_show_in,
                           const menuentry_vec_t &disabled_entries)
 {
+    // <FS:Luna Witch> Wear (replace) goes where Add is offered
+    menuentry_vec_t entries_to_show = entries_to_show_in;
+    if (fs_hide_wear_where_add_exists() && std::find(entries_to_show.begin(), entries_to_show.end(), "Wearable Add") != entries_to_show.end())
+    {
+        entries_to_show.erase(std::remove(entries_to_show.begin(), entries_to_show.end(), "Wearable And Object Wear"), entries_to_show.end());
+    }
+    // </FS:Luna Witch>
     const LLView::child_list_t *list = menu.getChildList();
 
     // For removing double separators or leading separator.  Start at true so that
@@ -5455,6 +5479,12 @@ void LLFolderBridge::buildContextMenuFolderOptions(U32 flags,   menuentry_vec_t&
                 disabled_items.push_back(std::string("Replace Outfit"));
             }
         }
+        // <FS:Luna Witch> Add To Outfit rather than Replace Outfit or Wear Items, but an outfit is still put on in place of the current one
+        if (type != LLFolderType::FT_OUTFIT)
+        {
+            fs_hide_replace_outfit(items);
+        }
+        // </FS:Luna Witch>
         if (is_agent_inventory)
         {
             items.push_back(std::string("Folder Wearables Separator"));

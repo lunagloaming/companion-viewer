@@ -580,6 +580,17 @@
     <key>Value</key>
     <integer>1</integer>
   </map>
+  <key>FSShowWearWhereAddExists</key>
+  <map>
+    <key>Comment</key>
+    <string>Offer Wear (put on in place of what is worn there) beside Add in menus, and put things on in place when dropped onto your avatar (Ctrl adds). Off: only Add is offered where both would be, and things dropped onto your avatar are added (Ctrl puts them on in place).</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>0</integer>
+  </map>
   <key>FSDoubleClickAddInventoryClothing</key>
   <map>
     <key>Comment</key>

@@ -2444,7 +2444,10 @@ EAcceptance LLToolDragAndDrop::dad3dRezAttachmentFromInv(
     }
 
 // [RLVa:KB] - Checked: 2013-02-13 (RLVa-1.4.8)
-    bool fReplace = !(mask & MASK_CONTROL);
+    // <FS:Luna Witch> Dropped onto the avatar: added, or with Ctrl put on in place, unless FSShowWearWhereAddExists
+    //bool fReplace = !(mask & MASK_CONTROL);
+    bool fReplace = !(mask & MASK_CONTROL) != fs_hide_wear_where_add_exists();
+    // </FS:Luna Witch>
     if ( (rlv_handler_t::isEnabled()) && (!rlvPredCanWearItem(item, (fReplace) ? RLV_WEAR_REPLACE : RLV_WEAR_ADD)) )
     {
         return ACCEPT_NO_LOCKED;
@@ -2473,7 +2476,7 @@ EAcceptance LLToolDragAndDrop::dad3dRezAttachmentFromInv(
         {
 // [SL:KB] - Patch: Appearance-DnDWear | Checked: 2010-09-28 (Catznip-2.2)
             // Make this behave consistent with dad3dWearItem
-            rez_attachment(item, 0, !(mask & MASK_CONTROL));
+            rez_attachment(item, 0, fReplace); // <FS:Luna Witch/> was !(mask & MASK_CONTROL), the same as fReplace then
 // [/SL:KB]
 //          rez_attachment(item, 0, false);
         }
@@ -2895,7 +2898,10 @@ EAcceptance LLToolDragAndDrop::dad3dWearItem(
         }
 
 // [RLVa:KB] - Checked: 2013-02-13 (RLVa-1.4.8)
-        bool fReplace = (!(mask & MASK_CONTROL)) || (LLAssetType::AT_BODYPART == item->getType());  // Body parts should always replace
+        // <FS:Luna Witch> Clothing dropped onto the avatar is added, or with Ctrl put on in place, unless FSShowWearWhereAddExists
+        //bool fReplace = (!(mask & MASK_CONTROL)) || (LLAssetType::AT_BODYPART == item->getType());  // Body parts should always replace
+        bool fReplace = (!(mask & MASK_CONTROL) != fs_hide_wear_where_add_exists()) || (LLAssetType::AT_BODYPART == item->getType());  // Body parts should always replace
+        // </FS:Luna Witch>
         if ( (rlv_handler_t::isEnabled()) && (!rlvPredCanWearItem(item, (fReplace) ? RLV_WEAR_REPLACE : RLV_WEAR_ADD)) )
         {
             return ACCEPT_NO_LOCKED;
