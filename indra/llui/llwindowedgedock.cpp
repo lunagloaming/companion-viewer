@@ -1453,7 +1453,7 @@ std::string LLWindowEdgeDock::describeState() const
         for (const Entry& entry : area.mEntries)
         {
             out << " ; " << entry.mName << " length " << entry.mLength;
-            const LLFloater* floater = entry.mFloater.get();
+            LLFloater* floater = entry.mFloater.get();
             if (!floater)
             {
                 out << " [not open]";
@@ -1472,7 +1472,7 @@ std::string LLWindowEdgeDock::describeState() const
     return out.str();
 }
 
-void LLWindowEdgeDock::logEvent(const char* event, const LLFloater* floater) const
+void LLWindowEdgeDock::logEvent(const char* event, LLFloater* floater) const
 {
     if (floater && diagnosticsEnabled())
     {
@@ -1513,7 +1513,7 @@ void LLWindowEdgeDock::checkAreas()
             empty = true;
             for (const Entry& entry : mAreas[e].mEntries)
             {
-                const LLFloater* floater = entry.mFloater.get();
+                LLFloater* floater = entry.mFloater.get();
                 if (isActive(entry) && floater->isInVisibleChain() && floater->getRect().notEmpty()
                     && floater->getRect().overlaps(rects[e]))
                 {
