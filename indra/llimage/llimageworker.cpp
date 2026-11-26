@@ -222,10 +222,12 @@ bool ImageRequest::processRequest()
         // some decoders are removing data when task is complete and there were errors
         mDecodedRaw = done && mDecodedImageRaw->getData();
 
-        // <FS:Luna Witch> Compress here, on the decode thread, never on the main thread
+        // <FS:Luna Witch> Compressed after it is shown, on FSBC7Compressor's threads, never here or on the main
+        // thread: a copy, since the image itself may be changed once it is handed over
         if (mDecodedRaw && mCompressBC7)
         {
-            mDecodedImageRaw->mBC7 = FSImageBC7::compress(mDecodedImageRaw);
+            mDecodedImageRaw->mBC7Source = new LLImageRaw(mDecodedImageRaw->getData(), mDecodedImageRaw->getWidth(),
+                                                          mDecodedImageRaw->getHeight(), mDecodedImageRaw->getComponents());
         }
         // </FS:Luna Witch>
 

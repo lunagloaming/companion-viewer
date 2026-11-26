@@ -2630,7 +2630,7 @@ bool LLViewerFetchedTexture::updateFetch()
         // bypass texturefetch directly by pulling from LLTextureCache
         S32 fetch_request_response = -1;
         S32 worker_discard = -1;
-        // <FS:Luna Witch> Compress world textures to BC7 on the decode thread (fsimagebc7.h)
+        // <FS:Luna Witch> Compress world textures to BC7 once shown (fsimagebc7.h)
         //fetch_request_response = LLAppViewer::getTextureFetch()->createRequest(mFTType, mUrl, getID(), getTargetHost(), decode_priority,
         //    w, h, c, desired_discard, needsAux(), mCanUseHTTP);
         fetch_request_response = LLAppViewer::getTextureFetch()->createRequest(mFTType, mUrl, getID(), getTargetHost(), decode_priority,
