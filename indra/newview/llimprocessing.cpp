@@ -74,6 +74,7 @@
 #include "fscommon.h"
 #include "fsdata.h"
 #include "fskeywords.h"
+#include "fsradar.h" // <FS:Luna Witch/>
 #include "lggcontactsets.h" // <FS:PP> FIRE-17006 Autoresponse based on Contact Set
 #include "llagentui.h"
 #include "llavataractions.h"
@@ -1699,6 +1700,9 @@ void LLIMProcessing::processNewMessage(LLUUID from_id,
 
         case IM_FROM_TASK:
         {
+            // <FS:Luna Witch> A tip jar announcing a tip, even in Do Not Disturb
+            FSRadar::getInstance()->onObjectMessage(message, name);
+            // </FS:Luna Witch>
 
             if (is_do_not_disturb && !is_owned_by_me)
             {

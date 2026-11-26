@@ -199,6 +199,15 @@
 		 function="ToggleControl"
 		 parameter="FSRadarTickWelcomed"/>
 	</menu_item_check>
+	<menu_item_check
+	 label="Track those who have tipped"
+	 name="radarTrackTippers">
+		<menu_item_check.on_check
+		 control="FSRadarTrackTippers"/>
+		<menu_item_check.on_click
+		 function="ToggleControl"
+		 parameter="FSRadarTrackTippers"/>
+	</menu_item_check>
 	<menu_item_call
 	 label="Greetings..."
 	 name="radarGreetings">

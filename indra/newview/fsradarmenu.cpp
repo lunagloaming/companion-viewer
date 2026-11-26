@@ -41,6 +41,8 @@
 #include "llnetmap.h"
 #include "fsfloateravataralign.h"
 #include "llfloaterreg.h"
+#include "fsradar.h" // <FS:Luna Witch/>
+#include "llviewercontrol.h" // <FS:Luna Witch/>
 #include "llviewermenu.h"           // for gMenuHolder
 #include "rlvactions.h"
 #include "rlvhandler.h"
@@ -94,6 +96,11 @@ LLContextMenu* FSRadarMenu::createMenu()
         registrar.add("Nearby.People.SetAvatarMarkColor",       boost::bind(&LLNetMap::setAvatarMarkColor,                  id, _2));
         registrar.add("Nearby.People.ClearAvatarMarkColor",     boost::bind(&LLNetMap::clearAvatarMarkColor,                id));
         registrar.add("Nearby.People.ClearAllAvatarMarkColors", boost::bind(&LLNetMap::clearAvatarMarkColors                ));
+        // <FS:Luna Witch> Tippers on the nearby people list
+        registrar.add("Nearby.People.ToggleTipper", [id](LLUICtrl*, const LLSD&) { FSRadar::getInstance()->setTipper(id, !FSRadar::getInstance()->isTipper(id)); });
+        enable_registrar.add("Nearby.People.IsTipper", [id](LLUICtrl*, const LLSD&) { return FSRadar::getInstance()->isTipper(id); });
+        enable_registrar.add("Nearby.People.TracksTippers", [](LLUICtrl*, const LLSD&) { return gSavedSettings.getBOOL("FSRadarTrackTippers"); });
+        // </FS:Luna Witch>
 
         enable_registrar.add("Avatar.EnableItem",               boost::bind(&FSRadarMenu::enableContextMenuItem,            this, _2));
         enable_registrar.add("Avatar.CheckItem",                boost::bind(&FSRadarMenu::checkContextMenuItem,             this, _2));
