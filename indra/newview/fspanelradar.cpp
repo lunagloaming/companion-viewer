@@ -132,8 +132,8 @@ bool FSPanelRadar::postBuild()
     mRadarList->setSortCallback([list = mRadarList](S32 column, const LLScrollListItem* item1, const LLScrollListItem* item2) -> S32
     {
         FSRadar* radar = FSRadar::getInstance();
-        const S32 group1 = radar->needsGreeting(item1->getUUID()) ? 0 : 1;
-        const S32 group2 = radar->needsGreeting(item2->getUUID()) ? 0 : 1;
+        const S32 group1 = radar->highlightsArrival(item1->getUUID()) ? 0 : 1;
+        const S32 group2 = radar->highlightsArrival(item2->getUUID()) ? 0 : 1;
         if (group1 != group2)
         {
             // The list multiplies the result by -1 for a descending sort.

@@ -93,6 +93,8 @@ public:
     // Someone who came within chat range after we arrived and isn't ticked yet.
     // They are shown in their own colour at the top of the list.
     bool needsGreeting(const LLUUID& avatar_id) const { return mArrivedAvatars.contains(avatar_id) && !isGreeted(avatar_id); }
+    // Shown so: needs a greeting, and arrivals are highlighted (FSRadarHighlightArrivals).
+    bool highlightsArrival(const LLUUID& avatar_id) const;
 
     // Ticks the people a "welcome" in our own nearby chat names.
     void onOwnNearbyChat(std::string_view text);

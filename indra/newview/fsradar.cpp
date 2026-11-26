@@ -737,7 +737,7 @@ void FSRadar::updateRadarList()
 
         contactsets->hasFriendColorThatShouldShow(avId, ContactSetType::RADAR, name_color);
 
-        if (needsGreeting(avId))
+        if (highlightsArrival(avId))
         {
             name_color = colortable.getColor("RadarNeedsGreetingColor", LLColor4::cyan).get();
         }
@@ -1187,6 +1187,12 @@ void FSRadar::updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range,
     greetingStateChanged();
     logGreetingAbout(isGreeted(avatar_id) ? "came into chat range, already ticked" : "came into chat range", avatar_id,
         llformat("%.1f m", range));
+}
+
+bool FSRadar::highlightsArrival(const LLUUID& avatar_id) const
+{
+    static LLCachedControl<bool> sHighlightArrivals(gSavedSettings, "FSRadarHighlightArrivals");
+    return sHighlightArrivals && needsGreeting(avatar_id);
 }
 
 void FSRadar::loadGreetingState()
