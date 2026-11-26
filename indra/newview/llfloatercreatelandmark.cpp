@@ -41,6 +41,7 @@
 #include "lltextbox.h"
 #include "lltexteditor.h"
 #include "lluictrlfactory.h"
+#include "llviewercontrol.h"
 #include "llviewermessage.h"
 #include "llviewerparcelmgr.h"
 #include "llviewerregion.h"
@@ -147,6 +148,10 @@ void LLFloaterCreateLandmark::onOpen(const LLSD& key)
     if (key.has("dest_folder"))
     {
         dest_folder = key["dest_folder"].asUUID();
+    }
+    else if (gSavedSettings.getBOOL("FSCreateLandmarkInFavorites"))
+    {
+        dest_folder = gInventory.findCategoryUUIDForType(LLFolderType::FT_FAVORITE);
     }
     mItem = NULL;
     gInventory.addObserver(mInventoryObserver);
