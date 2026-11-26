@@ -3419,6 +3419,11 @@ void process_chat_from_simulator(LLMessageSystem *msg, void **user_data)
         {
             FSRadar::getInstance()->onOwnNearbyChat(mesg);
         }
+        // A tip jar announcing a tip
+        if (chat.mSourceType == CHAT_SOURCE_OBJECT)
+        {
+            FSRadar::getInstance()->onObjectMessage(mesg, chat.mFromName);
+        }
         // </FS:Luna Witch>
 
         LLTranslate::instance().logCharsSeen(mesg.size());

@@ -182,6 +182,15 @@
 		 parameter="FSRadarColorNamesByDistance"/>
 	</menu_item_check>
 	<menu_item_check
+	 label="Highlight people who arrive after me"
+	 name="radarHighlightArrivals">
+		<menu_item_check.on_check
+		 control="FSRadarHighlightArrivals"/>
+		<menu_item_check.on_click
+		 function="ToggleControl"
+		 parameter="FSRadarHighlightArrivals"/>
+	</menu_item_check>
+	<menu_item_check
 	 label="Tick people I welcome in chat"
 	 name="radarTickWelcomed">
 		<menu_item_check.on_check
@@ -190,6 +199,22 @@
 		 function="ToggleControl"
 		 parameter="FSRadarTickWelcomed"/>
 	</menu_item_check>
+	<menu_item_check
+	 label="Track those who have tipped"
+	 name="radarTrackTippers">
+		<menu_item_check.on_check
+		 control="FSRadarTrackTippers"/>
+		<menu_item_check.on_click
+		 function="ToggleControl"
+		 parameter="FSRadarTrackTippers"/>
+	</menu_item_check>
+	<menu_item_call
+	 label="Greetings..."
+	 name="radarGreetings">
+		<menu_item_call.on_click
+		 function="Floater.Show"
+		 parameter="fs_greetings"/>
+	</menu_item_call>
 	<menu_item_separator layout="topleft"/>
 	<context_menu
 	 label="Report To"
