@@ -39,6 +39,8 @@
 #include "llnotificationsutil.h"
 #include "lleventtimer.h"
 #include "llparcel.h"
+#include "llsdserialize.h"
+#include "llsdutil.h"
 
 // newview
 #include "fsassetblacklist.h"
@@ -71,6 +73,11 @@ namespace
     // People within chat range this soon after we arrive were already there
     // and are not shown as needing a greeting.
     constexpr F64 ARRIVAL_SETTLE_SECONDS = 30.0;
+
+    // The saved greeting state is written when it changes, and at least this
+    // often while it holds anything, so its time says when the viewer closed.
+    constexpr F64 GREETING_STATE_SAVE_SECONDS = 60.0;
+    const char* const GREETING_STATE_FILE = "greeting_state.xml";
 
     std::string cleanField(std::string_view text)
     {
@@ -321,6 +328,11 @@ void FSRadar::updateRadarList()
     }
     bool alertScripts = mRadarAlertRequest; // save the current value, so it doesn't get changed out from under us by another thread
     time_t now = time(nullptr);
+
+    if (!mGreetingStateLoaded && !gDirUtilp->getLindenUserDir().empty())
+    {
+        loadGreetingState();
+    }
 
     // We arrive somewhere when we log in, change region or teleport. Until things
     // settle, whoever is within chat range was already there.
@@ -918,6 +930,12 @@ void FSRadar::updateRadarList()
         }
     }
 
+    if (mGreetingStateLoaded && (mGreetingStateDirty
+        || ((!mGreetedAvatars.empty() || !mArrivedAvatars.empty()) && difftime(now, mGreetingStateSaved) > GREETING_STATE_SAVE_SECONDS)))
+    {
+        saveGreetingState();
+    }
+
     mLastRadarSweep.clear();
     for (const auto& [avid, entry] : mEntryList)
     {
@@ -990,6 +1008,7 @@ void FSRadar::setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand)
     {
         logGreetingAbout(greeted ? "ticked by hand" : "unticked by hand", avatar_id);
     }
+    greetingStateChanged();
     refreshSoon();
 }
 
@@ -1165,8 +1184,91 @@ void FSRadar::updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range,
     {
         return;
     }
+    greetingStateChanged();
     logGreetingAbout(isGreeted(avatar_id) ? "came into chat range, already ticked" : "came into chat range", avatar_id,
         llformat("%.1f m", range));
+}
+
+void FSRadar::loadGreetingState()
+{
+    mGreetingStateLoaded = true;
+    mGreetingStateSaved = time(nullptr);
+
+    static LLCachedControl<F32> sMemoryHours(gSavedSettings, "FSRadarGreetingMemoryHours");
+    const std::string file = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, GREETING_STATE_FILE);
+    if (sMemoryHours <= 0.f || !LLFile::isfile(file))
+    {
+        return;
+    }
+
+    LLSD state;
+    llifstream in(file.c_str(), std::ios::in | std::ios::binary);
+    if (!in.is_open() || LLSDSerialize::fromXML(state, in) == LLSDParser::PARSE_FAILURE || !state.isMap())
+    {
+        return;
+    }
+
+    const F64 age = LLDate::now().secondsSinceEpoch() - state["saved"].asDate().secondsSinceEpoch();
+    if (age < 0.0 || age > (F64)sMemoryHours * 3600.0)
+    {
+        logGreeting("earlier marks forgotten", LLUUID::null, {}, llformat("saved %.1f hours ago", age / 3600.0));
+        return;
+    }
+
+    for (const LLSD& id : llsd::inArray(state["greeted"]))
+    {
+        mGreetedAvatars.insert(id.asUUID());
+    }
+    for (const LLSD& id : llsd::inArray(state["arrived"]))
+    {
+        mArrivedAvatars.insert(id.asUUID());
+    }
+    logGreeting("earlier marks brought back", LLUUID::null, {}, llformat("saved %.1f hours ago; %d ticked, %d arrivals",
+        age / 3600.0, (S32)mGreetedAvatars.size(), (S32)mArrivedAvatars.size()));
+    refreshSoon();
+}
+
+void FSRadar::saveGreetingState()
+{
+    mGreetingStateDirty = false;
+    mGreetingStateSaved = time(nullptr);
+
+    static LLCachedControl<F32> sMemoryHours(gSavedSettings, "FSRadarGreetingMemoryHours");
+    if (sMemoryHours <= 0.f || gDirUtilp->getLindenUserDir().empty())
+    {
+        return;
+    }
+
+    LLSD state;
+    state["saved"] = LLDate::now();
+    LLSD& greeted = state["greeted"] = LLSD::emptyArray();
+    for (const LLUUID& id : mGreetedAvatars)
+    {
+        greeted.append(id);
+    }
+    LLSD& arrived = state["arrived"] = LLSD::emptyArray();
+    for (const LLUUID& id : mArrivedAvatars)
+    {
+        arrived.append(id);
+    }
+
+    const std::string file = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, GREETING_STATE_FILE);
+    const std::string temp = file + ".tmp";
+    {
+        llofstream out(temp.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+        if (!out.is_open())
+        {
+            LL_WARNS("FSRadar") << "Cannot write " << temp << LL_ENDL;
+            return;
+        }
+        LLSDSerialize::toPrettyXML(state, out);
+    }
+    if (LLFile::rename(temp, file, ENOENT) != 0)
+    {
+        // Windows doesn't replace a file that exists
+        LLFile::remove(file, ENOENT);
+        LLFile::rename(temp, file);
+    }
 }
 
 // The list is rebuilt about once a second. After a tick it is rebuilt at once,
