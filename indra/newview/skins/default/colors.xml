@@ -444,6 +444,9 @@
      name="RadarNeedsGreetingColor"
      value="0 1 1 1" />
     <color
+     name="RadarAwaitingThanksColor"
+     value="0 1 0 1" />
+    <color
      name="BackgroundChatColor"
      reference="DkGray" />
     <color

@@ -217,6 +217,7 @@
 #include "fsfloatersplashscreensettings.h"
 #include "fsfloaterstatistics.h"
 #include "fsfloaterstreamtitle.h"
+#include "fsfloatergreetings.h" // <FS:Luna Witch/>
 #include "fsfloaterteleporthistory.h"
 #include "fsfloatervoicecontrols.h"
 #include "fsfloatervolumecontrols.h"
@@ -479,6 +480,7 @@ void LLViewerFloaterReg::registerFloaters()
     //LLFloaterReg::add("im_container", "floater_im_container.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLFloaterIMContainer>);
     LLFloaterReg::add("fs_impanel", "floater_fs_im_session.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterIM>);
     LLFloaterReg::add("fs_im_container", "floater_fs_im_container.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterIMContainer>);
+    LLFloaterReg::add("fs_greetings", "floater_fs_greetings.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<FSFloaterGreetings>); // <FS:Luna Witch/>
     // <FS:Ansariel> [FS communication UI]
     LLFloaterReg::add("im_well_window", "floater_sys_well.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLIMWellWindow>);
     LLFloaterReg::add("incoming_call", "floater_incoming_call.xml", (LLFloaterBuildFunc)&LLFloaterReg::build<LLIncomingCallDialog>);

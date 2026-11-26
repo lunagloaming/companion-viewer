@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<floater
+ name="fs_greetings"
+ title="Greetings"
+ can_resize="true"
+ height="470"
+ width="470"
+ min_width="380"
+ min_height="400"
+ layout="topleft"
+ save_rect="true"
+ single_instance="true">
+	<string name="bad_patterns">These patterns aren't valid regular expressions and are left out:
+[ERRORS]</string>
+	<string name="not_a_welcome">Not a welcome.</string>
+	<string name="welcome_no_names">A welcome, but no names to look for.</string>
+	<string name="welcome_names">A welcome. Words looked for in the names of nearby people: [NAMES]</string>
+	<string name="not_a_tip">Not a tip.</string>
+	<string name="tip_from">A tip from "[NAME]". It counts if exactly one person nearby has that name.</string>
+	<string name="not_thanks">Not a thanks.</string>
+	<string name="thanks_no_names">A thanks, but no names to look for.</string>
+	<string name="thanks_names">A thanks. Words looked for in the names of tippers waiting for thanks: [NAMES]</string>
+	<tab_container
+	 follows="all"
+	 layout="topleft"
+	 left="1"
+	 right="-1"
+	 top="2"
+	 bottom="-1"
+	 name="greetings_tabs"
+	 tab_position="top"
+	 tab_height="20"
+	 tab_min_width="80">
+		<panel
+		 border="true"
+		 follows="all"
+		 layout="topleft"
+		 label="Welcome"
+		 name="welcome_panel">
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top="8"
+			 height="44"
+			 wrap="true"
+			 name="welcome_help">
+A line you say in nearby chat is a welcome when one of these patterns matches it. Nearby people named in the rest of the line are ticked as greeted. One regular expression per line; case is ignored.
+			</text>
+			<text_editor
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="4"
+			 height="90"
+			 max_length="4096"
+			 word_wrap="false"
+			 name="welcome_patterns" />
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="8"
+			 height="30"
+			 wrap="true"
+			 name="not_welcome_help">
+Never a welcome: parts of a line these patterns match are left out first, such as "you're welcome".
+			</text>
+			<text_editor
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="4"
+			 height="60"
+			 max_length="4096"
+			 word_wrap="false"
+			 name="not_welcome_patterns" />
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="6"
+			 height="44"
+			 wrap="true"
+			 text_color="Red"
+			 name="welcome_errors" />
+			<text
+			 follows="left|top"
+			 layout="topleft"
+			 left="10"
+			 top_pad="6"
+			 height="16"
+			 width="200"
+			 name="welcome_test_label">
+Try a line:
+			</text>
+			<line_editor
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="2"
+			 height="22"
+			 max_length_bytes="1023"
+			 name="welcome_test" />
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="4"
+			 height="44"
+			 wrap="true"
+			 name="welcome_result" />
+		</panel>
+		<panel
+		 border="true"
+		 follows="all"
+		 layout="topleft"
+		 label="Tips"
+		 name="tip_panel">
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top="8"
+			 height="74"
+			 wrap="true"
+			 name="tip_help">
+A tip jar's chat or IM is a tip when one of these patterns matches it. The first capture group, in brackets, is the tipper's name written out in full: a display name, First Last or a user name. The tipper is marked with a T, unticked and shown in green until thanked. One regular expression per line; case is ignored.
+			</text>
+			<text_editor
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="4"
+			 height="150"
+			 max_length="4096"
+			 word_wrap="false"
+			 name="tip_patterns" />
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="6"
+			 height="44"
+			 wrap="true"
+			 text_color="Red"
+			 name="tip_errors" />
+			<text
+			 follows="left|top"
+			 layout="topleft"
+			 left="10"
+			 top_pad="6"
+			 height="16"
+			 width="200"
+			 name="tip_test_label">
+Try a line:
+			</text>
+			<line_editor
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="2"
+			 height="22"
+			 max_length_bytes="1023"
+			 name="tip_test" />
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="4"
+			 height="44"
+			 wrap="true"
+			 name="tip_result" />
+		</panel>
+		<panel
+		 border="true"
+		 follows="all"
+		 layout="topleft"
+		 label="Thanks"
+		 name="thanks_panel">
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top="8"
+			 height="74"
+			 wrap="true"
+			 name="thanks_help">
+A line you say in nearby chat is a thanks when one of these patterns matches it. Tippers waiting for thanks who are named in the rest of the line are marked thanked and ticked as greeted again. One regular expression per line; case is ignored.
+			</text>
+			<text_editor
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="4"
+			 height="150"
+			 max_length="4096"
+			 word_wrap="false"
+			 name="thanks_patterns" />
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="6"
+			 height="44"
+			 wrap="true"
+			 text_color="Red"
+			 name="thanks_errors" />
+			<text
+			 follows="left|top"
+			 layout="topleft"
+			 left="10"
+			 top_pad="6"
+			 height="16"
+			 width="200"
+			 name="thanks_test_label">
+Try a line:
+			</text>
+			<line_editor
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="2"
+			 height="22"
+			 max_length_bytes="1023"
+			 name="thanks_test" />
+			<text
+			 follows="left|top|right"
+			 layout="topleft"
+			 left="10"
+			 right="-10"
+			 top_pad="4"
+			 height="44"
+			 wrap="true"
+			 name="thanks_result" />
+		</panel>
+	</tab_container>
+</floater>

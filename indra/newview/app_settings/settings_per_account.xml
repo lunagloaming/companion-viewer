@@ -1563,5 +1563,59 @@
             <key>Value</key>
             <map/>
         </map>
+     <key>FSGreetingWelcomePatterns</key>
+        <map>
+        <key>Comment</key>
+            <string>Regular expressions that make a line you say in nearby chat a welcome (case ignored). The names of nearby people in the rest of the line are ticked on the nearby people list. Edited in the Greetings floater.</string>
+        <key>Persist</key>
+            <integer>1</integer>
+        <key>Type</key>
+            <string>LLSD</string>
+        <key>Value</key>
+            <array>
+                <string>\bwelcome\b</string>
+            </array>
+        </map>
+     <key>FSGreetingNotWelcomePatterns</key>
+        <map>
+        <key>Comment</key>
+            <string>Regular expressions for parts of a line that are never a welcome, such as "you're welcome" (case ignored). They are left out before the welcome patterns are tried. Edited in the Greetings floater.</string>
+        <key>Persist</key>
+            <integer>1</integer>
+        <key>Type</key>
+            <string>LLSD</string>
+        <key>Value</key>
+            <array>
+                <string>\b(you(’|')?re|your|ur|yer|you\s+are)\s+(very\s+|so\s+|most\s+|more\s+than\s+)?welcome\b</string>
+            </array>
+        </map>
+     <key>FSGreetingTipPatterns</key>
+        <map>
+        <key>Comment</key>
+            <string>Regular expressions for a tip jar's chat or IM announcing a tip (case ignored). The first capture group is the tipper's name, written out in full (display name, "First Last" or user name). Edited in the Greetings floater.</string>
+        <key>Persist</key>
+            <integer>1</integer>
+        <key>Type</key>
+            <string>LLSD</string>
+        <key>Value</key>
+            <array>
+                <string>^(?:thanks?(?:\s+you)?(?:\s+so\s+much)?[,!.]*\s+)?(.+?)\s+(?:has\s+)?(?:just\s+)?(?:tipped|donated)\b</string>
+                <string>\bthank(?:s|\s+you)(?:\s+so\s+much)?[,!.]*\s+(.+?)[,!.]*\s+for\s+(?:the|your)\s+(?:L\$\s*\d+\s+)?(?:tip|donation)\b</string>
+                <string>\b(?:tip|donation)\s+(?:of\s+)?(?:L\$\s*)?\d+\s+from\s+(.+?)[.!]*$</string>
+            </array>
+        </map>
+     <key>FSGreetingThanksPatterns</key>
+        <map>
+        <key>Comment</key>
+            <string>Regular expressions that make a line you say in nearby chat a thanks (case ignored). Tippers waiting for thanks who are named in the rest of the line are marked thanked, and ticked as greeted again. Edited in the Greetings floater.</string>
+        <key>Persist</key>
+            <integer>1</integer>
+        <key>Type</key>
+            <string>LLSD</string>
+        <key>Value</key>
+            <array>
+                <string>\b(thanks|thank\s+you|thank\s+u|thx|thnx|ty|tyvm|tysm)\b</string>
+            </array>
+        </map>
     </map>
 </llsd>

@@ -39,11 +39,14 @@
 #include "llnotificationsutil.h"
 #include "lleventtimer.h"
 #include "llparcel.h"
+#include "llsdserialize.h"
+#include "llsdutil.h"
 
 // newview
 #include "fsassetblacklist.h"
 #include "fscommon.h"
 #include "fsgreetingnames.h"
+#include "fsgreetingpatterns.h"
 #include "fskeywords.h"
 #include "fslslbridge.h"
 #include "fslslbridgerequest.h"
@@ -71,6 +74,11 @@ namespace
     // People within chat range this soon after we arrive were already there
     // and are not shown as needing a greeting.
     constexpr F64 ARRIVAL_SETTLE_SECONDS = 30.0;
+
+    // The saved greeting state is written when it changes, and at least this
+    // often while it holds anything, so its time says when the viewer closed.
+    constexpr F64 GREETING_STATE_SAVE_SECONDS = 60.0;
+    const char* const GREETING_STATE_FILE = "greeting_state.xml";
 
     std::string cleanField(std::string_view text)
     {
@@ -321,6 +329,11 @@ void FSRadar::updateRadarList()
     }
     bool alertScripts = mRadarAlertRequest; // save the current value, so it doesn't get changed out from under us by another thread
     time_t now = time(nullptr);
+
+    if (!mGreetingStateLoaded && !gDirUtilp->getLindenUserDir().empty())
+    {
+        loadGreetingState();
+    }
 
     // We arrive somewhere when we log in, change region or teleport. Until things
     // settle, whoever is within chat range was already there.
@@ -638,6 +651,7 @@ void FSRadar::updateRadarList()
         entry["in_region"] = isInSameRegion;
         entry["on_parcel"] = isOnSameParcel;
         entry["flags"] = avFlag;
+        entry["tipper"] = tracksTippers() && isTipper(avId);
         entry["seen"] = avSeenStr;
         entry["range"] = (avRange > AVATAR_UNKNOWN_RANGE ? llformat("%3.2f", avRange) : llformat(">%3.2f", drawRadius));
         entry["typing"] = (avVo && avVo->isTyping());
@@ -725,7 +739,11 @@ void FSRadar::updateRadarList()
 
         contactsets->hasFriendColorThatShouldShow(avId, ContactSetType::RADAR, name_color);
 
-        if (needsGreeting(avId))
+        if (tracksTippers() && awaitsThanks(avId))
+        {
+            name_color = colortable.getColor("RadarAwaitingThanksColor", LLColor4::green).get();
+        }
+        else if (highlightsArrival(avId))
         {
             name_color = colortable.getColor("RadarNeedsGreetingColor", LLColor4::cyan).get();
         }
@@ -918,6 +936,13 @@ void FSRadar::updateRadarList()
         }
     }
 
+    if (mGreetingStateLoaded && (mGreetingStateDirty
+        || ((!mGreetedAvatars.empty() || !mArrivedAvatars.empty() || !mTippers.empty())
+            && difftime(now, mGreetingStateSaved) > GREETING_STATE_SAVE_SECONDS)))
+    {
+        saveGreetingState();
+    }
+
     mLastRadarSweep.clear();
     for (const auto& [avid, entry] : mEntryList)
     {
@@ -990,16 +1015,25 @@ void FSRadar::setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand)
     {
         logGreetingAbout(greeted ? "ticked by hand" : "unticked by hand", avatar_id);
     }
+    greetingStateChanged();
     refreshSoon();
 }
 
 void FSRadar::onOwnNearbyChat(std::string_view text)
 {
-    const std::vector<LLWString> words = FSGreetingNames::chatWords(text);
-    if (!FSGreetingNames::isWelcome(words))
+    onOwnThanks(std::string(text));
+
+    // A welcome is a line one of the welcome patterns matches, once the parts that are never a welcome
+    // ("you're welcome") are left out. The names are looked for in what neither matched.
+    std::string rest = FSGreetingPatterns::blank(std::string(text),
+        FSGreetingPatterns::findAll(FSGreetingPatterns::get("FSGreetingNotWelcomePatterns"), std::string(text)));
+    const std::vector<FSGreetingPatterns::Span> welcome = FSGreetingPatterns::findAll(FSGreetingPatterns::get("FSGreetingWelcomePatterns"), rest);
+    if (welcome.empty())
     {
         return;
     }
+    rest = FSGreetingPatterns::blank(rest, welcome);
+    const std::vector<LLWString> words = FSGreetingNames::chatWords(rest);
 
     static LLCachedControl<bool> sTickWelcomed(gSavedSettings, "FSRadarTickWelcomed");
     if (!sTickWelcomed)
@@ -1165,8 +1199,283 @@ void FSRadar::updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range,
     {
         return;
     }
+    greetingStateChanged();
     logGreetingAbout(isGreeted(avatar_id) ? "came into chat range, already ticked" : "came into chat range", avatar_id,
         llformat("%.1f m", range));
+}
+
+bool FSRadar::tracksTippers() const
+{
+    static LLCachedControl<bool> sTrackTippers(gSavedSettings, "FSRadarTrackTippers");
+    return sTrackTippers;
+}
+
+bool FSRadar::isHighlighted(const LLUUID& avatar_id) const
+{
+    return highlightsArrival(avatar_id) || (tracksTippers() && awaitsThanks(avatar_id));
+}
+
+LLUUID FSRadar::findNamed(const std::string& name, std::string* complete_name) const
+{
+    static const LLWString resident = utf8str_to_wstring("resident");
+    const std::vector<LLWString> wanted = FSGreetingNames::chatWords(name);
+    if (wanted.empty())
+    {
+        return LLUUID::null;
+    }
+    LLUUID found;
+    for (const auto& [id, entry] : mEntryList)
+    {
+        LLAvatarName av_name;
+        if (!LLAvatarNameCache::get(id, &av_name))
+        {
+            continue;
+        }
+        std::string account = av_name.getAccountName();
+        LLStringUtil::replaceChar(account, '.', ' ');
+        bool match = false;
+        for (const std::string& form : { av_name.getDisplayName(true), av_name.getUserName(), account })
+        {
+            std::vector<LLWString> words = FSGreetingNames::chatWords(form);
+            if (words.size() > 1 && words.back() == resident)
+            {
+                words.pop_back();
+            }
+            match = match || words == wanted;
+        }
+        if (!match)
+        {
+            continue;
+        }
+        if (found.notNull())
+        {
+            return LLUUID::null; // more than one
+        }
+        found = id;
+        if (complete_name)
+        {
+            *complete_name = av_name.getCompleteName();
+        }
+    }
+    return found;
+}
+
+void FSRadar::markTipped(const LLUUID& avatar_id)
+{
+    mTippers.insert(avatar_id);
+    mAwaitingThanks.insert(avatar_id);
+    mGreetedAvatars.erase(avatar_id);
+    greetingStateChanged();
+    refreshSoon();
+}
+
+void FSRadar::setTipper(const LLUUID& avatar_id, bool tipper)
+{
+    if (tipper)
+    {
+        markTipped(avatar_id);
+        logGreetingAbout("marked as tipper by hand", avatar_id);
+        return;
+    }
+    if (mTippers.erase(avatar_id) + mAwaitingThanks.erase(avatar_id) > 0)
+    {
+        logGreetingAbout("unmarked as tipper by hand", avatar_id);
+        greetingStateChanged();
+        refreshSoon();
+    }
+}
+
+void FSRadar::onObjectMessage(std::string_view text, std::string_view object_name)
+{
+    if (!tracksTippers())
+    {
+        return;
+    }
+    const std::string line(text);
+    std::string tipper;
+    if (!FSGreetingPatterns::findFirst(FSGreetingPatterns::get("FSGreetingTipPatterns"), line, &tipper))
+    {
+        return;
+    }
+    LLStringUtil::trim(tipper);
+    std::string complete_name;
+    const LLUUID id = findNamed(tipper, &complete_name);
+    if (id.isNull())
+    {
+        logGreeting("tip, but the tipper isn't one person nearby", LLUUID::null, {},
+            llformat("%s: \"%s\"; tipper \"%s\"", std::string(object_name).c_str(), line.c_str(), tipper.c_str()));
+        return;
+    }
+    logGreeting(awaitsThanks(id) ? "tipped again" : "tipped", id, complete_name,
+        llformat("%s: \"%s\"", std::string(object_name).c_str(), line.c_str()));
+    markTipped(id);
+}
+
+void FSRadar::onOwnThanks(const std::string& line)
+{
+    if (!tracksTippers() || mAwaitingThanks.empty())
+    {
+        return;
+    }
+    const std::vector<FSGreetingPatterns::Span> thanks = FSGreetingPatterns::findAll(FSGreetingPatterns::get("FSGreetingThanksPatterns"), line);
+    if (thanks.empty())
+    {
+        return;
+    }
+
+    // Only tippers waiting for thanks can be thanked: a whole word of their name, or the start of one (three letters at least)
+    struct Candidate
+    {
+        LLUUID mID;
+        std::string mName;
+        std::vector<LLWString> mKeys;
+    };
+    std::vector<Candidate> candidates;
+    for (const LLUUID& id : mAwaitingThanks)
+    {
+        LLAvatarName av_name;
+        if (LLAvatarNameCache::get(id, &av_name))
+        {
+            candidates.push_back({ id, av_name.getCompleteName(), FSGreetingNames::nameKeys(av_name.getDisplayName(true), av_name.getAccountName()) });
+        }
+    }
+
+    std::unordered_set<LLUUID> thanked;
+    for (const LLWString& word : FSGreetingNames::chatWords(FSGreetingPatterns::blank(line, thanks)))
+    {
+        if (FSGreetingNames::isFillerWord(word))
+        {
+            continue;
+        }
+        std::vector<const Candidate*> whole;
+        std::vector<const Candidate*> start;
+        for (const Candidate& candidate : candidates)
+        {
+            if (std::find(candidate.mKeys.begin(), candidate.mKeys.end(), word) != candidate.mKeys.end())
+            {
+                whole.push_back(&candidate);
+            }
+            else if (word.size() >= 3 && std::any_of(candidate.mKeys.begin(), candidate.mKeys.end(),
+                                                     [&](const LLWString& key) { return key.starts_with(word); }))
+            {
+                start.push_back(&candidate);
+            }
+        }
+        const std::vector<const Candidate*>& matches = whole.empty() ? start : whole;
+        if (matches.size() == 1 && thanked.insert(matches.front()->mID).second)
+        {
+            const Candidate& candidate = *matches.front();
+            mAwaitingThanks.erase(candidate.mID);
+            setGreeted(candidate.mID, true, false);
+            logGreeting("thanked", candidate.mID, candidate.mName, llformat("\"%s\"", line.c_str()));
+        }
+    }
+}
+
+bool FSRadar::highlightsArrival(const LLUUID& avatar_id) const
+{
+    static LLCachedControl<bool> sHighlightArrivals(gSavedSettings, "FSRadarHighlightArrivals");
+    return sHighlightArrivals && needsGreeting(avatar_id);
+}
+
+void FSRadar::loadGreetingState()
+{
+    mGreetingStateLoaded = true;
+    mGreetingStateSaved = time(nullptr);
+
+    static LLCachedControl<F32> sMemoryHours(gSavedSettings, "FSRadarGreetingMemoryHours");
+    const std::string file = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, GREETING_STATE_FILE);
+    if (sMemoryHours <= 0.f || !LLFile::isfile(file))
+    {
+        return;
+    }
+
+    LLSD state;
+    llifstream in(file.c_str(), std::ios::in | std::ios::binary);
+    if (!in.is_open() || LLSDSerialize::fromXML(state, in) == LLSDParser::PARSE_FAILURE || !state.isMap())
+    {
+        return;
+    }
+
+    const F64 age = LLDate::now().secondsSinceEpoch() - state["saved"].asDate().secondsSinceEpoch();
+    if (age < 0.0 || age > (F64)sMemoryHours * 3600.0)
+    {
+        logGreeting("earlier marks forgotten", LLUUID::null, {}, llformat("saved %.1f hours ago", age / 3600.0));
+        return;
+    }
+
+    for (const LLSD& id : llsd::inArray(state["greeted"]))
+    {
+        mGreetedAvatars.insert(id.asUUID());
+    }
+    for (const LLSD& id : llsd::inArray(state["arrived"]))
+    {
+        mArrivedAvatars.insert(id.asUUID());
+    }
+    for (const LLSD& id : llsd::inArray(state["tippers"]))
+    {
+        mTippers.insert(id.asUUID());
+    }
+    for (const LLSD& id : llsd::inArray(state["awaiting_thanks"]))
+    {
+        mAwaitingThanks.insert(id.asUUID());
+    }
+    logGreeting("earlier marks brought back", LLUUID::null, {}, llformat("saved %.1f hours ago; %d ticked, %d arrivals, %d tippers",
+        age / 3600.0, (S32)mGreetedAvatars.size(), (S32)mArrivedAvatars.size(), (S32)mTippers.size()));
+    refreshSoon();
+}
+
+void FSRadar::saveGreetingState()
+{
+    mGreetingStateDirty = false;
+    mGreetingStateSaved = time(nullptr);
+
+    static LLCachedControl<F32> sMemoryHours(gSavedSettings, "FSRadarGreetingMemoryHours");
+    if (sMemoryHours <= 0.f || gDirUtilp->getLindenUserDir().empty())
+    {
+        return;
+    }
+
+    LLSD state;
+    state["saved"] = LLDate::now();
+    LLSD& greeted = state["greeted"] = LLSD::emptyArray();
+    for (const LLUUID& id : mGreetedAvatars)
+    {
+        greeted.append(id);
+    }
+    LLSD& arrived = state["arrived"] = LLSD::emptyArray();
+    for (const LLUUID& id : mArrivedAvatars)
+    {
+        arrived.append(id);
+    }
+    LLSD& tippers = state["tippers"] = LLSD::emptyArray();
+    for (const LLUUID& id : mTippers)
+    {
+        tippers.append(id);
+    }
+    LLSD& awaiting = state["awaiting_thanks"] = LLSD::emptyArray();
+    for (const LLUUID& id : mAwaitingThanks)
+    {
+        awaiting.append(id);
+    }
+
+    const std::string file = gDirUtilp->getExpandedFilename(LL_PATH_PER_SL_ACCOUNT, GREETING_STATE_FILE);
+    const std::string temp = file + ".tmp";
+    {
+        llofstream out(temp.c_str(), std::ios::out | std::ios::binary | std::ios::trunc);
+        if (!out.is_open())
+        {
+            LL_WARNS("FSRadar") << "Cannot write " << temp << LL_ENDL;
+            return;
+        }
+        LLSDSerialize::toPrettyXML(state, out);
+    }
+    if (LLFile::rename(temp, file, ENOENT) != 0)
+    {
+        // Windows doesn't replace a file that exists
+        LLFile::remove(file, ENOENT);
+        LLFile::rename(temp, file);
+    }
 }
 
 // The list is rebuilt about once a second. After a tick it is rebuilt at once,

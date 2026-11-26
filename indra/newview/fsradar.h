@@ -83,18 +83,34 @@ public:
     void getCurrentData(std::vector<LLSD>& entries, LLSD& stats) const { entries = mRadarEntriesData; stats = mAvatarStats; }
     std::shared_ptr<FSRadarEntry> getEntry(const LLUUID& avatar_id);
 
-    // Greeted marks are a personal checklist for this session only. They are
-    // kept apart from the radar entries so leaving range and coming back
-    // keeps the mark, and they are never saved.
+    // Greeted marks are a personal checklist. They are kept apart from the
+    // radar entries so leaving range and coming back keeps the mark, and saved
+    // in the account's folder: logging back in within FSRadarGreetingMemoryHours
+    // of closing the viewer brings them back.
     bool isGreeted(const LLUUID& avatar_id) const { return mGreetedAvatars.contains(avatar_id); }
     void setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand = true);
 
     // Someone who came within chat range after we arrived and isn't ticked yet.
     // They are shown in their own colour at the top of the list.
     bool needsGreeting(const LLUUID& avatar_id) const { return mArrivedAvatars.contains(avatar_id) && !isGreeted(avatar_id); }
+    // Shown so: needs a greeting, and arrivals are highlighted (FSRadarHighlightArrivals).
+    bool highlightsArrival(const LLUUID& avatar_id) const;
 
-    // Ticks the people a "welcome" in our own nearby chat names.
+    // Ticks the people a "welcome" in our own nearby chat names, and marks the
+    // tippers our thanks name as thanked.
     void onOwnNearbyChat(std::string_view text);
+
+    // Tips (FSRadarTrackTippers): someone a tip jar names (FSGreetingTipPatterns), or
+    // marked by hand, is a tipper, shown with a T in the flags column, for as long as
+    // greeted marks are kept. A new tip unticks them and shows them in green at the
+    // top of the list until they are thanked in nearby chat (FSGreetingThanksPatterns).
+    bool isTipper(const LLUUID& avatar_id) const { return mTippers.contains(avatar_id); }
+    bool awaitsThanks(const LLUUID& avatar_id) const { return mAwaitingThanks.contains(avatar_id); }
+    void setTipper(const LLUUID& avatar_id, bool tipper);
+    // Chat or an IM from an object: a tip jar may be announcing a tip
+    void onObjectMessage(std::string_view text, std::string_view object_name);
+    // Shown in their own colour at the top of the list: arrivals waiting for a greeting, tippers waiting for thanks
+    bool isHighlighted(const LLUUID& avatar_id) const;
 
     // internals
     class Updater
@@ -137,6 +153,17 @@ private:
     void updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range, time_t now);
     void refreshSoon();
 
+    // greeting_state.xml in the account's folder
+    void loadGreetingState();
+    void saveGreetingState();
+    void greetingStateChanged() { mGreetingStateDirty = true; }
+
+    void markTipped(const LLUUID& avatar_id);
+    void onOwnThanks(const std::string& line);
+    bool tracksTippers() const;
+    // The one nearby person a name written out in full is ("Bella Lark", "bella.lark" or a display name), or null
+    LLUUID findNamed(const std::string& name, std::string* complete_name) const;
+
     std::unique_ptr<Updater> mRadarListUpdater;
 
     struct RadarFields
@@ -164,10 +191,15 @@ private:
     std::unordered_set<LLUUID> mGreetedAvatars;
     std::unordered_set<LLUUID> mArrivedAvatars;     // came within chat range after we arrived
     std::unordered_set<LLUUID> mAlreadyHere;        // within chat range when we arrived
+    std::unordered_set<LLUUID> mTippers;
+    std::unordered_set<LLUUID> mAwaitingThanks;
     LLUUID                  mArrivalRegion;
     time_t                  mArrivalTime{ 0 };
     bool                    mArrivalLogged{ true };
     bool                    mRefreshQueued{ false };
+    bool                    mGreetingStateLoaded{ false };
+    bool                    mGreetingStateDirty{ false };
+    time_t                  mGreetingStateSaved{ 0 };
     LLSD                    mAvatarStats;
 
     radar_update_callback_t mUpdateSignal;
