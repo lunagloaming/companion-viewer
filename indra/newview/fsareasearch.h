@@ -110,6 +110,7 @@ public:
     bool postBuild() override;
     void draw() override;
     void onOpen(const LLSD& key) override;
+    void onClose(bool app_quitting) override; // <FS:Luna Witch/>
 
     void avatarNameCacheCallback(const LLUUID& id, const LLAvatarName& av_name);
     void callbackLoadFullName(const LLUUID& id, const std::string& full_name);
@@ -168,6 +169,11 @@ public:
 
     void applySlappParams(const LLSD& params);
     std::string buildSlappLink() const;
+    // <FS:Luna Witch> The search, as SLapp parameters: kept from closing to opening again for the rest of the session
+    LLSD collectSlappParams() const;
+    static LLSD sSessionSearch;
+    bool mSearched = false;
+    // </FS:Luna Witch>
     void onCopySlappLink();
 
     bool isActive() const { return mActive; }

@@ -217,6 +217,10 @@ bool FSAreaSearch::postBuild()
     return LLFloater::postBuild();
 }
 
+// <FS:Luna Witch> The last search, kept for the rest of the session
+LLSD FSAreaSearch::sSessionSearch;
+// </FS:Luna Witch>
+
 void FSAreaSearch::onOpen(const LLSD& key)
 {
     if (key.isMap() && key.size() > 0)
@@ -224,8 +228,27 @@ void FSAreaSearch::onOpen(const LLSD& key)
         applySlappParams(key);
         return;
     }
+    // <FS:Luna Witch> Opened again: the last search is set up and run again, on the List tab
+    if (sSessionSearch.isMap())
+    {
+        applySlappParams(sSessionSearch);
+        return;
+    }
+    // </FS:Luna Witch>
     mTab->selectTab(1);
 }
+
+// <FS:Luna Witch>
+void FSAreaSearch::onClose(bool app_quitting)
+{
+    if (mSearched && !app_quitting)
+    {
+        onCommitLine(); // what was typed since the last search
+        sSessionSearch = collectSlappParams();
+    }
+    LLFloater::onClose(app_quitting);
+}
+// </FS:Luna Witch>
 
 namespace
 {
@@ -329,12 +352,25 @@ std::string FSAreaSearch::buildSlappLink() const
     std::ostringstream url;
     url << "secondlife:///app/openfloater/area_search";
     bool first = true;
-    auto add = [&](const char* k, const std::string& v)
+    // <FS:Luna Witch> The parameters are collected for the session too
+    const LLSD params = collectSlappParams();
+    for (LLSD::map_const_iterator it = params.beginMap(); it != params.endMap(); ++it)
     {
         url << (first ? '?' : '&');
         first = false;
-        url << k << '=' << LLURI::escape(v);
+        url << it->first << '=' << LLURI::escape(it->second.asString());
+    }
+    return url.str();
+}
+
+LLSD FSAreaSearch::collectSlappParams() const
+{
+    LLSD params = LLSD::emptyMap();
+    auto add = [&](const char* k, const std::string& v)
+    {
+        params[k] = v;
     };
+    // </FS:Luna Witch>
 
     for (const auto& t : sTextFields)
     {
@@ -384,7 +420,7 @@ std::string FSAreaSearch::buildSlappLink() const
         add("ca", CLICK_ACTION_NAMES[mFilterClickActionType]);
     }
 
-    return url.str();
+    return params; // <FS:Luna Witch/>
 }
 
 void FSAreaSearch::onCopySlappLink()
@@ -1496,6 +1532,7 @@ void FSAreaSearch::onButtonClickedSearch()
     // calling this will make sure to update any blanked out lines.
     onCommitLine();
 
+    mSearched = true; // <FS:Luna Witch/>
     mTab->selectFirstTab();
     refreshList(false);
 }
