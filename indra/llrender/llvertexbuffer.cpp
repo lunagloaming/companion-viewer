@@ -1126,6 +1126,7 @@ void LLVertexBuffer::flushBuffers()
 // buffer has stayed unmapped for sStagingReleaseSecs, and read the contents back from GL if it is ever
 // mapped again, so callers still see the old data in the parts they don't overwrite.
 F32 LLVertexBuffer::sStagingReleaseSecs = 0.f;
+bool LLVertexBuffer::sStagingLog = false;
 
 // Buffers that may hold a releasable CPU copy (main thread only). Never destroyed, so buffers freed
 // during static destruction can still unlist themselves.
@@ -1207,9 +1208,12 @@ void LLVertexBuffer::releaseIdleStaging()
     if (now - last_log >= 60.0 && (sStagingReleases || sStagingReleasedBytes))
     {
         last_log = now;
-        LL_INFOS("VBOStaging") << "CPU copies released: " << sStagingReleasedBytes / 1048576 << " MB now, "
-            << sStagingReleases << " releases; read back from GL: " << sStagingRestores << " times, "
-            << sStagingRestoredBytes / 1048576 << " MB; " << staged_buffers().size() << " buffers listed" << LL_ENDL;
+        if (sStagingLog)
+        {
+            LL_INFOS("VBOStaging") << "CPU copies released: " << sStagingReleasedBytes / 1048576 << " MB now, "
+                << sStagingReleases << " releases; read back from GL: " << sStagingRestores << " times, "
+                << sStagingRestoredBytes / 1048576 << " MB; " << staged_buffers().size() << " buffers listed" << LL_ENDL;
+        }
         if (sAllocTrace)
         {
             FSVBOTrace::log();

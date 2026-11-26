@@ -3038,6 +3038,17 @@
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>FSMemoryDiagnostics</key>
+    <map>
+      <key>Comment</key>
+      <string>Debug: log memory summaries once a minute: the vertex buffer staging copies (VBOStaging) and, where built in, the texture memory budget (TextureMemory, with its discard bias changes and BC7 compression figures).</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>0</integer>
+    </map>
     <key>FSVBOGPUCopyUpload</key>
     <map>
       <key>Comment</key>
