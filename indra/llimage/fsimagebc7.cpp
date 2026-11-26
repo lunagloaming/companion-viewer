@@ -29,6 +29,21 @@
 
 #include "fsimagebc7.h"
 
+#include <cerrno>
+#include <condition_variable>
+#include <deque>
+#include <mutex>
+#include <thread>
+#include <unordered_set>
+
+#if LL_LINUX
+#include <sys/resource.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+#elif LL_WINDOWS
+#include "llwin32headers.h"
+#endif
+
 #include "llimage.h"
 
 // bc7enc.h has no include guard and declares a global color_rgba: include it here only.
@@ -311,4 +326,168 @@ LLPointer<FSImageBC7> FSImageBC7::compress(const LLImageRaw* raw)
         sBytesSaved += source_bytes - bytes;
     }
     return image;
+}
+
+//-----------------------------------------------------------------------------
+// FSBC7Compressor
+//-----------------------------------------------------------------------------
+
+namespace
+{
+    // Jobs left waiting this long behind the others are stale: the oldest are dropped
+    constexpr size_t MAX_QUEUED_JOBS = 1024;
+
+    struct CompressJob
+    {
+        U64 id = 0;
+        LLPointer<LLImageRaw> source;
+    };
+
+    struct CompressResult
+    {
+        U64 id = 0;
+        LLPointer<FSImageBC7> bc7;
+    };
+
+    std::mutex sCompressMutex;
+    std::condition_variable sCompressWake;
+    std::deque<CompressJob> sCompressJobs;
+    std::deque<CompressResult> sCompressResults;
+    std::unordered_set<U64> sCancelledJobs;
+    std::vector<std::thread> sCompressThreads;
+    U64 sNextJobId = 1;
+    bool sCompressStopping = false;
+
+    // A little below normal: compressing gives way to decoding and the main thread, but is never starved
+    void lowerThreadPriority()
+    {
+#if LL_LINUX
+        const id_t tid = (id_t)syscall(SYS_gettid);
+        errno = 0;
+        const int nice_now = getpriority(PRIO_PROCESS, tid);
+        if (errno == 0)
+        {
+            setpriority(PRIO_PROCESS, tid, llmin(nice_now + 2, 19));
+        }
+#elif LL_WINDOWS
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+#endif
+    }
+
+    void compressThread()
+    {
+        lowerThreadPriority();
+        std::unique_lock<std::mutex> lock(sCompressMutex);
+        while (true)
+        {
+            sCompressWake.wait(lock, [] { return sCompressStopping || !sCompressJobs.empty(); });
+            if (sCompressStopping)
+            {
+                return;
+            }
+            CompressJob job = std::move(sCompressJobs.front());
+            sCompressJobs.pop_front();
+            CompressResult result;
+            result.id = job.id;
+            if (sCancelledJobs.erase(job.id) == 0)
+            {
+                lock.unlock();
+                result.bc7 = FSImageBC7::compress(job.source);
+                job.source = nullptr;
+                lock.lock();
+                if (sCancelledJobs.erase(job.id) != 0)
+                {
+                    result.bc7 = nullptr;
+                }
+            }
+            sCompressResults.push_back(std::move(result));
+        }
+    }
+}
+
+U64 FSBC7Compressor::queue(const LLPointer<LLImageRaw>& source)
+{
+    std::lock_guard<std::mutex> lock(sCompressMutex);
+    if (sCompressStopping)
+    {
+        return 0;
+    }
+    if (sCompressThreads.empty())
+    {
+        const U32 count = llclamp(std::thread::hardware_concurrency() / 4, 1U, 4U);
+        for (U32 i = 0; i < count; ++i)
+        {
+            sCompressThreads.emplace_back(compressThread);
+        }
+    }
+    while (sCompressJobs.size() >= MAX_QUEUED_JOBS)
+    {
+        sCompressResults.push_back({ sCompressJobs.front().id, nullptr });
+        sCompressJobs.pop_front();
+    }
+    const U64 id = sNextJobId++;
+    sCompressJobs.push_back({ id, source });
+    sCompressWake.notify_one();
+    return id;
+}
+
+void FSBC7Compressor::cancel(U64 id)
+{
+    if (id == 0)
+    {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(sCompressMutex);
+    for (auto it = sCompressJobs.begin(); it != sCompressJobs.end(); ++it)
+    {
+        if (it->id == id)
+        {
+            // Not started: answered at once, so the image copy is freed now
+            sCompressResults.push_back({ id, nullptr });
+            sCompressJobs.erase(it);
+            return;
+        }
+    }
+    // Being compressed: its result is dropped when done. Already done: nothing to do.
+    sCancelledJobs.insert(id);
+    for (const CompressResult& result : sCompressResults)
+    {
+        if (result.id == id)
+        {
+            sCancelledJobs.erase(id);
+            break;
+        }
+    }
+}
+
+bool FSBC7Compressor::takeResult(U64& id, LLPointer<FSImageBC7>& result)
+{
+    std::lock_guard<std::mutex> lock(sCompressMutex);
+    if (sCompressResults.empty())
+    {
+        return false;
+    }
+    id = sCompressResults.front().id;
+    result = sCompressResults.front().bc7;
+    sCompressResults.pop_front();
+    return true;
+}
+
+void FSBC7Compressor::shutdown()
+{
+    std::vector<std::thread> threads;
+    {
+        std::lock_guard<std::mutex> lock(sCompressMutex);
+        sCompressStopping = true;
+        threads.swap(sCompressThreads);
+    }
+    sCompressWake.notify_all();
+    for (std::thread& thread : threads)
+    {
+        thread.join();
+    }
+    std::lock_guard<std::mutex> lock(sCompressMutex);
+    sCompressJobs.clear();
+    sCompressResults.clear();
+    sCancelledJobs.clear();
 }

@@ -261,7 +261,14 @@ public:
     bool isBC7() const { return mIsBC7; }
     // A shrink failed once already: it isn't tried again, and the texture isn't dropped again (see LLViewerTextureList)
     bool bc7ShrinkFailed() const { return mBC7ShrinkFailed; }
+    // Swaps finished BC7 copies (FSBC7Compressor) into the textures they were made for, if those still hold the
+    // image they were made from. Once a frame, on the main thread.
+    static void applyCompressedBC7();
 private:
+    void queueBC7(const LLPointer<LLImageRaw>& source, LLGLuint tex_name);
+    void cancelBC7();   // the texture is changing: a BC7 copy on its way would be stale
+    bool swapInBC7(const FSImageBC7& bc7);
+    U64 mBC7JobId = 0;  // guarded by the job list's mutex
     bool setImageBC7(const FSImageBC7& bc7, const U8* raw_data);
     bool scaleDownBC7(S32 desired_discard);
     LLPointer<FSImageBC7> mPendingBC7; // handed over by createGLTexture for the next setImage

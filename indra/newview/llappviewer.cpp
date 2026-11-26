@@ -45,6 +45,7 @@
 #include "llagentui.h"
 #include "llagentwearables.h"
 #include "llimage.h" // <FS:Beq/> [FIRE-36494] Image allocation failure telemetry
+#include "fsimagebc7.h" // <FS:Luna Witch/>
 #include "lldirpicker.h"
 #include "llfloaterimcontainer.h"
 #include "llfloaterpreference.h"
@@ -2544,6 +2545,7 @@ bool LLAppViewer::cleanup()
     sTextureFetch->shutdown();
     sTextureCache->shutdown();
     sImageDecodeThread->shutdown();
+    FSBC7Compressor::shutdown(); // <FS:Luna Witch/>
     sPurgeDiskCacheThread->shutdown();
     if (mGeneralThreadPool)
     {

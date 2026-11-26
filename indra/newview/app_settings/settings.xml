@@ -27837,7 +27837,7 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSTextureCompressBC7</key>
     <map>
       <key>Comment</key>
-      <string>Compress world textures to BC7 on the texture decode threads, for about a quarter of the video memory. Each texture is checked block by block after compressing, and one BC7 would visibly harm stays uncompressed. Needs OpenGL 4.3. Applies to textures loaded after the change.</string>
+      <string>Compress world textures to BC7 after they are first shown (on threads of their own, at a little below normal priority), for about a quarter of the video memory. Each texture is checked block by block after compressing, and one BC7 would visibly harm stays uncompressed. Needs OpenGL 4.3. Applies to textures loaded after the change.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
