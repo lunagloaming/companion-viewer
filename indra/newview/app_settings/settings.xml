@@ -13,6 +13,17 @@
     <key>Value</key>
     <integer>0</integer>
   </map>
+  <key>FSCreateLandmarkInFavorites</key>
+  <map>
+    <key>Comment</key>
+    <string>"Landmark this Place" puts the new landmark in the Favorites bar folder unless another folder is chosen. Off: the Landmarks folder.</string>
+    <key>Persist</key>
+    <integer>1</integer>
+    <key>Type</key>
+    <string>Boolean</string>
+    <key>Value</key>
+    <integer>1</integer>
+  </map>
   <key>FSEnforceStrictObjectCheck</key>
   <map>
     <key>Comment</key>
