@@ -754,7 +754,7 @@ public:
 
     bool postBuild()
     {
-        setDoubleClickCallback(boost::bind(&FSChatHistoryHeader::showInspector, this));
+        setDoubleClickCallback(boost::bind(&FSChatHistoryHeader::onDoubleClick, this));
 
         setMouseEnterCallback(boost::bind(&FSChatHistoryHeader::showInfoCtrl, this));
         setMouseLeaveCallback(boost::bind(&FSChatHistoryHeader::hideInfoCtrl, this));
@@ -823,6 +823,32 @@ public:
             LLUrlAction::executeSLURL(LLSLURL("agent", mAvatarID, "inspect").getSLURLString());
         }
         //if chat source is system, you may add "else" here to define behaviour.
+    }
+
+    // Double-clicking another avatar's name zooms the camera to them, as in
+    // the radar; the (i) button still opens the inspector. Objects, system
+    // messages and our own name keep opening the inspector.
+    void onDoubleClick()
+    {
+        if (!gSavedSettings.getBOOL("FSChatNameDoubleClickZoom") || !mShowInfoCtrl ||
+            mSourceType != CHAT_SOURCE_AGENT || mAvatarID.isNull() || mAvatarID == gAgentID)
+        {
+            showInspector();
+            return;
+        }
+
+        if (LLAvatarActions::canZoomIn(mAvatarID))
+        {
+            LLAvatarActions::zoomIn(mAvatarID);
+        }
+        else
+        {
+            LLStringUtil::format_map_t string_args;
+            string_args["AVATARNAME"] = mFrom;
+            LLSD args;
+            args["MESSAGE"] = LLTrans::getString("camera_no_focus", string_args);
+            LLNotificationsUtil::add("SystemMessageTip", args);
+        }
     }
 
     static void onClickInfoCtrl(LLUICtrl* info_ctrl)
