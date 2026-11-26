@@ -156,8 +156,9 @@ private:
     void setDockedState(LLFloater* floater, bool docked);
     void restoreFloater(LLFloater* floater, const LLRect& free_rect);
 
-    // Diagnostics (FSWindowEdgeDockDiagnostics): the layout is logged whenever it changes, and an
-    // area that takes space without showing any floater is reported once
+    // An area that takes space without showing any of its floaters: its floaters are placed again, and if
+    // that doesn't bring one back, undocked, so they can be reached. Diagnostics (FSWindowEdgeDockDiagnostics):
+    // the layout is logged whenever it changes, and such an area is reported once
     bool diagnosticsEnabled() const;
     std::string describeState() const;
     void logEvent(const char* event, LLFloater* floater) const;
@@ -201,6 +202,8 @@ private:
     std::string             mLastLoggedState;
     LLFrameTimer            mCheckTimer;
     bool                    mReportedEmpty[EDGE_COUNT] = { false, false, false, false };
+    S32                     mEmptyChecks[EDGE_COUNT] = { 0, 0, 0, 0 };  // checks in a row that found the area empty
+    bool                    mForcePlacement = false;    // the next arrange sets every docked floater's shape
 
     LLHandle<LLContextMenu> mMenuHandle;
     LLHandle<LLFloater>     mMenuFloater;

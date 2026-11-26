@@ -1073,7 +1073,7 @@ void LLWindowEdgeDock::arrange()
                 cursor -= slot.mSize;
             }
 
-            if (rect != floater->getRect())
+            if (rect != floater->getRect() || mForcePlacement)
             {
                 floater->setShape(rect, false);
             }
@@ -1563,14 +1563,20 @@ void LLWindowEdgeDock::logStateIfChanged(const char* reason)
 
 void LLWindowEdgeDock::checkAreas()
 {
-    if (!gFloaterView || !diagnosticsEnabled())
+    if (!gFloaterView || resizeInProgress())
     {
         return;
     }
 
     // An area with space should show at least one of its floaters inside it
+    const LLRect frame = getFrame();
+    if (frame.getWidth() <= 0 || frame.getHeight() <= 0)
+    {
+        return;     // the window is minimized
+    }
     LLRect rects[EDGE_COUNT];
-    computeAreaRects(getFrame(), mDepths, mOrder, rects);
+    computeAreaRects(frame, mDepths, mOrder, rects);
+    bool place_again = false;
     for (S32 e = 0; e < EDGE_COUNT; ++e)
     {
         bool empty = false;
@@ -1588,11 +1594,47 @@ void LLWindowEdgeDock::checkAreas()
                 }
             }
         }
-        if (empty && !mReportedEmpty[e])
+        if (empty && !mReportedEmpty[e] && diagnosticsEnabled())
         {
             LL_WARNS("WindowEdgeDock") << "The " << EDGE_NAMES[e] << " area takes " << mDepths[e]
                                        << " pixels but shows no floater. " << describeState() << LL_ENDL;
         }
         mReportedEmpty[e] = empty;
+
+        mEmptyChecks[e] = empty ? mEmptyChecks[e] + 1 : 0;
+        if (mEmptyChecks[e] == 2)
+        {
+            // Empty for a while, not just in passing: place its floaters again
+            place_again = true;
+        }
+        else if (mEmptyChecks[e] >= 3)
+        {
+            // Placing them again didn't bring any back: undock them, so the space goes back to the world
+            // view and the floaters to where they were before docking, kept on screen
+            LL_WARNS("WindowEdgeDock") << "The " << EDGE_NAMES[e] << " area takes " << mDepths[e]
+                                       << " pixels but shows none of its floaters; undocking them. "
+                                       << describeState() << LL_ENDL;
+            mEmptyChecks[e] = 0;
+            std::vector<LLFloater*> floaters;
+            for (const Entry& entry : mAreas[e].mEntries)
+            {
+                if (isActive(entry))
+                {
+                    floaters.push_back(entry.mFloater.get());
+                }
+            }
+            for (LLFloater* floater : floaters)
+            {
+                undock(floater);
+                gFloaterView->bringToFront(floater, false);
+            }
+        }
+    }
+
+    if (place_again)
+    {
+        mForcePlacement = true;
+        arrange();
+        mForcePlacement = false;
     }
 }
