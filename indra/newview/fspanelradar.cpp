@@ -132,8 +132,8 @@ bool FSPanelRadar::postBuild()
     mRadarList->setSortCallback([list = mRadarList](S32 column, const LLScrollListItem* item1, const LLScrollListItem* item2) -> S32
     {
         FSRadar* radar = FSRadar::getInstance();
-        const S32 group1 = radar->highlightsArrival(item1->getUUID()) ? 0 : 1;
-        const S32 group2 = radar->highlightsArrival(item2->getUUID()) ? 0 : 1;
+        const S32 group1 = radar->isHighlighted(item1->getUUID()) ? 0 : 1;
+        const S32 group2 = radar->isHighlighted(item2->getUUID()) ? 0 : 1;
         if (group1 != group2)
         {
             // The list multiplies the result by -1 for a descending sort.
@@ -458,7 +458,15 @@ void FSPanelRadar::updateList(const std::vector<LLSD>& entries, const LLSD& stat
         if (entry.has("flags"))
         {
             LLScrollListText* flagsCell = (LLScrollListText*)row->getColumn(flagsColumnIndex);
-            flagsCell->setValue(flagsColumnValues[entry["flags"].asInteger()]);
+            // <FS:Luna Witch> T: a tipper (FSRadar::isTipper), where the flags are text
+            //flagsCell->setValue(flagsColumnValues[entry["flags"].asInteger()]);
+            std::string flags = flagsColumnValues[entry["flags"].asInteger()];
+            if (entry["tipper"].asBoolean() && flagsColumnType == "text")
+            {
+                flags += "T";
+            }
+            flagsCell->setValue(flags);
+            // </FS:Luna Witch>
         }
 
         if (options.has("age_color"))

@@ -1,6 +1,6 @@
 /**
  * @file fsfloatergreetings.h
- * @brief The Greetings floater: the patterns that tell welcomes in chat, with a line to try them on.
+ * @brief The Greetings floater: the patterns that tell welcomes, tips and thanks in chat, with a line to try them on.
  *
  * $LicenseInfo:firstyear=2026&license=viewerlgpl$
  * Phoenix Firestorm Viewer Source Code
@@ -69,6 +69,8 @@ private:
     void refresh(size_t tab);
 
     std::string tryWelcome(const std::string& line) const;
+    std::string tryTip(const std::string& line) const;
+    std::string tryThanks(const std::string& line) const;
     // The words of a line that could be names, once filler words are left out
     std::string nameWords(const std::string& text) const;
 

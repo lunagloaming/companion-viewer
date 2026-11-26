@@ -1,6 +1,6 @@
 /**
  * @file fsfloatergreetings.cpp
- * @brief The Greetings floater: the patterns that tell welcomes in chat, with a line to try them on.
+ * @brief The Greetings floater: the patterns that tell welcomes, tips and thanks in chat, with a line to try them on.
  *
  * $LicenseInfo:firstyear=2026&license=viewerlgpl$
  * Phoenix Firestorm Viewer Source Code
@@ -90,6 +90,8 @@ bool FSFloaterGreetings::postBuild()
     mTabs.reserve(4); // the editors' callbacks hold indexes into it
     addTab("welcome", { { "welcome_patterns", "FSGreetingWelcomePatterns" }, { "not_welcome_patterns", "FSGreetingNotWelcomePatterns" } },
         [this](const std::string& line) { return tryWelcome(line); });
+    addTab("tip", { { "tip_patterns", "FSGreetingTipPatterns" } }, [this](const std::string& line) { return tryTip(line); });
+    addTab("thanks", { { "thanks_patterns", "FSGreetingThanksPatterns" } }, [this](const std::string& line) { return tryThanks(line); });
     return true;
 }
 
@@ -188,4 +190,34 @@ std::string FSFloaterGreetings::tryWelcome(const std::string& line) const
     LLStringUtil::format_map_t args;
     args["[NAMES]"] = names;
     return getString("welcome_names", args);
+}
+
+std::string FSFloaterGreetings::tryTip(const std::string& line) const
+{
+    std::string tipper;
+    if (!FSGreetingPatterns::findFirst(FSGreetingPatterns::get("FSGreetingTipPatterns"), line, &tipper))
+    {
+        return getString("not_a_tip");
+    }
+    LLStringUtil::trim(tipper);
+    LLStringUtil::format_map_t args;
+    args["[NAME]"] = tipper;
+    return getString("tip_from", args);
+}
+
+std::string FSFloaterGreetings::tryThanks(const std::string& line) const
+{
+    const std::vector<FSGreetingPatterns::Span> thanks = FSGreetingPatterns::findAll(FSGreetingPatterns::get("FSGreetingThanksPatterns"), line);
+    if (thanks.empty())
+    {
+        return getString("not_thanks");
+    }
+    const std::string names = nameWords(FSGreetingPatterns::blank(line, thanks));
+    if (names.empty())
+    {
+        return getString("thanks_no_names");
+    }
+    LLStringUtil::format_map_t args;
+    args["[NAMES]"] = names;
+    return getString("thanks_names", args);
 }
