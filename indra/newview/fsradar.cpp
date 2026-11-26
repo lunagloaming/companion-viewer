@@ -46,6 +46,7 @@
 #include "fsassetblacklist.h"
 #include "fscommon.h"
 #include "fsgreetingnames.h"
+#include "fsgreetingpatterns.h"
 #include "fskeywords.h"
 #include "fslslbridge.h"
 #include "fslslbridgerequest.h"
@@ -1014,11 +1015,17 @@ void FSRadar::setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand)
 
 void FSRadar::onOwnNearbyChat(std::string_view text)
 {
-    const std::vector<LLWString> words = FSGreetingNames::chatWords(text);
-    if (!FSGreetingNames::isWelcome(words))
+    // A welcome is a line one of the welcome patterns matches, once the parts that are never a welcome
+    // ("you're welcome") are left out. The names are looked for in what neither matched.
+    std::string rest = FSGreetingPatterns::blank(std::string(text),
+        FSGreetingPatterns::findAll(FSGreetingPatterns::get("FSGreetingNotWelcomePatterns"), std::string(text)));
+    const std::vector<FSGreetingPatterns::Span> welcome = FSGreetingPatterns::findAll(FSGreetingPatterns::get("FSGreetingWelcomePatterns"), rest);
+    if (welcome.empty())
     {
         return;
     }
+    rest = FSGreetingPatterns::blank(rest, welcome);
+    const std::vector<LLWString> words = FSGreetingNames::chatWords(rest);
 
     static LLCachedControl<bool> sTickWelcomed(gSavedSettings, "FSRadarTickWelcomed");
     if (!sTickWelcomed)
