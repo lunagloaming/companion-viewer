@@ -27,6 +27,7 @@
 #include "llviewerprecompiledheaders.h"
 
 #include "llwearableitemslist.h"
+#include "llinventorybridge.h" // <FS:Luna Witch/> fs_hide_wear_where_add_exists
 
 #include "fsfloaterwearablefavorites.h"
 
@@ -1440,7 +1441,11 @@ void LLWearableItemsList::ContextMenu::updateItemsVisibility(LLContextMenu* menu
     bool show_create_new = mParent ? mParent->showCreateNew() : true; // <FS:Ansariel> Optional "Create new" menu item
 
     // *TODO: eliminate multiple traversals over the menu items
-    setMenuItemVisible(menu, "wear_wear",           n_already_worn == 0 && n_worn == 0 && can_be_worn);
+    // <FS:Luna Witch> Add rather than Wear (replace), where Add is offered
+    //setMenuItemVisible(menu, "wear_wear",           n_already_worn == 0 && n_worn == 0 && can_be_worn);
+    setMenuItemVisible(menu, "wear_wear",           n_already_worn == 0 && n_worn == 0 && can_be_worn
+                                                    && !(wear_add_visible && fs_hide_wear_where_add_exists()));
+    // </FS:Luna Witch>
 //  setMenuItemEnabled(menu, "wear_wear",           n_already_worn == 0 && n_worn == 0);
     setMenuItemVisible(menu, "wear_add",            wear_add_visible);
 //  setMenuItemEnabled(menu, "wear_add",            LLAppearanceMgr::instance().canAddWearables(ids));

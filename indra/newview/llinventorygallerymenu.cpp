@@ -699,6 +699,7 @@ void LLInventoryGalleryContextMenu::updateMenuItemsVisibility(LLContextMenu* men
                 {
                     disabled_items.push_back(std::string("Replace Outfit"));
                 }
+                fs_hide_replace_outfit(items); // <FS:Luna Witch/> only where Add To Outfit is offered: not for outfits
             }
             if (is_agent_inventory)
             {
