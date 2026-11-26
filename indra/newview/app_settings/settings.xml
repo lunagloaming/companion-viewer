@@ -24391,13 +24391,13 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSWindowEdgeDockDiagnostics</key>
     <map>
       <key>Comment</key>
-      <string>Log the window edge docking layout whenever it changes, and warn when a docked area takes space without showing any floater (to diagnose empty docked areas).</string>
+      <string>Debug: log floaters docking, undocking and being excluded, and the window edge docking layout whenever it changes, and warn when a docked area takes space without showing any floater (to diagnose empty docked areas).</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
       <string>Boolean</string>
       <key>Value</key>
-      <integer>1</integer>
+      <integer>0</integer>
     </map>
     <key>FSWindowEdgeDockByDragging</key>
     <map>
