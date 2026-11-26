@@ -41,6 +41,7 @@
 #include "lluictrlfactory.h"
 
 #include <algorithm>
+#include <sstream>
 
 namespace
 {
@@ -344,6 +345,10 @@ void LLWindowEdgeDock::removeEntry(EEdge edge, size_t index, bool restore_free_r
 
     LLFloater* floater = entries[index].mFloater.get();
     LLRect free_rect = entries[index].mFreeRect;
+    if (diagnosticsEnabled())
+    {
+        LL_INFOS("WindowEdgeDock") << "Undocked " << entries[index].mName << " from the " << edgeName(edge) << " edge" << LL_ENDL;
+    }
     entries.erase(entries.begin() + index);
     updateOrder();
 
@@ -573,6 +578,10 @@ void LLWindowEdgeDock::onFloaterVisibilityChanged(LLFloater* floater, bool visib
     {
         return;
     }
+    if (floater->isEdgeDocked())
+    {
+        logEvent(visible ? "shown" : "hidden", floater);
+    }
 
     if (!mLoaded)
     {
@@ -613,12 +622,17 @@ void LLWindowEdgeDock::onFloaterMinimized(LLFloater* floater)
 {
     if (floater && floater->isEdgeDocked())
     {
+        logEvent(floater->isMinimized() ? "minimized" : "unminimized", floater);
         arrange();
     }
 }
 
 void LLWindowEdgeDock::onFloaterClosed(LLFloater* floater, bool app_quitting)
 {
+    if (!app_quitting)
+    {
+        logEvent("closed", floater);
+    }
     // A closed single-instance floater docks again when it is next opened. Other floaters
     // (several inventories, profiles and so on) come and go, so they forget it.
     if (!app_quitting && floater && floater->isEdgeDocked() && !floater->getIsSingleInstance())
@@ -633,6 +647,7 @@ void LLWindowEdgeDock::onFloaterAttachedElsewhere(LLFloater* floater)
     size_t index = 0;
     if (floater && floater->isEdgeDocked() && findEntry(floater, &edge, &index))
     {
+        logEvent("attached elsewhere", floater);
         removeEntry(edge, index, false);
         saveLayout();
     }
@@ -1008,6 +1023,8 @@ void LLWindowEdgeDock::arrange()
     }
     mInsetsDirty = true;
     mArranging = false;
+
+    logStateIfChanged("arranged");
 }
 
 bool LLWindowEdgeDock::resizeInProgress() const
@@ -1071,6 +1088,11 @@ void LLWindowEdgeDock::update()
     if (mLayoutDirty)
     {
         arrange();
+    }
+    if (mCheckTimer.getElapsedTimeF32() > 2.f)
+    {
+        mCheckTimer.reset();
+        checkAreas();
     }
     if (mInsetsDirty && !resizeInProgress())
     {
@@ -1398,4 +1420,113 @@ bool LLWindowEdgeDock::onMenuIsDocked()
 {
     LLFloater* floater = mMenuFloater.get();
     return floater && floater->isEdgeDocked();
+}
+
+//-----------------------------------------------------------------------------
+// Diagnostics
+//-----------------------------------------------------------------------------
+bool LLWindowEdgeDock::diagnosticsEnabled() const
+{
+    LLControlGroup* group = settings();
+    return group && group->controlExists("FSWindowEdgeDockDiagnostics") && group->getBOOL("FSWindowEdgeDockDiagnostics");
+}
+
+std::string LLWindowEdgeDock::describeState() const
+{
+    std::ostringstream out;
+    const LLRect frame = getFrame();
+    out << "frame " << frame << " dock_top " << mDockTop << " favorites_bottom " << mFavoritesBottom << " order";
+    for (EEdge edge : mOrder)
+    {
+        out << " " << edgeName(edge);
+    }
+    LLRect rects[EDGE_COUNT];
+    computeAreaRects(frame, mDepths, mOrder, rects);
+    for (S32 e = 0; e < EDGE_COUNT; ++e)
+    {
+        const Area& area = mAreas[e];
+        if (area.mEntries.empty() && mDepths[e] <= 0)
+        {
+            continue;
+        }
+        out << " | " << EDGE_NAMES[e] << ": depth " << mDepths[e] << " (preferred " << area.mDepth << ") rect " << rects[e];
+        for (const Entry& entry : area.mEntries)
+        {
+            out << " ; " << entry.mName << " length " << entry.mLength;
+            const LLFloater* floater = entry.mFloater.get();
+            if (!floater)
+            {
+                out << " [not open]";
+                continue;
+            }
+            out << " [" << (isActive(entry) ? "active" : "inactive")
+                << (floater->isDead() ? " dead" : "")
+                << (floater->isEdgeDocked() ? "" : " not-docked")
+                << (floater->getVisible() ? " visible" : " hidden")
+                << (floater->isMinimized() ? " minimized" : "")
+                << (floater->isInVisibleChain() ? "" : " parent-hidden")
+                << (floater->getParent() == gFloaterView ? "" : " hosted-elsewhere")
+                << "] rect " << floater->getRect();
+        }
+    }
+    return out.str();
+}
+
+void LLWindowEdgeDock::logEvent(const char* event, const LLFloater* floater) const
+{
+    if (floater && diagnosticsEnabled())
+    {
+        LL_INFOS("WindowEdgeDock") << "Docked floater " << floater->getInstanceName() << " (" << floater->getName() << ") "
+                                   << event << LL_ENDL;
+    }
+}
+
+void LLWindowEdgeDock::logStateIfChanged(const char* reason)
+{
+    if (!diagnosticsEnabled())
+    {
+        return;
+    }
+    std::string state = describeState();
+    if (state != mLastLoggedState)
+    {
+        LL_INFOS("WindowEdgeDock") << "Layout " << reason << ": " << state << LL_ENDL;
+        mLastLoggedState = state;
+    }
+}
+
+void LLWindowEdgeDock::checkAreas()
+{
+    if (!gFloaterView || !diagnosticsEnabled())
+    {
+        return;
+    }
+
+    // An area with space should show at least one of its floaters inside it
+    LLRect rects[EDGE_COUNT];
+    computeAreaRects(getFrame(), mDepths, mOrder, rects);
+    for (S32 e = 0; e < EDGE_COUNT; ++e)
+    {
+        bool empty = false;
+        if (mDepths[e] > 0)
+        {
+            empty = true;
+            for (const Entry& entry : mAreas[e].mEntries)
+            {
+                const LLFloater* floater = entry.mFloater.get();
+                if (isActive(entry) && floater->isInVisibleChain() && floater->getRect().notEmpty()
+                    && floater->getRect().overlaps(rects[e]))
+                {
+                    empty = false;
+                    break;
+                }
+            }
+        }
+        if (empty && !mReportedEmpty[e])
+        {
+            LL_WARNS("WindowEdgeDock") << "The " << EDGE_NAMES[e] << " area takes " << mDepths[e]
+                                       << " pixels but shows no floater. " << describeState() << LL_ENDL;
+        }
+        mReportedEmpty[e] = empty;
+    }
 }
