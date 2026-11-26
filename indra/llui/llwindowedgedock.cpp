@@ -548,8 +548,11 @@ void LLWindowEdgeDock::dock(LLFloater* floater, EEdge edge, S32 position)
     area.mEntries.insert(area.mEntries.begin() + position, entry);
     updateOrder();
 
-    LL_INFOS("WindowEdgeDock") << "Docked floater " << entry.mName << " (" << floater->getName() << ") to the "
-                               << edgeName(edge) << " edge" << LL_ENDL;
+    if (diagnosticsEnabled())
+    {
+        LL_INFOS("WindowEdgeDock") << "Docked floater " << entry.mName << " (" << floater->getName() << ") to the "
+                                   << edgeName(edge) << " edge" << LL_ENDL;
+    }
 
     setDockedState(floater, true);
     arrange();
@@ -1400,7 +1403,10 @@ void LLWindowEdgeDock::onMenuExclude()
     {
         excluded.append(name);
         group->setLLSD("FSWindowEdgeDockExcluded", excluded);
-        LL_INFOS("WindowEdgeDock") << "Excluded floater " << name << " (" << floater->getName() << ") from docking" << LL_ENDL;
+        if (diagnosticsEnabled())
+        {
+            LL_INFOS("WindowEdgeDock") << "Excluded floater " << name << " (" << floater->getName() << ") from docking" << LL_ENDL;
+        }
     }
 
     if (floater->isEdgeDocked())
