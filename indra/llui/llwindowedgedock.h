@@ -48,7 +48,9 @@ class LLView;
 // under them.
 //
 // The edge docked to first runs the full length of the window; the next one
-// runs the length that is left, and so on. Several floaters in one area share it: stacked top to bottom
+// runs the length that is left, and so on. An edge whose floaters are all
+// closed, hidden or minimized gives up its place: when one of them shows
+// again, that edge comes after the ones already showing. Several floaters in one area share it: stacked top to bottom
 // at the sides, left to right at the top and bottom. Every floater can dock
 // unless it is on the exclusion list (FSWindowEdgeDockExcluded) or too big for
 // the edge. The layout is saved in FSWindowEdgeDockLayout.
@@ -168,8 +170,14 @@ private:
     bool onMenuCanDock(const LLSD& param);
     bool onMenuIsDocked();
 
+    // Whether an area shows a floater. PENDING: it did when the layout was saved, and keeps its place
+    // in the order until it shows one again. NOT_USED: it goes last when it next shows one.
+    enum EUse { USE_PENDING, USE_SHOWING, USE_NOT_USED };
+    void updateUse(const S32 depths[EDGE_COUNT]);
+
     Area                    mAreas[EDGE_COUNT];
     std::vector<EEdge>      mOrder;     // edges with docked floaters, in the order they were first docked to
+    EUse                    mUse[EDGE_COUNT];
     S32                     mDepths[EDGE_COUNT];        // the depths in use after the last arrange
     S32                     mAppliedInsets[EDGE_COUNT]; // what the inset views leave out now
     std::vector<LLHandle<LLView> > mInsetViews;
