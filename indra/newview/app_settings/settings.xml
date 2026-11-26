@@ -24495,13 +24495,57 @@ Change of this parameter will affect the layout of buttons in notification toast
     <key>FSWindowEdgeDockLayout</key>
     <map>
       <key>Comment</key>
-      <string>Which floaters are docked to the edges of the viewer window, in what order, and how big each docked area is. Kept up to date by the viewer.</string>
+      <string>Which floaters are docked to the edges of the viewer window, in what order, and how big each docked area is. Kept up to date by the viewer. By default People and Conversations are docked to the left, People taking the top third.</string>
       <key>Persist</key>
       <integer>1</integer>
       <key>Type</key>
       <string>LLSD</string>
       <key>Value</key>
-      <map />
+      <map>
+        <key>depths</key>
+        <map>
+          <key>left</key>
+          <integer>380</integer>
+        </map>
+        <key>order</key>
+        <array>
+          <string>left</string>
+        </array>
+        <key>in_use</key>
+        <array>
+          <string>left</string>
+        </array>
+        <key>floaters</key>
+        <array>
+          <map>
+            <key>name</key>
+            <string>people</string>
+            <key>edge</key>
+            <string>left</string>
+            <key>length</key>
+            <real>1.0</real>
+          </map>
+          <map>
+            <key>name</key>
+            <string>fs_im_container</string>
+            <key>edge</key>
+            <string>left</string>
+            <key>length</key>
+            <real>2.0</real>
+          </map>
+        </array>
+      </map>
+    </map>
+    <key>FSWindowEdgeDockOpenAtFirstLogin</key>
+    <map>
+      <key>Comment</key>
+      <string>Open People and Conversations at the next login (docked to the left by the default FSWindowEdgeDockLayout). On for a new install; turned off once done.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
     </map>
     <key>FSWindowEdgeDockExcluded</key>
     <map>
