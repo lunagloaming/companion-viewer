@@ -322,6 +322,7 @@ private:
     void onClickRefresh();
     void buyObject(FSObjectProperties& details, LLViewerObject* objectp);
     void sitOnObject(FSObjectProperties& details, LLViewerObject* objectp);
+    void zoomToObject(LLViewerObject* objectp);
     void onCommitCheckboxBeacons();
 	
 	void onCopyToClipboard();
