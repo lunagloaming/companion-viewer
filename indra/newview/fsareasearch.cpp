@@ -67,6 +67,7 @@
 #include "rlvhandler.h"
 #include "llclipboard.h"
 #include "lluri.h"
+#include "pipeline.h" // <FS:Luna Witch/> gPipeline.lineSegmentIntersectInWorld
 
 // max number of objects that can be (de-)selected in a single packet.
 constexpr S32 MAX_OBJECTS_PER_PACKET = 255;
@@ -2164,7 +2165,76 @@ bool FSPanelAreaSearchList::onContextMenuItemClick(const LLSD& userdata)
     return true;
 }
 
-// Moves the camera to look at the object, keeping the direction it views it from.
+// <FS:Luna Witch> Whether something solid stands in front of the object in this direction, close enough
+// that a camera there would be behind it (a wall a display hangs on, say).
+static bool zoom_side_blocked(LLViewerObject* objectp, const LLBBox& bbox, const LLVector3d& dir)
+{
+    // From just outside the bounding box, as far out as a camera looking at it would typically be
+    const LLVector3 extents = bbox.getExtentLocal();
+    const LLVector3 dir_f(dir);
+    const LLVector3 axes[3] = { LLVector3::x_axis * bbox.getRotation(), LLVector3::y_axis * bbox.getRotation(), LLVector3::z_axis * bbox.getRotation() };
+    F32 half_depth = 0.f;
+    for (S32 i = 0; i < 3; ++i)
+    {
+        half_depth += 0.5f * extents.mV[i] * fabsf(dir_f * axes[i]);
+    }
+    const F32 reach = llclamp(1.5f * extents.length(), 1.5f, 10.f);
+    const LLVector3 center = bbox.getCenterAgent();
+    LLVector4a start;
+    LLVector4a end;
+    start.load3((center + dir_f * (half_depth + 0.05f)).mV);
+    end.load3((center + dir_f * (half_depth + reach)).mV);
+
+    S32 face = -1;
+    LLViewerObject* hit = gPipeline.lineSegmentIntersectInWorld(start, end, false, false, true, false, &face);
+    // Avatars and the object's own linkset don't count
+    return hit && !hit->isAvatar() && !hit->isAttachment() && hit->getRootEdit() != objectp->getRootEdit();
+}
+
+// The direction to look at the object from: the camera's own side, unless that is blocked close by; then the
+// opposite side; and if both are, whichever side of the object's largest face is open, the camera's side first.
+static LLVector3d choose_zoom_side(LLViewerObject* objectp, const LLBBox& bbox, const LLVector3d& camera_dir)
+{
+    if (!zoom_side_blocked(objectp, bbox, camera_dir))
+    {
+        return camera_dir;
+    }
+    if (!zoom_side_blocked(objectp, bbox, -camera_dir))
+    {
+        return -camera_dir;
+    }
+
+    const LLVector3 extents = bbox.getExtentLocal();
+    S32 largest = 0;
+    F32 largest_area = -1.f;
+    for (S32 i = 0; i < 3; ++i)
+    {
+        const F32 area = extents.mV[(i + 1) % 3] * extents.mV[(i + 2) % 3];
+        if (area > largest_area)
+        {
+            largest_area = area;
+            largest = i;
+        }
+    }
+    const LLVector3 local_axes[3] = { LLVector3::x_axis, LLVector3::y_axis, LLVector3::z_axis };
+    LLVector3d normal(local_axes[largest] * bbox.getRotation());
+    if (normal * camera_dir < 0.0)
+    {
+        normal = -normal;
+    }
+    if (!zoom_side_blocked(objectp, bbox, normal))
+    {
+        return normal;
+    }
+    if (!zoom_side_blocked(objectp, bbox, -normal))
+    {
+        return -normal;
+    }
+    return camera_dir;
+}
+// </FS:Luna Witch>
+
+// Moves the camera to look at the object, keeping the direction it views it from (unless that side is blocked).
 void FSPanelAreaSearchList::zoomToObject(LLViewerObject* objectp)
 {
     // Disable flycam if active.  Without this, the requested look-at doesn't happen because the flycam code overrides all other camera motion.
@@ -2198,6 +2268,7 @@ void FSPanelAreaSearchList::zoomToObject(LLViewerObject* objectp)
     LLVector3d target_pos(center);
     LLVector3d camera_dir(gAgentCamera.getCameraPositionGlobal() - target_pos);
     camera_dir.normalize();
+    camera_dir = choose_zoom_side(objectp, bbox, camera_dir); // <FS:Luna Witch/> not from behind a wall
 
     // We need the aspect ratio, and the 3 components of the bbox as height, width, and depth.
     F32 aspect_ratio(LLViewerMediaFocus::getBBoxAspectRatio(bbox, LLVector3(camera_dir), &height, &width, &depth));
