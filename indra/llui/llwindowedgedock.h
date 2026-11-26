@@ -28,6 +28,7 @@
 #ifndef LL_LLWINDOWEDGEDOCK_H
 #define LL_LLWINDOWEDGEDOCK_H
 
+#include "llframetimer.h"
 #include "llhandle.h"
 #include "llrect.h"
 #include "llsd.h"
@@ -153,6 +154,14 @@ private:
     void setDockedState(LLFloater* floater, bool docked);
     void restoreFloater(LLFloater* floater, const LLRect& free_rect);
 
+    // Diagnostics (FSWindowEdgeDockDiagnostics): the layout is logged whenever it changes, and an
+    // area that takes space without showing any floater is reported once
+    bool diagnosticsEnabled() const;
+    std::string describeState() const;
+    void logEvent(const char* event, const LLFloater* floater) const;
+    void logStateIfChanged(const char* reason);
+    void checkAreas();
+
     void onMenuDock(const LLSD& param);
     void onMenuUndock();
     void onMenuExclude();
@@ -180,6 +189,10 @@ private:
     EEdge                   mDropEdge = EDGE_NONE;      // where a dragged floater would dock
     S32                     mDropPosition = -1;
     LLRect                  mDropRect;                  // in floater view coordinates
+
+    std::string             mLastLoggedState;
+    LLFrameTimer            mCheckTimer;
+    bool                    mReportedEmpty[EDGE_COUNT] = { false, false, false, false };
 
     LLHandle<LLContextMenu> mMenuHandle;
     LLHandle<LLFloater>     mMenuFloater;
