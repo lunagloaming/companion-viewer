@@ -1998,8 +1998,8 @@ bool LLTextureCache::refreshReadOnlyHeaders()
 
     LLTimer timer;
     readHeaderCache();
-    LL_INFOS("TextureCache") << "Refreshed read-only texture header index: " << mHeaderEntriesInfo.mEntries << " entries in "
-                             << timer.getElapsedTimeF32() * 1000.f << " ms" << LL_ENDL;
+    LL_DEBUGS("TextureCache") << "Refreshed read-only texture header index: " << mHeaderEntriesInfo.mEntries << " entries in "
+                              << timer.getElapsedTimeF32() * 1000.f << " ms" << LL_ENDL;
     return true;
 }
 // </FS:Luna Witch>
