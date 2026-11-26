@@ -613,8 +613,12 @@ bool FloaterQuickPrefs::postBuild()
         mBtnResetDefaults = getChild<LLButton>("Restore_Btn");
 
         mAvatarZOffsetSlider = getChild<LLSliderCtrl>("HoverHeightSlider");
-        mAvatarZOffsetSlider->setMinValue(MIN_HOVER_Z);
-        mAvatarZOffsetSlider->setMaxValue(MAX_HOVER_Z);
+        // The quick slider covers a narrower range than the server allows
+        // (MIN_HOVER_Z to MAX_HOVER_Z) so that each step stays small; the
+        // Hover Height floater and the chat command keep the full range.
+        constexpr F32 QUICK_PREFS_HOVER_LIMIT = 2.f;
+        mAvatarZOffsetSlider->setMinValue(llmax(MIN_HOVER_Z, -QUICK_PREFS_HOVER_LIMIT));
+        mAvatarZOffsetSlider->setMaxValue(llmin(MAX_HOVER_Z, QUICK_PREFS_HOVER_LIMIT));
 
         mMaxComplexitySlider = getChild<LLSliderCtrl>("IndirectMaxComplexity");
         mMaxComplexityLabel = getChild<LLTextBox>("IndirectMaxComplexityText");
