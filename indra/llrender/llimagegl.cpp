@@ -41,6 +41,7 @@
 #include "llrender.h"
 #include "llwindow.h"
 #include "llframetimer.h"
+#include <mutex>
 #include <unordered_set>
 
 extern LL_COMMON_API bool on_main_thread();
@@ -604,6 +605,7 @@ LLImageGL::LLImageGL(
 
 LLImageGL::~LLImageGL()
 {
+    cancelBC7(); // <FS:Luna Witch/>
     if (!mExternalTexture && gGLManager.mInited)
     {
         LLImageGL::cleanup();
@@ -841,6 +843,7 @@ void LLImageGL::setImage(const LLImageRaw* imageraw)
 bool LLImageGL::setImage(const U8* data_in, bool data_hasmips /* = false */, S32 usename /* = 0 */)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_TEXTURE;
+    cancelBC7(); // <FS:Luna Witch/>
 
     const bool is_compressed = isCompressed();
 
@@ -1252,6 +1255,7 @@ bool LLImageGL::setSubImage(const U8* datap, S32 data_width, S32 data_height, S3
     {
         return true;
     }
+    cancelBC7(); // <FS:Luna Witch/>
     // <FS:Luna Witch> BC7 textures only come from fetched images, never updated in parts
     if (mIsBC7)
     {
@@ -1370,6 +1374,7 @@ bool LLImageGL::setSubImage(const LLImageRaw* imageraw, S32 x_pos, S32 y_pos, S3
 // Copy sub image from frame buffer
 bool LLImageGL::setSubImageFromFrameBuffer(S32 fb_x, S32 fb_y, S32 x_pos, S32 y_pos, S32 width, S32 height)
 {
+    cancelBC7(); // <FS:Luna Witch/>
     if (gGL.getTexUnit(0)->bind(this, false, true))
     {
         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, fb_x, fb_y, x_pos, y_pos, width, height);
@@ -1419,6 +1424,7 @@ static std::vector<U32> sFreeList[DELETE_DELAY+1];
 void LLImageGL::updateClass()
 {
     sFrameCount++;
+    applyCompressedBC7(); // <FS:Luna Witch/>
 
     // wait a few frames before actually deleting the textures to avoid
     // synchronization issues with the GPU
@@ -1783,8 +1789,27 @@ bool LLImageGL::createGLTexture(S32 discard_level, const LLImageRaw* imageraw, S
     {
         mPendingBC7 = imageraw->mBC7;
     }
+    // A copy to compress to BC7 once this upload is shown (FSBC7Compressor). The image only lends it once.
+    LLPointer<LLImageRaw> bc7_source;
+    if (imageraw->mBC7Source.notNull())
+    {
+        const LLImageRaw* source = imageraw->mBC7Source.get();
+        if (bc7Supported() && mUseMipMaps && mPendingBC7.isNull() && source->getWidth() == raw_w
+            && source->getHeight() == raw_h && source->getComponents() == imageraw->getComponents())
+        {
+            bc7_source = imageraw->mBC7Source;
+        }
+        imageraw->mBC7Source = nullptr;
+    }
+    LLGLuint created_name = 0;
+    LLGLuint* name_out = tex_name ? tex_name : &created_name;
+    const bool created = createGLTexture(discard_level, rawdata, false, usename, defer_copy, name_out);
+    if (created && bc7_source.notNull() && *name_out != 0)
+    {
+        queueBC7(bc7_source, *name_out);
+    }
+    return created;
     // </FS:Luna Witch>
-    return createGLTexture(discard_level, rawdata, false, usename, defer_copy, tex_name);
 }
 
 bool LLImageGL::createGLTexture(S32 discard_level, const U8* data_in, bool data_hasmips, S32 usename, bool defer_copy, LLGLuint* tex_name)
@@ -2102,6 +2127,7 @@ bool LLImageGL::readBackRaw(S32 discard_level, LLImageRaw* imageraw, bool compre
 void LLImageGL::destroyGLTexture()
 {
     checkActiveThread();
+    cancelBC7(); // <FS:Luna Witch/>
 
     if (mTexName != 0)
     {
@@ -2690,6 +2716,156 @@ bool LLImageGL::setImageBC7(const FSImageBC7& bc7, const U8* raw_data)
     return true;
 }
 
+namespace
+{
+    // BC7 copies being made after upload (FSBC7Compressor), by job id
+    struct BC7Job
+    {
+        LLImageGL*  image = nullptr;
+        LLGLuint    tex_name = 0;   // the texture the copy replaces
+        S32         discard = -1;
+    };
+    std::mutex sBC7JobMutex;
+    std::unordered_map<U64, BC7Job> sBC7Jobs;
+
+    // Swapped in per frame at most: each is a few glCompressedTexImage2D calls
+    constexpr S32 MAX_BC7_SWAPS_PER_FRAME = 8;
+}
+
+void LLImageGL::queueBC7(const LLPointer<LLImageRaw>& source, LLGLuint tex_name)
+{
+    cancelBC7();
+    const U64 id = FSBC7Compressor::queue(source);
+    if (id == 0)
+    {
+        return;
+    }
+    std::lock_guard<std::mutex> lock(sBC7JobMutex);
+    sBC7Jobs[id] = { this, tex_name, mCurrentDiscardLevel };
+    mBC7JobId = id;
+}
+
+void LLImageGL::cancelBC7()
+{
+    U64 id = 0;
+    {
+        std::lock_guard<std::mutex> lock(sBC7JobMutex);
+        if (mBC7JobId == 0)
+        {
+            return;
+        }
+        id = mBC7JobId;
+        mBC7JobId = 0;
+        sBC7Jobs.erase(id);
+    }
+    FSBC7Compressor::cancel(id);
+}
+
+//static
+void LLImageGL::applyCompressedBC7()
+{
+    LL_PROFILE_ZONE_SCOPED_CATEGORY_TEXTURE;
+    S32 swapped = 0;
+    U64 id = 0;
+    LLPointer<FSImageBC7> bc7;
+    while (swapped < MAX_BC7_SWAPS_PER_FRAME && FSBC7Compressor::takeResult(id, bc7))
+    {
+        std::lock_guard<std::mutex> lock(sBC7JobMutex);
+        auto it = sBC7Jobs.find(id);
+        if (it == sBC7Jobs.end())
+        {
+            continue;   // cancelled: the texture changed or is gone
+        }
+        const BC7Job job = it->second;
+        sBC7Jobs.erase(it);
+        LLImageGL* image = job.image;
+        if (image->mBC7JobId == id)
+        {
+            image->mBC7JobId = 0;
+        }
+        // Still the texture it was made for, at the same size (a texture made on the GL thread is only
+        // handed to the main thread later: then it is left uncompressed)
+        if (bc7.isNull() || image->mIsBC7 || image->mTexName == 0 || image->mTexName != job.tex_name
+            || image->mCurrentDiscardLevel != job.discard
+            || bc7->getWidth() != (U32)image->getWidth(job.discard) || bc7->getHeight() != (U32)image->getHeight(job.discard))
+        {
+            continue;
+        }
+        if (image->swapInBC7(*bc7))
+        {
+            ++swapped;
+        }
+    }
+}
+
+// The texture's levels again, from its BC7 copy, in a new texture name that replaces the old one once every
+// level is in: if any upload fails, the uncompressed texture stays as it was.
+bool LLImageGL::swapInBC7(const FSImageBC7& bc7)
+{
+#if LL_DARWIN
+    return false; // bc7Supported() is false on macOS
+#else
+    const bool srgb = mFormatInternal == GL_SRGB8_ALPHA8 || mFormatInternal == GL_SRGB8
+                      || mFormatInternal == GL_SRGB_ALPHA || mFormatInternal == GL_SRGB;
+    const U32 format = srgb ? GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM : GL_COMPRESSED_RGBA_BPTC_UNORM;
+    const std::vector<FSImageBC7::Level>& levels = bc7.getLevels();
+    const S32 count = llmin((S32)levels.size(), llmax((S32)mMaxDiscardLevel - (S32)mCurrentDiscardLevel, 0) + 1);
+    if (count <= 0)
+    {
+        return false;
+    }
+
+    const bool had_mipmaps = mHasMipMaps;
+    LLGLuint new_name = 0;
+    LLImageGL::generateTextures(1, &new_name);
+    gGL.getTexUnit(0)->bind(this, false, false, new_name);
+    clear_glerror();
+    for (S32 i = 0; i < count; ++i)
+    {
+        const FSImageBC7::Level& level = levels[i];
+        glCompressedTexImage2D(mTarget, i, format, level.width, level.height, 0, (GLsizei)level.blocks.size(), level.blocks.data());
+        if (i == 0)
+        {
+            alloc_tex_bytes(level.blocks.size(), level.width, level.height);
+        }
+        else
+        {
+            add_tex_bytes(level.blocks.size());
+        }
+    }
+    glTexParameteri(mTarget, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(mTarget, GL_TEXTURE_MAX_LEVEL, count - 1);
+    if (bc7.isOpaque())
+    {
+        // BC7 can only give an opaque texture alpha 254 in places; sample exactly what the source had
+        glTexParameteri(mTarget, GL_TEXTURE_SWIZZLE_A, GL_ONE);
+    }
+    mHasMipMaps = count > 1;
+    gGL.getTexUnit(0)->setHasMipMaps(mHasMipMaps);
+    gGL.getTexUnit(0)->setTextureAddressMode(mAddressMode);
+    gGL.getTexUnit(0)->setTextureFilteringOption(mFilterOption);
+    gGL.getTexUnit(0)->unbind(mBindTarget);
+
+    if (glGetError() != GL_NO_ERROR)
+    {
+        LL_WARNS_ONCE("Texture") << "Uploading a BC7 texture failed; textures that fail stay uncompressed" << LL_ENDL;
+        mHasMipMaps = had_mipmaps;
+        LLImageGL::deleteTextures(1, &new_name);
+        return false;
+    }
+
+    LLImageGL::deleteTextures(1, &mTexName);
+    mTexName = new_name;
+    mIsBC7 = true;
+    mBC7Format = format;
+    mBC7AlphaIsOne = bc7.isOpaque();
+    mMipLevels = count - 1;
+    mTexOptionsDirty = true;
+    mTextureMemory = (S64Bytes)getMipBytes(mCurrentDiscardLevel);
+    return true;
+#endif
+}
+
 bool LLImageGL::scaleDownBC7(S32 desired_discard)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_TEXTURE;
@@ -2800,6 +2976,7 @@ bool LLImageGL::scaleDownBC7(S32 desired_discard)
 bool LLImageGL::scaleDown(S32 desired_discard)
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_TEXTURE;
+    cancelBC7(); // <FS:Luna Witch/>
 
     if (mTarget != GL_TEXTURE_2D
         || mFormatInternal == -1 // not initialized

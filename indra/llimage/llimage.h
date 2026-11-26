@@ -255,6 +255,9 @@ public:
     // <FS:Luna Witch> The image and its mipmaps compressed to BC7 by the decode thread (fsimagebc7.h), or null.
     // Only valid while its size matches the image's: LLImageGL checks before using it.
     LLPointer<FSImageBC7> mBC7;
+    // A copy of the image the decode thread made for compressing to BC7 after the image is shown
+    // (FSBC7Compressor), or null. LLImageGL queues it when it uploads the image, if the sizes still match.
+    mutable LLPointer<LLImageRaw> mBC7Source;
     // </FS:Luna Witch>
 
 
