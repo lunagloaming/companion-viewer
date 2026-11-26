@@ -207,7 +207,7 @@ F32 FSTextureBudget::chooseBias(F32 current_bias, const Inputs& in)
             LL_INFOS("TextureMemory") << "BC7 last minute: " << bc7.compressed << " textures compressed, " << bc7.rejected
                                       << " left uncompressed (" << bc7.rejected_alpha << " of them for holes or specks in alpha), "
                                       << (S32)(bc7.bytes_saved >> 20) << " MB saved; compressing took "
-                                      << (S32)(bc7.microseconds / 1000) << " ms of decode thread time, decoding "
+                                      << (S32)(bc7.microseconds / 1000) << " ms of compression thread time; decoding "
                                       << (S32)(bc7.decode_microseconds / 1000) << " ms" << LL_ENDL;
         }
         sBiasChanges = 0;

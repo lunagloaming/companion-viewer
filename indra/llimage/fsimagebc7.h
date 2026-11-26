@@ -37,7 +37,7 @@
 class LLImageRaw;
 
 // A decoded texture and its mipmaps compressed to BC7: 4x4 texels in 16 bytes, a quarter of RGBA8.
-// Made on the decode threads; LLImageGL uploads the levels as they are. A texture BC7 would visibly
+// Made after the texture is shown, on FSBC7Compressor's threads; LLImageGL uploads the levels as they are. A texture BC7 would visibly
 // harm (fine-grained normal maps, thin alpha lattices) is left uncompressed: every block is decoded
 // back and compared with its source. A fully opaque texture may decode with alpha 254 here and there,
 // so LLImageGL samples its alpha as exactly 1 (isOpaque).
@@ -82,5 +82,21 @@ private:
     S32 mSourceComponents = 0;
     bool mOpaque = false;
 };
+
+// Compresses decoded textures to BC7 after they are shown: a texture is uploaded uncompressed first, and
+// swapped for its BC7 copy once that is ready (LLImageGL). A few threads do it, at a little below normal
+// priority, so compressing never holds up decoding.
+namespace FSBC7Compressor
+{
+    // Queues a copy of a decoded image; the returned id names the job (never 0).
+    U64 queue(const LLPointer<LLImageRaw>& source);
+    // The job isn't wanted any more: its texture was replaced or freed. Any thread.
+    void cancel(U64 id);
+    // A finished job, if there is one: its id and the result (null when BC7 would harm the texture,
+    // or when the job was dropped). For the main thread.
+    bool takeResult(U64& id, LLPointer<FSImageBC7>& result);
+    // Stops the threads; jobs not done are dropped.
+    void shutdown();
+}
 
 #endif // FS_IMAGEBC7_H
