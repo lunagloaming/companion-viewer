@@ -3481,6 +3481,16 @@ bool idle_startup()
         FSFavoriteGroups::getInstance()->loadFavorites();
         // </FS:PP>
 
+        // <FS:Luna Witch> A new install opens People and Conversations at its first login; the default
+        // FSWindowEdgeDockLayout docks them to the left
+        if (gSavedSettings.getBOOL("FSWindowEdgeDockOpenAtFirstLogin"))
+        {
+            gSavedSettings.setBOOL("FSWindowEdgeDockOpenAtFirstLogin", false);
+            LLFloaterReg::showInstance("people", LLSD(), false);
+            LLFloaterReg::showInstance("fs_im_container", LLSD(), false);
+        }
+        // </FS:Luna Witch>
+
         LLStartUp::setStartupState( STATE_STARTED );
         do_startup_frame();
 

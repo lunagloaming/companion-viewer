@@ -29,6 +29,7 @@
 
 #include "llwindowedgedock.h"
 
+#include "llapp.h"
 #include "llcontrol.h"
 #include "lldraghandle.h"
 #include "llfloater.h"
@@ -66,6 +67,7 @@ LLWindowEdgeDock::LLWindowEdgeDock()
     {
         mDepths[edge] = 0;
         mAppliedInsets[edge] = 0;
+        mUse[edge] = USE_NOT_USED;
     }
 }
 
@@ -218,6 +220,20 @@ void LLWindowEdgeDock::loadLayout()
         }
     }
 
+    // Areas that showed a floater keep their place until it shows again. Layouts saved before
+    // "in_use" was written count every area in the order as showing.
+    const bool has_use = layout.has("in_use");
+    const LLSD& in_use = layout["in_use"];
+    for (EEdge edge : mOrder)
+    {
+        bool used = !has_use;
+        for (LLSD::array_const_iterator it = in_use.beginArray(); it != in_use.endArray() && !used; ++it)
+        {
+            used = edgeFromName(it->asString()) == edge;
+        }
+        mUse[edge] = used ? USE_PENDING : USE_NOT_USED;
+    }
+
     const LLSD& floaters = layout["floaters"];
     for (LLSD::array_const_iterator it = floaters.beginArray(); it != floaters.endArray(); ++it)
     {
@@ -267,12 +283,18 @@ void LLWindowEdgeDock::saveLayout()
         }
     }
     LLSD order = LLSD::emptyArray();
+    LLSD in_use = LLSD::emptyArray();
     for (EEdge edge : mOrder)
     {
         order.append(EDGE_NAMES[edge]);
+        if (mUse[edge] != USE_NOT_USED)
+        {
+            in_use.append(EDGE_NAMES[edge]);
+        }
     }
     layout["depths"] = depths;
     layout["order"] = order;
+    layout["in_use"] = in_use;
     layout["floaters"] = floaters;
     group->setLLSD("FSWindowEdgeDockLayout", layout);
 }
@@ -793,6 +815,42 @@ void LLWindowEdgeDock::updateOrder()
     }
 }
 
+void LLWindowEdgeDock::updateUse(const S32 depths[EDGE_COUNT])
+{
+    // An area that shows a floater again after showing none goes after the areas already showing, so the
+    // area docked to first keeps the full length of its edge (an area whose floater was closed doesn't
+    // keep its old place ahead of the others)
+    bool changed = false;
+    for (S32 e = 0; e < EDGE_COUNT; ++e)
+    {
+        const EEdge edge = (EEdge)e;
+        if (depths[edge] > 0)
+        {
+            if (mUse[edge] == USE_NOT_USED)
+            {
+                auto it = std::find(mOrder.begin(), mOrder.end(), edge);
+                if (it != mOrder.end())
+                {
+                    mOrder.erase(it);
+                }
+                mOrder.push_back(edge);
+                changed = true;
+            }
+            mUse[edge] = USE_SHOWING;
+        }
+        else if (mUse[edge] == USE_SHOWING)
+        {
+            mUse[edge] = USE_NOT_USED;
+            changed = true;
+        }
+    }
+    // Floaters closing while the viewer quits don't change the saved layout
+    if (changed && !LLApp::isExiting())
+    {
+        saveLayout();
+    }
+}
+
 void LLWindowEdgeDock::computeAreaRects(const LLRect& frame, const S32 depths[EDGE_COUNT], const std::vector<EEdge>& order,
                                         LLRect rects[EDGE_COUNT], LLRect* world_out) const
 {
@@ -885,6 +943,8 @@ void LLWindowEdgeDock::arrange()
             depths[edge] = llclamp(depth, min_depth, llmax(min_depth, maxDepth(edge, frame)));
         }
     }
+
+    updateUse(depths);
 
     LLRect rects[EDGE_COUNT];
     computeAreaRects(frame, depths, mOrder, rects);
@@ -1013,7 +1073,7 @@ void LLWindowEdgeDock::arrange()
                 cursor -= slot.mSize;
             }
 
-            if (rect != floater->getRect())
+            if (rect != floater->getRect() || mForcePlacement)
             {
                 floater->setShape(rect, false);
             }
@@ -1503,14 +1563,20 @@ void LLWindowEdgeDock::logStateIfChanged(const char* reason)
 
 void LLWindowEdgeDock::checkAreas()
 {
-    if (!gFloaterView || !diagnosticsEnabled())
+    if (!gFloaterView || resizeInProgress())
     {
         return;
     }
 
     // An area with space should show at least one of its floaters inside it
+    const LLRect frame = getFrame();
+    if (frame.getWidth() <= 0 || frame.getHeight() <= 0)
+    {
+        return;     // the window is minimized
+    }
     LLRect rects[EDGE_COUNT];
-    computeAreaRects(getFrame(), mDepths, mOrder, rects);
+    computeAreaRects(frame, mDepths, mOrder, rects);
+    bool place_again = false;
     for (S32 e = 0; e < EDGE_COUNT; ++e)
     {
         bool empty = false;
@@ -1528,11 +1594,47 @@ void LLWindowEdgeDock::checkAreas()
                 }
             }
         }
-        if (empty && !mReportedEmpty[e])
+        if (empty && !mReportedEmpty[e] && diagnosticsEnabled())
         {
             LL_WARNS("WindowEdgeDock") << "The " << EDGE_NAMES[e] << " area takes " << mDepths[e]
                                        << " pixels but shows no floater. " << describeState() << LL_ENDL;
         }
         mReportedEmpty[e] = empty;
+
+        mEmptyChecks[e] = empty ? mEmptyChecks[e] + 1 : 0;
+        if (mEmptyChecks[e] == 2)
+        {
+            // Empty for a while, not just in passing: place its floaters again
+            place_again = true;
+        }
+        else if (mEmptyChecks[e] >= 3)
+        {
+            // Placing them again didn't bring any back: undock them, so the space goes back to the world
+            // view and the floaters to where they were before docking, kept on screen
+            LL_WARNS("WindowEdgeDock") << "The " << EDGE_NAMES[e] << " area takes " << mDepths[e]
+                                       << " pixels but shows none of its floaters; undocking them. "
+                                       << describeState() << LL_ENDL;
+            mEmptyChecks[e] = 0;
+            std::vector<LLFloater*> floaters;
+            for (const Entry& entry : mAreas[e].mEntries)
+            {
+                if (isActive(entry))
+                {
+                    floaters.push_back(entry.mFloater.get());
+                }
+            }
+            for (LLFloater* floater : floaters)
+            {
+                undock(floater);
+                gFloaterView->bringToFront(floater, false);
+            }
+        }
+    }
+
+    if (place_again)
+    {
+        mForcePlacement = true;
+        arrange();
+        mForcePlacement = false;
     }
 }
