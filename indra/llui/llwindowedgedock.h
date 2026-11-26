@@ -158,7 +158,7 @@ private:
     // area that takes space without showing any floater is reported once
     bool diagnosticsEnabled() const;
     std::string describeState() const;
-    void logEvent(const char* event, const LLFloater* floater) const;
+    void logEvent(const char* event, LLFloater* floater) const;
     void logStateIfChanged(const char* reason);
     void checkAreas();
 
