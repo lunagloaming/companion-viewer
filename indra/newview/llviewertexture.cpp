@@ -63,6 +63,7 @@
 #include "lltexturecache.h"
 #include "llviewerwindow.h"
 #include "llwindow.h"
+#include "fsinstanceslots.h" // <FS:Luna Witch/>
 #include "fstexturebudget.h" // <FS:Luna Witch/>
 #include "llrendertarget.h" // <FS:Luna Witch/>
 ///////////////////////////////////////////////////////////////////////////////
@@ -543,7 +544,11 @@ void LLViewerTexture::updateClass()
     // While we're at it, assume we have 1024 to play with at minimum when the divisor is in use.  Works more elegantly with the logic below this.
     // -Geenz 2025-03-21
     // F32 budget = max_vram_budget == 0 ? llmax(1024, (F32)gGLManager.mVRAM / tex_vram_divisor) : (F32)max_vram_budget;
-    F32 budget = !max_vram_budget_enabled ? llmax(1024, (F32)gGLManager.mVRAM / (tex_vram_divisor() > 0.f ? tex_vram_divisor() : 1.f)) : (F32)max_vram_budget;
+    // <FS:Luna Witch> An autodetected budget assumes the whole GPU; share it with other running viewer instances
+    //F32 budget = !max_vram_budget_enabled ? llmax(1024, (F32)gGLManager.mVRAM / (tex_vram_divisor() > 0.f ? tex_vram_divisor() : 1.f)) : (F32)max_vram_budget;
+    const F32 instance_count = (F32)FSInstanceSlots::instance().getActiveInstanceCount();
+    F32 budget = !max_vram_budget_enabled ? llmax(1024, (F32)gGLManager.mVRAM / (tex_vram_divisor() > 0.f ? tex_vram_divisor() : 1.f) / instance_count) : (F32)max_vram_budget;
+    // </FS:Luna Witch>
 
     // Try to leave at least half a GB for everyone else and for bias,
     // but keep at least 768MB for ourselves
@@ -638,7 +643,9 @@ void LLViewerTexture::updateClass()
     // A budget set by hand, or the whole card shared by the divisor
     const F32 ceiling = !max_vram_budget_enabled ? llmax(1024.f, (F32)gGLManager.mVRAM / (tex_vram_divisor() > 0.f ? tex_vram_divisor() : 1.f))
                                                  : (F32)max_vram_budget;
-    F32 target = target_for(ceiling);
+    // An automatic budget is shared with the other running viewer instances (FSInstanceSlots)
+    const F32 instance_count = !max_vram_budget_enabled ? (F32)llmax(FSInstanceSlots::instance().getActiveInstanceCount(), 1) : 1.f;
+    F32 target = target_for(ceiling / instance_count);
     S32 card_free_mb = -1;
     S32 evictions = -1;
     if (!max_vram_budget_enabled && budget_from_card)
@@ -648,11 +655,35 @@ void LLViewerTexture::updateClass()
         if (card_free_mb >= 0)
         {
             // What this viewer uses plus what is free, less a reserve for the desktop, other programs and what
-            // isn't counted. Never less than half the card: other programs count as one more viewer.
+            // isn't counted. Never less than an even share of the card, with other programs counted as one
+            // more viewer, so a viewer that has taken more gives memory back as another one grows.
             const F32 live = used + (F32)card_free_mb - (F32)vram_reserve();
-            target = llclamp(live, target_for(ceiling / 2.f), target);
+            target = llclamp(live, target_for(ceiling / (instance_count + 1.f)), target_for(ceiling));
         }
     }
+
+    // System memory limits the budget the same way. On Linux (seen with NVIDIA) what textures and vertex
+    // buffers use shows up about one for one in the viewer's own memory, so a budget taken from a 24 GB card
+    // alone let one viewer and a browser bring 32 GB of RAM down to 2 GB available, and the low-memory cap
+    // below never fired. What this viewer uses plus what the system has available stays about the same while
+    // its textures grow or shrink, so the limit holds steady, and several viewers share the memory as they
+    // share the card. A budget set by hand is left alone.
+    F32 system_limit = 0.f;
+#if LL_LINUX
+    static LLCachedControl<U32> ram_reserve(gSavedSettings, "FSTextureSystemMemoryReserve", 0);
+    if (!max_vram_budget_enabled)
+    {
+        const F32 available_mb = (F32)getFreeSystemMemory().value(); // refreshes the total too
+        const F32 total_mb = (F32)LLMemory::getMaxMemKB().value() / 1024.f;
+        if (total_mb > 0.f && available_mb < total_mb)
+        {
+            // Left for the system and other programs: an eighth of the memory, at least 2 GB, unless set
+            const F32 reserve = ram_reserve() > 0 ? (F32)ram_reserve() : llmax(2048.f, total_mb / 8.f);
+            system_limit = llmax(used + available_mb - reserve, MIN_VRAM_BUDGET);
+            target = llmin(target, system_limit);
+        }
+    }
+#endif
 
     // The card is overcommitted when the NVIDIA driver moves video memory out to system memory, or when an
     // allocation fails outright. Either holds textures below what they use for a while.
@@ -819,6 +850,7 @@ void LLViewerTexture::updateClass()
         inputs.card_free_mb = card_free_mb;
         inputs.evictions = evictions;
         inputs.system_cap_mb = system_cap;
+        inputs.system_limit_mb = system_limit;
         sDesiredDiscardBias = FSTextureBudget::chooseBias(sDesiredDiscardBias, inputs);
     }
     // </FS:Luna Witch>
@@ -888,6 +920,72 @@ U32Megabytes getFreeCommitMemory()
 #endif
 // </FS:Beq>
 
+// <FS:Luna Witch> Linux memory pressure (PSI). With compressed swap such as zram, free memory can look
+// fine while the system is thrashing, so also look at how much time tasks are stalled waiting on memory.
+#if LL_LINUX
+// Returns the "some avg60" percentage from /proc/pressure/memory, or a negative value if unavailable.
+// The one-minute average: "some avg10" hovered around the threshold (2.09%, 1.71%, 2.08% within seconds)
+// and every crossing blurred the textures in view.
+F32 get_linux_memory_pressure()
+{
+    static LLFrameTimer timer;
+    static F32 pressure_res = -1.f;
+    static bool first_call = true;
+
+    if (!first_call && timer.getElapsedTimeF32() < MEMORY_CHECK_WAIT_TIME) //call this once per second.
+    {
+        return pressure_res;
+    }
+
+    first_call = false;
+    timer.reset();
+
+    pressure_res = -1.f;
+    if (LLFILE* fp = LLFile::fopen("/proc/pressure/memory", "r"))
+    {
+        F32 avg10 = 0.f;
+        F32 avg60 = 0.f;
+        if (fscanf(fp, "some avg10=%f avg60=%f", &avg10, &avg60) == 2)
+        {
+            pressure_res = avg60;
+        }
+        LLFile::close(fp);
+    }
+    return pressure_res;
+}
+
+F32 get_linux_memory_pressure_threshold()
+{
+    static LLCachedControl<F32> pressure_threshold(gSavedSettings, "FSLinuxMemPressureThreshold", 2.f);
+    return pressure_threshold;
+}
+
+bool is_linux_memory_pressure_high()
+{
+    // High above the threshold, and stays high until it falls below half of it
+    static bool was_high = false;
+    const F32 threshold = get_linux_memory_pressure_threshold();
+    const F32 pressure = get_linux_memory_pressure();
+    const bool is_high = threshold > 0.f && (was_high ? pressure >= threshold * 0.5f : pressure > threshold);
+    if (is_high != was_high)
+    {
+        LL_INFOS("TextureMemory") << "Linux memory pressure " << (is_high ? "high" : "back down") << ": some avg60="
+                                  << pressure << "% (high above " << threshold << "%, back down below "
+                                  << threshold * 0.5f << "%)" << LL_ENDL;
+        was_high = is_high;
+    }
+    return is_high;
+}
+
+bool is_linux_memory_pressure_recovered()
+{
+    // Require pressure to fall well below the trigger level before restoring texture quality.
+    const F32 threshold = get_linux_memory_pressure_threshold();
+    return threshold <= 0.f || get_linux_memory_pressure() < threshold * 0.5f;
+}
+#endif
+// </FS:Luna Witch>
+
 S32Megabytes get_render_free_main_memory_treshold()
 {
     static LLCachedControl<U32> min_free_main_memory(gSavedSettings, "RenderMinFreeMainMemoryThreshold", 512);
@@ -916,6 +1014,10 @@ bool LLViewerTexture::isSystemMemoryLow()
 #if LL_WINDOWS
     const bool commit_low = getFreeCommitMemory() < get_render_free_commit_memory_threshold();
     return physical_low || commit_low;
+// <FS:Luna Witch> Linux memory pressure
+#elif LL_LINUX
+    return physical_low || is_linux_memory_pressure_high();
+// </FS:Luna Witch>
 #else
     return physical_low;
 #endif
@@ -950,6 +1052,10 @@ bool LLViewerTexture::isSystemMemoryRecovered()
 #if LL_WINDOWS
     return physical_recovered &&
         getFreeCommitMemory() > get_render_free_commit_memory_threshold() + margin;
+// <FS:Luna Witch> Linux memory pressure
+#elif LL_LINUX
+    return physical_recovered && is_linux_memory_pressure_recovered();
+// </FS:Luna Witch>
 #else
     return physical_recovered;
 #endif

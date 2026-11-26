@@ -31,6 +31,7 @@
 
 #include "llframetimer.h"
 #include "fsimagebc7.h"
+#include "llviewercontrol.h"
 #include "llviewertexture.h"
 
 namespace
@@ -168,29 +169,40 @@ F32 FSTextureBudget::chooseBias(F32 current_bias, const Inputs& in)
         rise_timer.reset();
     }
 
+    // <FS:Luna Witch> logged only with the debug setting FSMemoryDiagnostics
+    static LLCachedControl<bool> diagnostics(gSavedSettings, "FSMemoryDiagnostics");
     if (chosen != current)
     {
         ++sBiasChanges;
-        LL_INFOS("TextureMemory") << "Discard bias " << BIASES[current] << " -> " << BIASES[chosen] << " (" << cause
-                                  << "): would need " << (S32)predicted_mb[current] << " MB at " << BIASES[current]
-                                  << ", " << (S32)predicted_mb[chosen] << " MB at " << BIASES[chosen]
-                                  << "; target " << (S32)in.target_mb << " MB, using " << (S32)in.used_mb << " MB"
-                                  << (in.system_cap_mb > 0.f ? " (capped for low system memory)" : "") << LL_ENDL;
+        if (diagnostics)
+        {
+            LL_INFOS("TextureMemory") << "Discard bias " << BIASES[current] << " -> " << BIASES[chosen] << " (" << cause
+                                      << "): would need " << (S32)predicted_mb[current] << " MB at " << BIASES[current]
+                                      << ", " << (S32)predicted_mb[chosen] << " MB at " << BIASES[chosen]
+                                      << "; target " << (S32)in.target_mb << " MB, using " << (S32)in.used_mb << " MB"
+                                      << (in.system_cap_mb > 0.f ? " (capped for low system memory)"
+                                          : in.system_limit_mb > 0.f && in.target_mb >= in.system_limit_mb ? " (limited by system memory)"
+                                                                                                            : "") << LL_ENDL;
+        }
     }
 
     static LLFrameTimer summary_timer;
     if (summary_timer.getElapsedTimeF32() > SUMMARY_SECS)
     {
         summary_timer.reset();
-        LL_INFOS("TextureMemory") << "Textures " << (S32)in.texture_mb << " MB (render targets " << (S32)in.render_target_mb
-                                  << "), vertex buffers " << (S32)in.vertex_mb << " MB; target " << (S32)in.target_mb
-                                  << " MB; bias " << BIASES[chosen] << ", predicted " << (S32)predicted_mb[chosen]
-                                  << " MB; card free " << in.card_free_mb << " MB, evictions " << in.evictions
-                                  << "; system memory cap " << (S32)in.system_cap_mb << " MB; last minute: "
-                                  << sBiasChanges << " bias changes, " << sShrunkInView
-                                  << " textures shrunk while on screen" << LL_ENDL;
+        if (diagnostics)
+        {
+            LL_INFOS("TextureMemory") << "Textures " << (S32)in.texture_mb << " MB (render targets " << (S32)in.render_target_mb
+                                      << "), vertex buffers " << (S32)in.vertex_mb << " MB; target " << (S32)in.target_mb
+                                      << " MB; bias " << BIASES[chosen] << ", predicted " << (S32)predicted_mb[chosen]
+                                      << " MB; card free " << in.card_free_mb << " MB, evictions " << in.evictions
+                                      << "; system memory allows " << (S32)in.system_limit_mb << " MB, low-memory cap "
+                                      << (S32)in.system_cap_mb << " MB; last minute: "
+                                      << sBiasChanges << " bias changes, " << sShrunkInView
+                                      << " textures shrunk while on screen" << LL_ENDL;
+        }
         const FSImageBC7::Stats bc7 = FSImageBC7::takeStats();
-        if (bc7.compressed || bc7.rejected)
+        if (diagnostics && (bc7.compressed || bc7.rejected))
         {
             LL_INFOS("TextureMemory") << "BC7 last minute: " << bc7.compressed << " textures compressed, " << bc7.rejected
                                       << " left uncompressed (" << bc7.rejected_alpha << " of them for holes or specks in alpha), "

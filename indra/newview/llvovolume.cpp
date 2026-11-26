@@ -94,6 +94,7 @@
 #include "rlvlocks.h"
 // [/RLVa:KB]
 #include "llviewernetwork.h"
+#include "fsrebuildtrace.h" // <FS:Luna Witch/>
 
 const F32 FORCE_SIMPLE_RENDER_AREA = 512.f;
 const F32 FORCE_CULL_AREA = 8.f;
@@ -2544,7 +2545,32 @@ S32 LLVOVolume::setTEColor(const U8 te, const LLColor4& color)
     else if (color != tep->getColor())
     {
         F32 old_alpha = tep->getColor().mV[3];
-        if (color.mV[3] != old_alpha)
+        // <FS:Luna Witch> A colour change used to rebuild the object's whole spatial group (for an attachment, the
+        // whole attachment) into new vertex buffers. Scripted fades, blinks and hide/show "flipbook" animations on
+        // rigged attachments did that thousands of times a minute in a crowd. Colour and alpha are per vertex, so
+        // when the face can stay in its render batch the in-place path below (REBUILD_COLOR + dirtyMesh) is enough:
+        // - its alpha class (LLFace::fsAlphaClass) doesn't change;
+        // - it is hidden: it keeps its batch and LLFace::getGeometryVolume gives it degenerate triangles;
+        // - it is shown again while still in the batch it was put in with the same class.
+        // GLTF faces take their colour from the material: unchanged.
+        static LLCachedControl<bool> in_place_colour(gSavedSettings, "FSInPlaceColorUpdates", true);
+        const S32 old_class = LLFace::fsAlphaClass(old_alpha, tep->getGlow());
+        const S32 new_class = LLFace::fsAlphaClass(color.mV[3], tep->getGlow());
+        LLFace* face = mDrawable.notNull() && te < mDrawable->getNumFaces() ? mDrawable->getFace(te) : nullptr;
+        const bool batched = face && face->getTEOffset() == te && face->getVertexBuffer() && face->getIndicesCount();
+        const bool same_batch = in_place_colour && !tep->getGLTFRenderMaterial()
+            && (old_class == new_class
+                || (batched && new_class == 0 && LLFace::fsCanHideInPlace())
+                || (batched && old_class == 0 && face->mFSBatchedAlphaClass == new_class));
+        FSRebuildTrace::colourChange(old_class, new_class, same_batch);
+        if (face && face->getTEOffset() == te && new_class == 0 && old_class != 0)
+        {
+            face->mFSHiddenFromAlphaClass = (S8)(same_batch ? old_class : -1);
+            face->mFSHiddenTime = gFrameTimeSeconds;
+        }
+        //if (color.mV[3] != old_alpha)
+        if (color.mV[3] != old_alpha && !same_batch)
+        // </FS:Luna Witch>
         {
             gPipeline.markTextured(mDrawable);
             //treat this alpha change as an LoD update since render batches may need to get rebuilt
@@ -2555,7 +2581,8 @@ S32 LLVOVolume::setTEColor(const U8 te, const LLColor4& color)
         if (mDrawable.notNull() && retval)
         {
             // These should only happen on updates which are not the initial update.
-            mColorChanged = true;
+            //mColorChanged = true;
+            mColorChanged = mColorChanged || !same_batch; // <FS:Luna Witch/>
             mDrawable->setState(LLDrawable::REBUILD_COLOR);
             shrinkWrap();
             dirtyMesh();
@@ -5626,6 +5653,15 @@ void LLVolumeGeometryManager::registerFace(LLSpatialGroup* group, LLFace* facep,
 
     LL_LABEL_VERTEX_BUFFER(facep->getVertexBuffer(), LLRenderPass::lookupPassName(type));
 
+    // <FS:Luna Witch> remember which alpha class this face was batched with (LLVOVolume::setTEColor). A face hidden
+    // in place keeps the render pool of its class before hiding, so that is the class its batch fits.
+    if (const LLTextureEntry* te = facep->getTextureEntry())
+    {
+        const S32 alpha_class = LLFace::fsAlphaClass(te->getColor().mV[3], te->getGlow());
+        facep->mFSBatchedAlphaClass = (S8)(alpha_class == 0 ? facep->mFSHiddenFromAlphaClass : alpha_class);
+    }
+    // </FS:Luna Witch>
+
     U32 passType = type;
 
     bool rigged = facep->isState(LLFace::RIGGED);
@@ -6227,6 +6263,22 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
 
                     bool force_simple = (facep->getPixelArea() < FORCE_SIMPLE_RENDER_AREA);
                     U32 type = gPipeline.getPoolTypeFromTE(te, tex);
+                    // <FS:Luna Witch> A face hidden in place moments ago keeps the pool of its class before hiding, so it
+                    // stays batched (with degenerate triangles) and can be shown again in place. Faces that would be
+                    // drawn as alpha masks when visible can't be reproduced while hidden: those drop out as before.
+                    bool keep_hidden = facep->fsKeepHiddenInBatch(te);
+                    if (keep_hidden)
+                    {
+                        LLTextureEntry visible_te(*te);
+                        visible_te.setAlpha(LLFace::fsClassAlpha(facep->mFSHiddenFromAlphaClass));
+                        const U32 visible_type = gPipeline.getPoolTypeFromTE(&visible_te, tex);
+                        keep_hidden = visible_type != LLDrawPool::POOL_ALPHA || facep->mFSHiddenFromAlphaClass == 1;
+                        if (keep_hidden)
+                        {
+                            type = visible_type;
+                        }
+                    }
+                    // </FS:Luna Witch>
                     if (is_pbr && gltf_mat && gltf_mat->mAlphaMode != LLGLTFMaterial::ALPHA_MODE_BLEND)
                     {
                         type = LLDrawPool::POOL_GLTF_PBR;
@@ -6289,7 +6341,8 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
                             }
                             // <FS:ND> Even more crash avoidance ...
                             //if (alpha > 0.f || te->getGlow() > 0.f)
-                            if (alpha > 0.f || (te && te->getGlow() > 0.f))
+                            //if (alpha > 0.f || (te && te->getGlow() > 0.f))
+                            if (alpha > 0.f || (te && te->getGlow() > 0.f) || keep_hidden) // <FS:Luna Witch/>
                             { //only treat as alpha in the pipeline if < 100% transparent
                                 drawablep->setState(LLDrawable::HAS_ALPHA);
                                 add_face(sAlphaFaces, alpha_count, facep);
@@ -6474,6 +6527,7 @@ void LLVolumeGeometryManager::rebuildGeom(LLSpatialGroup* group)
     }
 
     group->mGeometryBytes = geometryBytes;
+    FSRebuildTrace::rebuilt(group, geometryBytes); // <FS:Luna Witch/>
 
     {
         //drawables have been rebuilt, clear rebuild status
@@ -6949,7 +7003,13 @@ U32 LLVolumeGeometryManager::genDrawInfo(LLSpatialGroup* group, U32 mask, LLFace
                 }
             }
 
-            F32 blinn_phong_alpha = te->getColor().mV[3];
+            //F32 blinn_phong_alpha = te->getColor().mV[3];
+            // <FS:Luna Witch> A face hidden in place moments ago (see rebuildGeom) is batched in the pass it has when
+            // visible, so showing it again in place draws it; with its current alpha 0 it went to the never-drawn
+            // invisible pass, and a shown face stayed a hole until the group was rebuilt again.
+            const bool fs_keep_hidden = facep->fsKeepHiddenInBatch(te);
+            F32 blinn_phong_alpha = fs_keep_hidden ? LLFace::fsClassAlpha(facep->mFSHiddenFromAlphaClass) : te->getColor().mV[3];
+            // </FS:Luna Witch>
             bool use_legacy_bump = te->getBumpmap() && (te->getBumpmap() < 18) && (!mat || mat->getNormalID().isNull());
             bool blinn_phong_opaque = blinn_phong_alpha >= 0.999f;
             bool blinn_phong_transparent = blinn_phong_alpha < 0.999f;
@@ -7115,7 +7175,8 @@ U32 LLVolumeGeometryManager::genDrawInfo(LLSpatialGroup* group, U32 mask, LLFace
             else if (is_alpha)
             {
                 // can we safely treat this as an alpha mask?
-                if (facep->getFaceColor().mV[3] <= 0.f)
+                //if (facep->getFaceColor().mV[3] <= 0.f)
+                if (facep->getFaceColor().mV[3] <= 0.f && !fs_keep_hidden) // <FS:Luna Witch/>
                 { //100% transparent, don't render unless we're highlighting transparent
                     LL_PROFILE_ZONE_NAMED_CATEGORY_VOLUME("facep->alpha -> invisible");
                     registerFace(group, facep, LLRenderPass::PASS_ALPHA_INVISIBLE);
