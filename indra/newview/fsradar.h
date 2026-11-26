@@ -83,9 +83,10 @@ public:
     void getCurrentData(std::vector<LLSD>& entries, LLSD& stats) const { entries = mRadarEntriesData; stats = mAvatarStats; }
     std::shared_ptr<FSRadarEntry> getEntry(const LLUUID& avatar_id);
 
-    // Greeted marks are a personal checklist for this session only. They are
-    // kept apart from the radar entries so leaving range and coming back
-    // keeps the mark, and they are never saved.
+    // Greeted marks are a personal checklist. They are kept apart from the
+    // radar entries so leaving range and coming back keeps the mark, and saved
+    // in the account's folder: logging back in within FSRadarGreetingMemoryHours
+    // of closing the viewer brings them back.
     bool isGreeted(const LLUUID& avatar_id) const { return mGreetedAvatars.contains(avatar_id); }
     void setGreeted(const LLUUID& avatar_id, bool greeted, bool by_hand = true);
 
@@ -137,6 +138,11 @@ private:
     void updateArrivals(const LLUUID& avatar_id, F32 range, F32 chat_range, time_t now);
     void refreshSoon();
 
+    // greeting_state.xml in the account's folder
+    void loadGreetingState();
+    void saveGreetingState();
+    void greetingStateChanged() { mGreetingStateDirty = true; }
+
     std::unique_ptr<Updater> mRadarListUpdater;
 
     struct RadarFields
@@ -168,6 +174,9 @@ private:
     time_t                  mArrivalTime{ 0 };
     bool                    mArrivalLogged{ true };
     bool                    mRefreshQueued{ false };
+    bool                    mGreetingStateLoaded{ false };
+    bool                    mGreetingStateDirty{ false };
+    time_t                  mGreetingStateSaved{ 0 };
     LLSD                    mAvatarStats;
 
     radar_update_callback_t mUpdateSignal;

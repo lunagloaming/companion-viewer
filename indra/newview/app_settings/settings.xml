@@ -24619,6 +24619,17 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Value</key>
       <integer>0</integer>
     </map>
+    <key>FSRadarGreetingMemoryHours</key>
+    <map>
+      <key>Comment</key>
+      <string>Greeted ticks and arrivals on the nearby people list are kept this many hours after the viewer closes: logging back in within that time picks up where you left off. 0 forgets them when the viewer closes.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>3.0</real>
+    </map>
     <key>FSRadarTickWelcomed</key>
     <map>
       <key>Comment</key>
