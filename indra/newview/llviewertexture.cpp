@@ -2597,7 +2597,7 @@ bool LLViewerFetchedTexture::updateFetch()
         const F64 now = LLFrameTimer::getTotalSeconds();
         const bool waiting = mIsFetching && decode_priority > 0.f && getDiscardLevel() < 0 && mRawImage.isNull();
         // A gap between calls means the texture was not wanted meanwhile: start counting again.
-        if (!waiting || now - mLastFetchUpdate > 10.0)
+        if (!waiting || now - mLastFetchUpdate > 30.0)
         {
             mNoDataSince = now;
         }
