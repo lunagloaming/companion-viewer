@@ -200,6 +200,10 @@ public:
 
     // GLTF override
     LLGLTFMaterial* getGLTFMaterialOverride() const { return mGLTFMaterialOverrides; }
+
+    // <FS> Called, if set, when getGLTFRenderMaterial() finds a material override but no render
+    // material made from it, so the viewer can log which object and face it is.
+    static void (*sRenderMaterialMissingCallback)(const LLTextureEntry* entry);
     S32 setGLTFMaterialOverride(LLGLTFMaterial* mat);
     // Clear most overrides so the render material better matches the material
     // ID (preserve transforms). If the overrides become passthrough, set the

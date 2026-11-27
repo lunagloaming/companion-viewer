@@ -26571,6 +26571,28 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Backup</key>
       <integer>0</integer>
     </map>
+    <key>FSMissingTexturePlaceholder</key>
+    <map>
+      <key>Comment</key>
+      <string>A texture that fails to load (a failed fetch tried once more, or no image after FSMissingTextureTimeout seconds) shows a placeholder image instead of staying blank, and the log lists the objects using it (tag MissingTexture). A rebake or texture refresh fetches it again. Map tiles are left out.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>FSMissingTextureTimeout</key>
+    <map>
+      <key>Comment</key>
+      <string>Seconds a wanted texture may wait for its first image before it is given up on and shows the missing texture placeholder (FSMissingTexturePlaceholder). 0 waits forever.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>F32</string>
+      <key>Value</key>
+      <real>240.0</real>
+    </map>
     <key>FSRenderParcelSelectionToMaxBuildHeight</key>
     <map>
       <key>Comment</key>
