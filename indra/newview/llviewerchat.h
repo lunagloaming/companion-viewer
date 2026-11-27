@@ -42,6 +42,8 @@ public:
     // </FS:AO>
     static void getChatColor(const LLChat& chat, std::string& r_color_name, F32& r_color_alpha);
     static LLFontGL* getChatFont();
+    // <FS:Luna Witch> The font family for the text of chat messages (FSChatTextFont), or the chat font's if it has none
+    static std::string getChatTextFontName();
     static S32 getChatFontSize();
     static void formatChatMsg(const LLChat& chat, std::string& formated_msg);
     static std::string getSenderSLURL(const LLChat& chat, const LLSD& args);

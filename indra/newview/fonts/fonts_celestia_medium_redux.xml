@@ -180,6 +180,21 @@
     <file>DejaVuSans.ttf</file>
   </font>
 
+  <!-- <FS:Luna Witch> Chat text (FSChatTextFont): Iosevka Moolin, with the global fallbacks after it -->
+  <font name="ChatText" comment="Name of the chat text font">
+    <file>IosevkaMoolin-Regular.ttf</file>
+  </font>
+  <font name="ChatText" comment="Name of the bold chat text font" font_style="BOLD">
+    <file>IosevkaMoolin-Bold.ttf</file>
+  </font>
+  <font name="ChatText" comment="Name of the italic chat text font" font_style="ITALIC">
+    <file>IosevkaMoolin-Italic.ttf</file>
+  </font>
+  <font name="ChatText" comment="Name of the bold italic chat text font" font_style="BOLD|ITALIC">
+    <file>IosevkaMoolin-BoldItalic.ttf</file>
+  </font>
+  <!-- </FS:Luna Witch> -->
+
   <font_size name="Scripting"
 	     comment="Size of script editor font (points, or 1/72 of an inch)"
 	     size="8.6"

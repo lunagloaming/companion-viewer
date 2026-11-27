@@ -289,6 +289,27 @@ LLFontGL* LLViewerChat::getChatFont()
 
 }
 
+// <FS:Luna Witch>
+//static
+std::string LLViewerChat::getChatTextFontName()
+{
+    LLFontGL* chat_font = getChatFont();
+    const std::string chat_font_name = LLFontGL::nameFromFont(chat_font);
+    static LLCachedControl<std::string> text_font(gSavedSettings, "FSChatTextFont");
+    const std::string name = text_font;
+    if (name.empty() || name == chat_font_name)
+    {
+        return chat_font_name;
+    }
+    // A font scheme without the family: the chat font as before
+    if (!LLFontGL::getFont(LLFontDescriptor(name, LLFontGL::sizeFromFont(chat_font), LLFontGL::NORMAL)))
+    {
+        return chat_font_name;
+    }
+    return name;
+}
+// </FS:Luna Witch>
+
 //static
 S32 LLViewerChat::getChatFontSize()
 {
