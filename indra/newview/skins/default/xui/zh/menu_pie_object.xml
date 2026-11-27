@@ -17,7 +17,7 @@
 	<pie_slice label="支付" name="Pay..." />
 	<pie_menu label="更多 &gt;" name="Object Pie More 1">
 		<pie_slice label="刪除" name="Delete" />
-		<pie_slice label="穿上" name="Wear" />
+		<pie_slice label="新增" name="Add"/>
 		<pie_slice label="取得副本" name="Take Copy"/>
 		<pie_menu label="附著到HUD &gt;" name="Pie Object Attach HUD" />
 		<pie_menu label="附著 &gt;" name="Pie Object Attach">

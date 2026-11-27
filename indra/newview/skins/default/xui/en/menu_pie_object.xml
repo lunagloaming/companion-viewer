@@ -158,10 +158,10 @@
     </pie_slice>
     <pie_slice
         enabled="false"
-        label="Wear"
-        name="Wear">
+        label="Add"
+        name="Add">
         <pie_slice.on_click
-            function="Object.AttachToAvatar" />
+            function="Object.AttachAddToAvatar" />
         <pie_slice.on_enable
             function="Object.EnableWear" />
     </pie_slice>
