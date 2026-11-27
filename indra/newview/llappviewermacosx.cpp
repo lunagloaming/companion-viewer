@@ -425,8 +425,12 @@ std::string LLAppViewerMacOSX::generateSerialNumber()
 
     // JC: Sample code from http://developer.apple.com/technotes/tn/tn1103.html
     CFStringRef serialNumber = NULL;
+    // <FS:Luna Witch> kIOMasterPortDefault is deprecated since macOS 12
+    //io_service_t    platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault,
+    //                                                             IOServiceMatching("IOPlatformExpertDevice"));
     io_service_t    platformExpert = IOServiceGetMatchingService(kIOMainPortDefault,
                                                                  IOServiceMatching("IOPlatformExpertDevice"));
+    // </FS:Luna Witch>
     if (platformExpert)
     {
         serialNumber = (CFStringRef) IORegistryEntryCreateCFProperty(platformExpert,
