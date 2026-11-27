@@ -70,7 +70,7 @@ jobs:
       - name: Check out what to build
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'push' && github.ref || (inputs.tag != '' && format('refs/tags/{0}', inputs.tag)) || (inputs.kind == 'release' && 'release' || 'nightly') }}
+          ref: ${{ github.event_name == 'push' && github.ref || (inputs.tag != '' && format('refs/tags/{0}', inputs.tag)) || (inputs.kind == 'release' && 'refs/heads/release' || 'refs/heads/nightly') }}
           # The build number is the commit count, so the whole history is needed.
           fetch-depth: 0
 
