@@ -25593,7 +25593,7 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Type</key>
       <string>U32</string>
       <key>Value</key>
-      <integer>2017</integer>
+      <integer>4065</integer>
     </map>
     <key>FSParcelMusicAutoPlay</key>
     <map>

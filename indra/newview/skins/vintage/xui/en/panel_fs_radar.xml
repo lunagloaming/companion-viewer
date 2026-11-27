@@ -121,6 +121,11 @@
 					 name="age"
 					 width="50"/>
 					<radar_list.columns
+					 label="Height"
+					 name="height"
+					 tool_tip="Height as Edit Shape shows it, once the avatar's appearance has loaded"
+					 width="50"/>
+					<radar_list.columns
 					 label=""
 					 name="in_region"
 					 tool_tip="Is in the same region (green) or on the same parcel (green/yellow)"
