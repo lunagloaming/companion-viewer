@@ -32,6 +32,7 @@
 #include "llagent.h"
 #include "fscommon.h"
 #include "llstartup.h"
+#include "llviewercontrol.h"
 #include "llface.h"
 #include "llfetchedgltfmaterial.h"
 #include "llselectmgr.h"
