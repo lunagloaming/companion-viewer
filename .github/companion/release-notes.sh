@@ -19,8 +19,8 @@ short="${version%.*}"
 date="$(date -u '+%Y-%m-%d')"
 
 case "$kind" in
-    nightly) pkg=companion-viewer-nightly; label="Companion Viewer Nightly"; branch=companion-viewer-nightly ;;
-    release) pkg=companion-viewer; label="Companion Viewer"; branch=companion-viewer-release ;;
+    nightly) pkg=companion-viewer-nightly; label="Companion Viewer Nightly"; branch=nightly ;;
+    release) pkg=companion-viewer; label="Companion Viewer"; branch=release ;;
     *) echo "unknown kind '$kind'" >&2; exit 2 ;;
 esac
 file() { find "$dist" -maxdepth 1 -name "$1" -printf '%f\n' | sort | head -1; }
