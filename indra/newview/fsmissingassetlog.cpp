@@ -30,6 +30,8 @@
 #include "fsmissingassetlog.h"
 
 #include "llagent.h"
+#include "fscommon.h"
+#include "llstartup.h"
 #include "llface.h"
 #include "llfetchedgltfmaterial.h"
 #include "llselectmgr.h"
@@ -96,6 +98,72 @@ namespace
     }
 
     const size_t MAX_FACES_LOGGED = 25;
+
+    // Where a face is, in a few words, for local chat.
+    std::string short_place(LLViewerObject* object, S32 face)
+    {
+        if (!object)
+        {
+            return "an unknown object";
+        }
+        std::ostringstream out;
+        LLViewerObject* root = object->getRootEdit() ? object->getRootEdit() : object;
+        LLSelectNode* node = LLSelectMgr::getInstance()->getSelection()->findNode(root);
+        LLSelectNode* hover = LLSelectMgr::getInstance()->getHoverNode();
+        if (!node && hover && hover->getObject() == root)
+        {
+            node = hover;
+        }
+        if (node && node->mValid && !node->mName.empty())
+        {
+            out << "'" << node->mName << "' ";
+        }
+        out << "object " << object->getID();
+        if (face >= 0)
+        {
+            out << " face " << face;
+        }
+        if (root->isAttachment())
+        {
+            LLVOAvatar* avatar = object->getAvatar();
+            out << (avatar && avatar == gAgentAvatarp ? ", worn by you" : ", worn by someone");
+            if (object->isHUDAttachment())
+            {
+                out << " (HUD)";
+            }
+        }
+        else if (LLViewerRegion* region = object->getRegion())
+        {
+            const LLVector3 position = region->getPosRegionFromAgent(object->getPositionAgent());
+            out << ", " << region->getName() << llformat(" %.0f, %.0f, %.0f", position.mV[VX], position.mV[VY], position.mV[VZ]);
+        }
+        return out.str();
+    }
+}
+
+void FSMissingAssetLog::warnInChat(const std::string& text)
+{
+#ifndef LL_RELEASE_FOR_DOWNLOAD
+    static LLCachedControl<bool> enabled(gSavedSettings, "FSMissingAssetChatWarning", true);
+    if (!enabled || LLStartUp::getStartupState() < STATE_STARTED)
+    {
+        return;
+    }
+    // A broken region can fail dozens of assets at once: the log has them all.
+    static U32 warnings = 0;
+    const U32 MAX_WARNINGS = 25;
+    if (warnings > MAX_WARNINGS)
+    {
+        return;
+    }
+    if (++warnings > MAX_WARNINGS)
+    {
+        FSCommon::report_to_nearby_chat("Missing asset warnings: more than " + std::to_string(MAX_WARNINGS)
+            + " this session, further ones only in the log.");
+        return;
+    }
+    FSCommon::report_to_nearby_chat(text);
+#endif
 }
 
 std::string FSMissingAssetLog::describeFace(LLViewerObject* object, S32 face)
@@ -241,6 +309,71 @@ void FSMissingAssetLog::logTextureGivenUp(LLViewerFetchedTexture* texture, const
             << " is not on any object face right now (it may be a UI image, an avatar bake, terrain, sky,"
             << " or a material texture not yet drawn)" << LL_ENDL;
     }
+
+    std::string where = "no object face";
+    for (U32 channel = 0; channel < LLRender::NUM_TEXTURE_CHANNELS && where == "no object face"; ++channel)
+    {
+        const LLViewerTexture::ll_face_list_t* faces = texture->getFaceList(channel);
+        if (faces && texture->getNumFaces(channel) > 0 && !faces->empty() && (*faces)[0])
+        {
+            where = short_place((*faces)[0]->getViewerObject(), (*faces)[0]->getTEOffset());
+        }
+    }
+    const size_t total = logged + not_logged;
+    warnInChat("Missing texture " + id.asString() + " (" + reason + ") on " + where
+        + (total > 1 ? " and " + std::to_string(total - 1) + " more" : std::string())
+        + ". Showing the placeholder; details in the log (MissingTexture).");
+}
+
+void FSMissingAssetLog::logMaterialGivenUp(const LLUUID& id, const LLFetchedGLTFMaterial* material, const std::string& reason)
+{
+    LL_WARNS("MissingMaterial") << "PBR material " << id
+        << " could not be loaded and is now the plain grey placeholder material. Reason: " << reason << LL_ENDL;
+
+    size_t logged = 0;
+    size_t not_logged = 0;
+    std::string first_place;
+    for (S32 i = 0; i < gObjectList.getNumObjects(); ++i)
+    {
+        LLViewerObject* object = gObjectList.getObject(i);
+        if (!object || object->isDead())
+        {
+            continue;
+        }
+        for (S32 face = 0; face < object->getNumTEs(); ++face)
+        {
+            const LLTextureEntry* entry = object->getTE(face);
+            if (!entry || (entry->getGLTFMaterial() != material && object->getRenderMaterialID(face) != id))
+            {
+                continue;
+            }
+            if (first_place.empty())
+            {
+                first_place = short_place(object, face);
+            }
+            if (logged >= MAX_FACES_LOGGED)
+            {
+                ++not_logged;
+                continue;
+            }
+            ++logged;
+            LL_WARNS("MissingMaterial") << "PBR material " << id << " is used by " << describeFace(object, face) << LL_ENDL;
+        }
+    }
+    if (not_logged > 0)
+    {
+        LL_WARNS("MissingMaterial") << "PBR material " << id << " is used by " << not_logged << " more faces, not listed" << LL_ENDL;
+    }
+    if (logged == 0)
+    {
+        LL_WARNS("MissingMaterial") << "PBR material " << id
+            << " is not on any object face right now (it may be a terrain material or not yet drawn)" << LL_ENDL;
+        first_place = "no object face";
+    }
+    const size_t total = logged + not_logged;
+    warnInChat("Missing PBR material " + id.asString() + " (" + reason + ") on " + first_place
+        + (total > 1 ? " and " + std::to_string(total - 1) + " more" : std::string())
+        + ". Showing plain grey; details in the log (MissingMaterial).");
 }
 
 void FSMissingAssetLog::logRenderMaterialMissing(const LLTextureEntry* entry)
