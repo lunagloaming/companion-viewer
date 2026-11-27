@@ -556,7 +556,7 @@ void LLGLTFMaterialList::onAssetLoadComplete(const LLUUID& id, LLAssetType::ETyp
         {
             apply_missing_material_placeholder(asset_data->mMaterial);
             FSMissingAssetLog::logMaterialGivenUp(id, asset_data->mMaterial,
-                llformat("asset request failed: %s (%d)", LLAssetStorage::getErrorString(status).c_str(), status));
+                llformat("asset request failed: %s (%d)", LLAssetStorage::getErrorString(status), status));
             asset_data->mMaterial->materialComplete(true);
             delete asset_data;
             return;
