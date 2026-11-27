@@ -444,12 +444,18 @@ bool LLManipTranslate::handleHover(S32 x, S32 y, MASK mask)
     // ...build mode moves camera about focus point
     if (mObjectSelection->getSelectType() != SELECT_TYPE_HUD)
     {
+        // <FS:Luna Witch> the world view may not start at the window's corner
+        //if (x < ROTATE_H_MARGIN)
         if (x < world_rect.mLeft + ROTATE_H_MARGIN)
+        // </FS:Luna Witch>
         {
             gAgentCamera.cameraOrbitAround(rotate_angle);
             rotated = true;
         }
+        // <FS:Luna Witch> the world view may not start at the window's corner
+        //else if (x > world_rect.getWidth() - ROTATE_H_MARGIN)
         else if (x > world_rect.mRight - ROTATE_H_MARGIN)
+        // </FS:Luna Witch>
         {
             gAgentCamera.cameraOrbitAround(-rotate_angle);
             rotated = true;
@@ -996,7 +1002,10 @@ void LLManipTranslate::highlightManipulators(S32 x, S32 y)
     LLRect world_view_rect = gViewerWindow->getWorldViewRectScaled();
     F32 half_width = (F32)world_view_rect.getWidth() / 2.f;
     F32 half_height = (F32)world_view_rect.getHeight() / 2.f;
+    // <FS:Luna Witch> the world view may not start at the window's corner
+    //LLVector2 mousePos((F32)x - half_width, (F32)y - half_height);
     LLVector2 mousePos((F32)(x - world_view_rect.getCenterX()), (F32)(y - world_view_rect.getCenterY()));
+    // </FS:Luna Witch>
     LLVector2 mouse_delta;
 
     // Keep order consistent with insertion via stable_sort
