@@ -26,11 +26,11 @@
 
 #ifdef LL_DARWIN
 #import <Cocoa/Cocoa.h>
-#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h> // <FS:Luna Witch/>
 #include <iostream>
 #include "llfilepicker_mac.h"
 
-// Map file extensions to content types for NSSavePanel/NSOpenPanel (macOS 11+ API).
+// <FS:Luna Witch> Map file extensions to content types for NSSavePanel/NSOpenPanel (macOS 11+ API).
 // An empty result means "allow all", matching the old behaviour for an empty list.
 static NSArray<UTType*>* content_types_for_extensions(NSArray<NSString*>* extensions)
 {
@@ -45,6 +45,7 @@ static NSArray<UTType*>* content_types_for_extensions(NSArray<NSString*>* extens
     }
     return types;
 }
+// </FS:Luna Witch>
 
 NSOpenPanel *init_panel(const std::vector<std::string>* allowed_types, unsigned int flags)
 {
@@ -76,7 +77,10 @@ NSOpenPanel *init_panel(const std::vector<std::string>* allowed_types, unsigned 
 
     if (fileTypes)
     {
+        // <FS:Luna Witch> setAllowedFileTypes is deprecated since macOS 12
+        //[panel setAllowedFileTypes:fileTypes];
         [panel setAllowedContentTypes:content_types_for_extensions(fileTypes)];
+        // </FS:Luna Witch>
     }
     else
     {
@@ -218,7 +222,10 @@ std::unique_ptr<std::string> doSaveDialog(const std::string* file,
         //[panel setMessage:@"Save Image File"];
         [panel setTreatsFilePackagesAsDirectories: ( flags & F_NAV_SUPPORT ) ];
         [panel setCanSelectHiddenExtension:true];
+        // <FS:Luna Witch> setAllowedFileTypes is deprecated since macOS 12
+        //[panel setAllowedFileTypes:fileType];
         [panel setAllowedContentTypes:content_types_for_extensions(fileType)];
+        // </FS:Luna Witch>
         NSString *fileName = [NSString stringWithCString:file->c_str() encoding:[NSString defaultCStringEncoding]];
 
         NSURL* url = [NSURL fileURLWithPath:fileName];
@@ -253,7 +260,10 @@ void doSaveDialogModeless(const std::string* file,
         //[panel setMessage:@"Save Image File"];
         [panel setTreatsFilePackagesAsDirectories: ( flags & F_NAV_SUPPORT ) ];
         [panel setCanSelectHiddenExtension:true];
+        // <FS:Luna Witch> setAllowedFileTypes is deprecated since macOS 12
+        //[panel setAllowedFileTypes:fileType];
         [panel setAllowedContentTypes:content_types_for_extensions(fileType)];
+        // </FS:Luna Witch>
         NSString *fileName = [NSString stringWithCString:file->c_str() encoding:[NSString defaultCStringEncoding]];
 
         NSURL* url = [NSURL fileURLWithPath:fileName];

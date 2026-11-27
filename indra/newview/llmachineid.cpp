@@ -350,8 +350,12 @@ bool LLWMIMethods::getGenericSerialNumber(const BSTR &select, const LPCWSTR &var
 bool getSerialNumber(unsigned char *unique_id, size_t len)
 {
     CFStringRef serial_cf_str = NULL;
+    // <FS:Luna Witch> kIOMasterPortDefault is deprecated since macOS 12
+    //io_service_t platformExpert = IOServiceGetMatchingService(kIOMasterPortDefault,
+    //                                                             IOServiceMatching("IOPlatformExpertDevice"));
     io_service_t platformExpert = IOServiceGetMatchingService(kIOMainPortDefault,
                                                                  IOServiceMatching("IOPlatformExpertDevice"));
+    // </FS:Luna Witch>
     if (platformExpert)
     {
         serial_cf_str = (CFStringRef) IORegistryEntryCreateCFProperty(platformExpert,
