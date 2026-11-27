@@ -112,7 +112,7 @@ void FSFloaterGreetings::addTab(const std::string& prefix, const std::vector<std
     tab.mTest = getChild<LLLineEditor>(prefix + "_test");
     tab.mResult = getChild<LLTextBox>(prefix + "_result");
     tab.mTry = std::move(try_line);
-    tab.mTest->setKeystrokeCallback([this, index](LLLineEditor*, void*) { refresh(index); }, nullptr);
+    tab.mTest->setKeystrokeCallback([this, index](LLLineEditor*, void*) { refreshTab(index); }, nullptr);
 }
 
 void FSFloaterGreetings::onOpen(const LLSD& key)
@@ -123,7 +123,7 @@ void FSFloaterGreetings::onOpen(const LLSD& key)
         {
             list.mEditor->setText(joinLines(FSGreetingPatterns::getPatterns(list.mSetting)));
         }
-        refresh(i);
+        refreshTab(i);
     }
 }
 
@@ -133,10 +133,10 @@ void FSFloaterGreetings::onEdited(size_t index)
     {
         FSGreetingPatterns::setPatterns(list.mSetting, splitLines(list.mEditor->getText()));
     }
-    refresh(index);
+    refreshTab(index);
 }
 
-void FSFloaterGreetings::refresh(size_t index)
+void FSFloaterGreetings::refreshTab(size_t index)
 {
     Tab& tab = mTabs[index];
     std::string errors;
