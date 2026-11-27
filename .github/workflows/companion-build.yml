@@ -1,9 +1,9 @@
 # Builds Companion Viewer for Linux, macOS and Windows and publishes it as a GitHub release.
 #
-# Nightly: tag Companion_Nightly_<version> on companion-viewer-nightly, published as a
+# Nightly: tag Companion_Nightly_<version> on nightly, published as a
 #          prerelease; only the newest nightly release is kept.
 # Both are published only when all three platforms built; otherwise re-run the failed jobs.
-# Release: tag Companion_Release_<version> on companion-viewer-release, published as the
+# Release: tag Companion_Release_<version> on release, published as the
 #          latest release; the newest three are kept.
 #
 # <version> is indra/newview/VIEWER_VERSION_FS.txt plus the commit count
@@ -70,7 +70,7 @@ jobs:
       - name: Check out what to build
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'push' && github.ref || (inputs.tag != '' && format('refs/tags/{0}', inputs.tag)) || (inputs.kind == 'release' && 'companion-viewer-release' || 'companion-viewer-nightly') }}
+          ref: ${{ github.event_name == 'push' && github.ref || (inputs.tag != '' && format('refs/tags/{0}', inputs.tag)) || (inputs.kind == 'release' && 'release' || 'nightly') }}
           # The build number is the commit count, so the whole history is needed.
           fetch-depth: 0
 
