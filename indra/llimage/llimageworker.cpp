@@ -40,8 +40,11 @@ public:
                  S32 discard,
                  bool needs_aux,
                  const LLPointer<LLImageDecodeThread::Responder>& responder,
+                 // <FS:Luna Witch> compress_bc7
+                 //U32 request_id);
                  U32 request_id,
-                 bool compress_bc7); // <FS:Luna Witch/>
+                 bool compress_bc7);
+                 // </FS:Luna Witch>
     virtual ~ImageRequest();
 
     /*virtual*/ bool processRequest();
@@ -96,8 +99,11 @@ LLImageDecodeThread::handle_t LLImageDecodeThread::decodeImage(
     const LLPointer<LLImageFormatted>& image,
     S32 discard,
     bool needs_aux,
+    // <FS:Luna Witch> compress_bc7
+    //const LLPointer<LLImageDecodeThread::Responder>& responder)
     const LLPointer<LLImageDecodeThread::Responder>& responder,
-    bool compress_bc7) // <FS:Luna Witch/>
+    bool compress_bc7)
+    // </FS:Luna Witch>
 {
     LL_PROFILE_ZONE_SCOPED_CATEGORY_TEXTURE;
 
@@ -107,7 +113,10 @@ LLImageDecodeThread::handle_t LLImageDecodeThread::decodeImage(
 
     // Instantiate the ImageRequest right in the lambda, why not?
     bool posted = mThreadPool->getQueue().post(
-        [req = ImageRequest(image, discard, needs_aux, responder, decode_id, compress_bc7)] // <FS:Luna Witch/>
+        // <FS:Luna Witch> compress_bc7
+        //[req = ImageRequest(image, discard, needs_aux, responder, decode_id)]
+        [req = ImageRequest(image, discard, needs_aux, responder, decode_id, compress_bc7)]
+        // </FS:Luna Witch>
         () mutable
         {
             auto done = req.processRequest();
@@ -137,8 +146,11 @@ ImageRequest::ImageRequest(const LLPointer<LLImageFormatted>& image,
                            S32 discard,
                            bool needs_aux,
                            const LLPointer<LLImageDecodeThread::Responder>& responder,
+                           // <FS:Luna Witch> compress_bc7
+                           //U32 request_id)
                            U32 request_id,
-                           bool compress_bc7) // <FS:Luna Witch/>
+                           bool compress_bc7)
+                           // </FS:Luna Witch>
     : mFormattedImage(image),
       mDiscardLevel(discard),
       mNeedsAux(needs_aux),
