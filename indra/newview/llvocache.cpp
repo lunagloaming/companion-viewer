@@ -1190,8 +1190,11 @@ LLVOCache::LLVOCache(bool read_only) :
     mReadOnly(read_only),
     mNumEntries(0),
     mCacheSize(1),
+    // <FS:Luna Witch> per-instance object cache directory
+    //mEnabled(true)
     mEnabled(true),
-    mObjectCacheDirLeaf(object_cache_dirname) // <FS:Luna Witch/>
+    mObjectCacheDirLeaf(object_cache_dirname)
+    // </FS:Luna Witch>
 {
 #ifndef LL_TEST
     mEnabled = gSavedSettings.getBOOL("ObjectCacheEnabled");
