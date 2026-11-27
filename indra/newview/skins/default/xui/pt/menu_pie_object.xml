@@ -17,7 +17,7 @@
 	<pie_slice label="Pagar" name="Pay..."/>
 	<pie_menu label="Mais &gt;" name="Object Pie More 1">
 		<pie_slice label="Excluir" name="Delete"/>
-		<pie_slice label="Vestir" name="Wear"/>
+		<pie_slice label="Adicionar" name="Add"/>
 		<pie_slice label="Pegar copia" name="Take Copy" />
 		<pie_menu label="Anexar HUD &gt;" name="Pie Object Attach HUD"/>
 		<pie_menu label="Anexar &gt;" name="Pie Object Attach">

@@ -13,7 +13,7 @@
 	<pie_slice label="Ödə" name="Pay..."/>
 	<pie_menu label="İrəli &gt;" name="Object Pie More 1">
 		<pie_slice label="Sil" name="Delete"/>
-		<pie_slice label="Geyin" name="Wear"/>
+		<pie_slice label="Əlavə et" name="Add"/>
 		<pie_slice label="Köçürtməsin götür" name="Take Copy" />
 		<pie_menu label="HUD Əlavə et &gt;" name="Pie Object Attach HUD" />
 		<pie_menu label="Birləşdir &gt;" name="Pie Object Attach">
