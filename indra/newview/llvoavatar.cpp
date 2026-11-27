@@ -3090,7 +3090,10 @@ LLViewerFetchedTexture *LLVOAvatar::getBakedTextureImage(const U8 te, const LLUU
         LL_DEBUGS("Avatar") << avString() << "get server-bake image from URL " << url << LL_ENDL;
         result = LLViewerTextureManager::getFetchedTextureFromUrl(
             url, FTT_SERVER_BAKE, true, LLGLTexture::BOOST_NONE, LLViewerTexture::LOD_TEXTURE, 0, 0, uuid);
-        if (result->isMissingAsset())
+        // <FS> Missing texture placeholder: a rebake fetches a bake that failed again too
+        //if (result->isMissingAsset())
+        if (result->isMissingAsset() || result->usesMissingTexturePlaceholder())
+        // </FS>
         {
             result->setIsMissingAsset(false);
         }

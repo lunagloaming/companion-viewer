@@ -105,6 +105,7 @@ set(viewer_SOURCE_FILES
     exogroupmutelist.cpp
     floatermedialists.cpp
     fsareasearch.cpp
+    fsmissingassetlog.cpp
     fsareasearchmenu.cpp
     fsassetblacklist.cpp
     fsavatarrenderpersistence.cpp
@@ -990,6 +991,7 @@ set(viewer_HEADER_FILES
     exogroupmutelist.h
     floatermedialists.h
     fsareasearch.h
+    fsmissingassetlog.h
     fsareasearchmenu.h
     fsassetblacklist.h
     fsavatarrenderpersistence.h

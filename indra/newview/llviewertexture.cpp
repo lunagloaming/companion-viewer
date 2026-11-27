@@ -66,6 +66,9 @@
 #include "fsinstanceslots.h" // <FS:Luna Witch/>
 #include "fstexturebudget.h" // <FS:Luna Witch/>
 #include "llrendertarget.h" // <FS:Luna Witch/>
+#include "fsmissingassetlog.h"
+#include "lldir.h"
+#include "llimagepng.h"
 ///////////////////////////////////////////////////////////////////////////////
 
 // statics
@@ -1701,7 +1704,7 @@ void LLViewerFetchedTexture::loadFromFastCache()
             //discard all oversized textures.
             destroyRawImage();
             LL_WARNS() << "oversized, setting as missing" << LL_ENDL;
-            setIsMissingAsset();
+            setIsMissingAsset(true, "oversized image in the local fast cache");
             mRawDiscardLevel = INVALID_DISCARD_LEVEL;
         }
         else
@@ -1988,7 +1991,7 @@ bool LLViewerFetchedTexture::preCreateTexture(S32 usename/*= 0*/)
         // We treat these images as missing assets which causes them to
         // be renderd as 'missing image' and to stop requesting data
         LL_WARNS() << "!size_ok, setting as missing" << LL_ENDL;
-        setIsMissingAsset();
+        setIsMissingAsset(true, llformat("unusable image size (%d x %d)", mRawImage->getWidth(), mRawImage->getHeight()));
         destroyRawImage();
         return false;
     }
@@ -2006,7 +2009,7 @@ bool LLViewerFetchedTexture::preCreateTexture(S32 usename/*= 0*/)
             // if we change format. Texture might be corrupted server side, so just set as
             // missing and clear cashed texture (do not cause reload loop, will retry&recover
             // during new session)
-            setIsMissingAsset();
+            setIsMissingAsset(true, "image has too few colour channels for its format");
             destroyRawImage();
             LLAppViewer::getTextureCache()->removeFromCache(mID);
             return false;
@@ -2346,7 +2349,7 @@ bool LLViewerFetchedTexture::processFetchResults(S32& desired_discard, S32 curre
                 //discard all oversized textures.
                 destroyRawImage();
                 LL_WARNS() << "oversize, setting as missing" << LL_ENDL;
-                setIsMissingAsset();
+                setIsMissingAsset(true, llformat("image too large (%d x %d)", mFullWidth, mFullHeight));
                 mRawDiscardLevel = INVALID_DISCARD_LEVEL;
                 mIsFetching = false;
                 mLastPacketTimer.reset();
@@ -2414,8 +2417,23 @@ bool LLViewerFetchedTexture::processFetchResults(S32& desired_discard, S32 curre
             && mFetchState > 1) // 1 - initial, make sure fetcher did at least something
         {
             // We finished but received no data
-            if (getDiscardLevel() < 0)
+            if (getDiscardLevel() < 0 && canUsePlaceholder() && mFetchFailures == 0)
             {
+                // <FS> Missing texture placeholder: a failed fetch is tried once more before giving up.
+                ++mFetchFailures;
+                LL_WARNS("Texture") << mID << " fetch failed (" << mLastHttpGetStatus.toTerseString()
+                    << ", worker state " << mFetchState << "), trying once more" << LL_ENDL;
+                if (mHasFetcher)
+                {
+                    LLAppViewer::getTextureFetch()->deleteRequest(getID(), true);
+                    mHasFetcher = false;
+                }
+                mFetchRetryPending = true;
+                mFetchRetryTimer.reset();
+            }
+            else if (getDiscardLevel() < 0)
+            {
+                ++mFetchFailures;
                 if (getFTType() != FTT_MAP_TILE)
                 {
                     LL_WARNS() << mID
@@ -2426,7 +2444,8 @@ bool LLViewerFetchedTexture::processFetchResults(S32& desired_discard, S32 curre
                         << " worker state " << mFetchState
                         << LL_ENDL;
                 }
-                setIsMissingAsset();
+                setIsMissingAsset(true, llformat("fetch failed %u time(s), last status %s, worker state %d",
+                    mFetchFailures, mLastHttpGetStatus.toTerseString().c_str(), mFetchState));
                 desired_discard = -1;
             }
             else
@@ -2489,6 +2508,17 @@ bool LLViewerFetchedTexture::updateFetch()
         // but don't check until we've processed the raw data we have
         return false;
     }
+    // <FS> Missing texture placeholder
+    if (mPlaceholderPending)
+    {
+        applyMissingTexturePlaceholder();
+        return false;
+    }
+    if (mUsesPlaceholder)
+    {
+        return false; // shows the placeholder until a rebake or texture refresh
+    }
+    // </FS>
     if (mIsMissingAsset)
     {
         LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("vftuf - missing asset");
@@ -2560,6 +2590,27 @@ bool LLViewerFetchedTexture::updateFetch()
         }
     }
 
+    // <FS> Missing texture placeholder: give up on a texture that has been wanted for
+    // FSMissingTextureTimeout seconds without receiving any image at all.
+    if (canUsePlaceholder())
+    {
+        const F64 now = LLFrameTimer::getTotalSeconds();
+        const bool waiting = mIsFetching && decode_priority > 0.f && getDiscardLevel() < 0 && mRawImage.isNull();
+        // A gap between calls means the texture was not wanted meanwhile: start counting again.
+        if (!waiting || now - mLastFetchUpdate > 10.0)
+        {
+            mNoDataSince = now;
+        }
+        mLastFetchUpdate = now;
+        static LLCachedControl<F32> timeout(gSavedSettings, "FSMissingTextureTimeout", 240.f);
+        if (waiting && timeout() > 0.f && now - mNoDataSince > timeout())
+        {
+            setIsMissingAsset(true, llformat("no image received after %.0f seconds (worker state %d)", now - mNoDataSince, mFetchState));
+            return false;
+        }
+    }
+    // </FS>
+
     desired_discard = llmin(desired_discard, getMaxDiscardLevel());
 
     bool make_request = true;
@@ -2581,6 +2632,10 @@ bool LLViewerFetchedTexture::updateFetch()
     else if (current_discard >= 0 && current_discard <= mMinDiscardLevel)
     {
         LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("vftuf - current < min");
+        make_request = false;
+    }
+    else if (mFetchRetryPending && mFetchRetryTimer.getElapsedTimeF32() < 15.f) // <FS> wait before trying a failed fetch again
+    {
         make_request = false;
     }
 
@@ -2640,6 +2695,7 @@ bool LLViewerFetchedTexture::updateFetch()
         if (fetch_request_response >= 0) // positive values and 0 are discard values
         {
             LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("vftuf - request created");
+            mFetchRetryPending = false; // <FS> Missing texture placeholder
             mHasFetcher = true;
             mIsFetching = true;
             mLastWorkerDiscardLevel = worker_discard;
@@ -2704,6 +2760,12 @@ void LLViewerFetchedTexture::clearFetchedResults()
 {
     // <FS:Ansariel> For texture refresh
     mIsMissingAsset = false;
+    // <FS> Missing texture placeholder: fetch the real texture again
+    mUsesPlaceholder = false;
+    mPlaceholderPending = false;
+    mPlaceholderUnusable = false;
+    mFetchFailures = 0;
+    mFetchRetryPending = false;
 
     if(mNeedsCreateTexture || mIsFetching)
     {
@@ -2732,8 +2794,31 @@ void LLViewerFetchedTexture::forceToDeleteRequest()
     mDesiredDiscardLevel = getMaxDiscardLevel() + 1;
 }
 
-void LLViewerFetchedTexture::setIsMissingAsset(bool is_missing)
+void LLViewerFetchedTexture::setIsMissingAsset(bool is_missing, const std::string& reason)
 {
+    if (!is_missing && usesMissingTexturePlaceholder())
+    {
+        retryAfterPlaceholder();
+        return;
+    }
+    // <FS> Missing texture placeholder: show the placeholder instead of marking the texture missing.
+    if (is_missing && !mPlaceholderPending && canUsePlaceholder())
+    {
+        FSMissingAssetLog::logTextureGivenUp(this, reason.empty() ? std::string("marked missing") : reason);
+        if (mHasFetcher)
+        {
+            LLAppViewer::getTextureFetch()->deleteRequest(getID(), true);
+            mHasFetcher = false;
+            mIsFetching = false;
+            mLastPacketTimer.reset();
+            mFetchState = 0;
+            mFetchPriority = 0;
+        }
+        mFetchRetryPending = false;
+        mPlaceholderPending = true; // applied by the next updateFetch(), outside any texture creation in progress
+        return;
+    }
+    // </FS>
     if (is_missing == mIsMissingAsset)
     {
         return;
@@ -2770,6 +2855,101 @@ void LLViewerFetchedTexture::setIsMissingAsset(bool is_missing)
     }
     mIsMissingAsset = is_missing;
 }
+
+// <FS> Missing texture placeholder
+namespace
+{
+    // The placeholder image, read once. Null if the file is missing or unreadable.
+    LLPointer<LLImageRaw> missing_texture_placeholder()
+    {
+        static LLPointer<LLImageRaw> image;
+        static bool loaded = false;
+        if (!loaded)
+        {
+            loaded = true;
+            const std::string path = gDirUtilp->findSkinnedFilename("textures", "missing_texture_placeholder.png");
+            LLPointer<LLImagePNG> png = new LLImagePNG();
+            LLPointer<LLImageRaw> raw = new LLImageRaw();
+            if (!path.empty() && png->load(path) && png->decode(raw, 0.f) && raw->getWidth() > 0
+                && LLImageGL::checkSize(raw->getWidth(), raw->getHeight()))
+            {
+                image = raw;
+            }
+            else
+            {
+                LL_WARNS("Texture") << "Missing texture placeholder could not be read: '" << path << "'" << LL_ENDL;
+            }
+        }
+        return image;
+    }
+}
+
+bool LLViewerFetchedTexture::canUsePlaceholder() const
+{
+    static LLCachedControl<bool> enabled(gSavedSettings, "FSMissingTexturePlaceholder", true);
+    // Map tiles are missing for every empty region, which is normal.
+    return enabled && !mUsesPlaceholder && !mPlaceholderUnusable && getFTType() != FTT_MAP_TILE;
+}
+
+void LLViewerFetchedTexture::applyMissingTexturePlaceholder()
+{
+    mPlaceholderPending = false;
+    LLPointer<LLImageRaw> placeholder = missing_texture_placeholder();
+    if (placeholder.isNull() || mGLTexturep.isNull())
+    {
+        mPlaceholderUnusable = true;
+        setIsMissingAsset(true); // as without the placeholder
+        return;
+    }
+
+    S8 components = placeholder->getComponents();
+    if (mGLTexturep->getHasExplicitFormat() && mGLTexturep->getPrimaryFormat() == GL_RGBA)
+    {
+        components = 4; // the texture's format asks for an alpha channel: give it an opaque one
+    }
+    const U16 width = placeholder->getWidth();
+    const U16 height = placeholder->getHeight();
+    LLPointer<LLImageRaw> raw = new LLImageRaw(width, height, components);
+    if (!raw->getData())
+    {
+        mPlaceholderUnusable = true;
+        setIsMissingAsset(true);
+        return;
+    }
+    const U8* src = placeholder->getData();
+    U8* dst = raw->getData();
+    const S8 src_components = placeholder->getComponents();
+    for (S32 i = 0; i < width * height; ++i)
+    {
+        for (S8 c = 0; c < components; ++c)
+        {
+            dst[i * components + c] = c < src_components ? src[i * src_components + c] : 255;
+        }
+    }
+
+    destroyRawImage();
+    mUsesPlaceholder = true;
+    mIsMissingAsset = false;
+    mRawImage = raw;
+    sRawCount++;
+    mRawDiscardLevel = 0;
+    mFullWidth = width;
+    mFullHeight = height;
+    setTexelsPerImage();
+    mIsRawImageValid = true;
+    addToCreateTexture();
+}
+
+void LLViewerFetchedTexture::retryAfterPlaceholder()
+{
+    if (!usesMissingTexturePlaceholder())
+    {
+        return;
+    }
+    LL_INFOS("Texture") << mID << ": dropping the missing texture placeholder, fetching the texture again" << LL_ENDL;
+    clearFetchedResults();
+}
+// </FS>
 
 void LLViewerFetchedTexture::setLoadedCallback( loaded_callback_func loaded_callback,
                                        S32 discard_level, bool keep_imageraw, bool needs_aux, void* userdata,
