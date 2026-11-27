@@ -1524,13 +1524,23 @@ void FSChatHistory::appendMessage(const LLChat& chat, const LLSD &args, const LL
     body_message_params.color(txt_color);
     body_message_params.readonly_color(txt_color);
     body_message_params.alpha(alpha);
-    body_message_params.font.name(font_name);
+    // <FS:Luna Witch> Messages in their own font (FSChatTextFont). V2 headers keep the chat font; with V1
+    // headers the whole line is in the message font.
+    //body_message_params.font.name(font_name);
+    body_message_params.font.name(LLViewerChat::getChatTextFontName());
+    // </FS:Luna Witch>
     body_message_params.font.size(font_size);
     body_message_params.font.style(input_append_params.font.style);
 
     LLStyle::Params name_params(body_message_params);
     name_params.color(name_color);
     name_params.readonly_color(name_color);
+    // <FS:Luna Witch>
+    if (!use_plain_text_chat_history)
+    {
+        name_params.font.name(font_name);
+    }
+    // </FS:Luna Witch>
     std::string name_font_style_postfix = use_plain_text_chat_history ? "UNDERLINE" : "";
     name_params.font.style = name_font_style_postfix; // This will be used when hovering the name (LLTextBase::appendAndHighlightTextImpl() will filter it out)
     std::string delimiter_style = "NORMAL";
