@@ -389,7 +389,11 @@ void FSPanelRadar::updateList(const std::vector<LLSD>& entries, const LLSD& stat
         row_data["columns"][4]["value"] = (entry["sitting"].asBoolean() ? sittingColumnIcon : "");
 
         row_data["columns"][5]["column"] = "flags";
-        row_data["columns"][5]["type"] = flagsColumnType;
+        // <FS:Luna Witch> A tipper's flags are text even where they are icons: a coin (see below)
+        //row_data["columns"][5]["type"] = flagsColumnType;
+        const bool tipper_coin = entry["tipper"].asBoolean() && flagsColumnType != "text";
+        row_data["columns"][5]["type"] = tipper_coin ? std::string("text") : flagsColumnType;
+        // </FS:Luna Witch>
 
         row_data["columns"][6]["column"] = "has_notes";
         row_data["columns"][6]["type"] = "icon";
@@ -458,12 +462,13 @@ void FSPanelRadar::updateList(const std::vector<LLSD>& entries, const LLSD& stat
         if (entry.has("flags"))
         {
             LLScrollListText* flagsCell = (LLScrollListText*)row->getColumn(flagsColumnIndex);
-            // <FS:Luna Witch> T: a tipper (FSRadar::isTipper), where the flags are text
+            // <FS:Luna Witch> A tipper (FSRadar::isTipper): T where the flags are text, and where they are
+            // icons a coin in place of the payment icon (a tipper has payment info, of course)
             //flagsCell->setValue(flagsColumnValues[entry["flags"].asInteger()]);
             std::string flags = flagsColumnValues[entry["flags"].asInteger()];
-            if (entry["tipper"].asBoolean() && flagsColumnType == "text")
+            if (entry["tipper"].asBoolean())
             {
-                flags += "T";
+                flags = flagsColumnType == "text" ? flags + "T" : std::string("\xF0\x9F\xAA\x99"); // U+1FA99 coin
             }
             flagsCell->setValue(flags);
             // </FS:Luna Witch>
