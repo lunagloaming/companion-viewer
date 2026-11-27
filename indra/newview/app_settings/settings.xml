@@ -26571,6 +26571,28 @@ Change of this parameter will affect the layout of buttons in notification toast
       <key>Backup</key>
       <integer>0</integer>
     </map>
+    <key>FSMissingAssetChatWarning</key>
+    <map>
+      <key>Comment</key>
+      <string>Debug builds only: a texture or PBR material that fails to load and gets a placeholder (FSMissingTexturePlaceholder, FSMissingMaterialPlaceholder) is also reported in local chat, seen by this viewer alone. Release builds only write it to the log.</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
+    <key>FSMissingMaterialPlaceholder</key>
+    <map>
+      <key>Comment</key>
+      <string>A PBR material asset that fails to load becomes a plain matte grey material instead, and the log lists the objects using it (tag MissingMaterial).</string>
+      <key>Persist</key>
+      <integer>1</integer>
+      <key>Type</key>
+      <string>Boolean</string>
+      <key>Value</key>
+      <integer>1</integer>
+    </map>
     <key>FSMissingTexturePlaceholder</key>
     <map>
       <key>Comment</key>
