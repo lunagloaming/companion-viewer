@@ -64,7 +64,10 @@ LLDir_Mac::LLDir_Mac()
 {
     mDirDelimiter = "/";
 
+    // <FS:Luna Witch> Companion Viewer branding
+    //const std::string     secondLifeString = "Firestorm";
     const std::string     secondLifeString = "CompanionViewer";
+    // </FS:Luna Witch>
 
     std::string executablepathstr = getSystemExecutableFolder();
 

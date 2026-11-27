@@ -53,7 +53,10 @@ int main(int argc, char **argv)
 
     if( strAsk == "ask" )
     {
+        // <FS:Luna Witch> Companion Viewer branding
+        //auto choice = fl_choice( "Firestorm has crashed, submit the minidump?", "No", "Yes", nullptr );
         auto choice = fl_choice( "Companion Viewer has crashed, submit the minidump?", "No", "Yes", nullptr );
+        // </FS:Luna Witch>
         if( choice == 0 )
         {
             std::cerr << "Abort send due to users choice" << std::endl;
