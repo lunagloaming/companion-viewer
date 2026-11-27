@@ -514,7 +514,10 @@ GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
            (gchar*)"private-slvideoplugin",
            (gchar*)"SL Video sink plugin",
            plugin_init, (gchar*)"1.0", (gchar*)"LGPL",
+           // <FS:Luna Witch> Companion Viewer branding
+           //(gchar*)"Firestorm",
            (gchar*)"Companion Viewer",
+           // </FS:Luna Witch>
            (gchar*)"http://www.firestormviewer.org");
 #undef PACKAGE
 void gst_slvideo_init_class (void)
