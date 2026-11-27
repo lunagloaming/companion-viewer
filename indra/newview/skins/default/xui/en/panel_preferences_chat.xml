@@ -376,6 +376,42 @@
                  top_delta="0"
                  width="60" />
             </radio_group>
+            <text
+             follows="left|top"
+             layout="topleft"
+             left="20"
+             top_pad="4"
+             height="16"
+             name="chat_text_font_label"
+             width="170">
+                Chat message font:
+            </text>
+            <combo_box
+             control_name="FSChatTextFont"
+             follows="left|top"
+             layout="topleft"
+             left_pad="0"
+             top_delta="-3"
+             height="20"
+             name="chat_text_font"
+             width="200">
+                <combo_box.item
+                 label="Iosevka Moolin"
+                 name="chat_text_font_iosevka"
+                 value="ChatText" />
+                <combo_box.item
+                 label="Interface font"
+                 name="chat_text_font_interface"
+                 value="" />
+                <combo_box.item
+                 label="Monospace"
+                 name="chat_text_font_monospace"
+                 value="Monospace" />
+                <combo_box.item
+                 label="DejaVu Sans"
+                 name="chat_text_font_dejavu"
+                 value="DejaVu" />
+            </combo_box>
 
             <check_box
              control_name="IMShowNamesForP2PConv"

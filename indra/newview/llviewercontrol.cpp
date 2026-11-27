@@ -1549,6 +1549,10 @@ void settings_setup_listeners()
     setting_setup_signal_listener(gSavedSettings, "ChatFontSize", FSFloaterIM::handleChatHistoryStyleChanged);
     setting_setup_signal_listener(gSavedSettings, "ChatFontSize", FSFloaterNearbyChat::handleChatHistoryStyleChanged);
     setting_setup_signal_listener(gSavedSettings, "ChatFontSize", LLViewerChat::signalChatFontChanged);
+    // <FS:Luna Witch> The font of chat messages
+    setting_setup_signal_listener(gSavedSettings, "FSChatTextFont", FSFloaterIM::handleChatHistoryStyleChanged);
+    setting_setup_signal_listener(gSavedSettings, "FSChatTextFont", FSFloaterNearbyChat::handleChatHistoryStyleChanged);
+    // </FS:Luna Witch>
     // </FS:Ansariel> [FS communication UI]
 
     setting_setup_signal_listener(gSavedPerAccountSettings, "GlobalOnlineStatusToggle", handleGlobalOnlineStatusChanged);
