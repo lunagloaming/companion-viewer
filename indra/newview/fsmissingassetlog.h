@@ -32,7 +32,9 @@
 
 #include <string>
 
+class LLFetchedGLTFMaterial;
 class LLTextureEntry;
+class LLUUID;
 class LLViewerFetchedTexture;
 class LLViewerObject;
 
@@ -46,6 +48,14 @@ namespace FSMissingAssetLog
     // A texture the viewer gave up on (it now shows the missing texture placeholder),
     // with every face and object that uses it.
     void logTextureGivenUp(LLViewerFetchedTexture* texture, const std::string& reason);
+
+    // A PBR material asset the viewer gave up on (it is now the plain grey placeholder material),
+    // with every face and object that uses it.
+    void logMaterialGivenUp(const LLUUID& id, const LLFetchedGLTFMaterial* material, const std::string& reason);
+
+    // Debug builds only: a warning in local chat, seen by this viewer alone
+    // (debug setting FSMissingAssetChatWarning). Release builds only log.
+    void warnInChat(const std::string& text);
 
     // A face with a PBR material override but no render material made from it
     // (LLTextureEntry::getGLTFRenderMaterial()). Logged once per face.

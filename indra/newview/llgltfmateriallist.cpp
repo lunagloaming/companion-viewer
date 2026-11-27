@@ -51,6 +51,8 @@
 
 #include <unordered_set>
 
+#include "fsmissingassetlog.h" // <FS> Missing material placeholder
+
 LLGLTFMaterialList gGLTFMaterialList;
 
 LLGLTFMaterialList::modify_queue_t LLGLTFMaterialList::sModifyQueue;
@@ -510,6 +512,29 @@ void LLGLTFMaterialList::addSelectionUpdateCallback(void(*update_callback)(const
     handle_gltf_override_message.addCallback(update_callback);
 }
 
+// <FS> Missing material placeholder: a material asset that cannot be loaded becomes a plain
+// matte grey material, and everything using it carries on as if it had loaded.
+namespace
+{
+    bool use_missing_material_placeholder()
+    {
+        static LLCachedControl<bool> enabled(gSavedSettings, "FSMissingMaterialPlaceholder", true);
+        return enabled;
+    }
+
+    void apply_missing_material_placeholder(LLFetchedGLTFMaterial* material)
+    {
+        material->mTextureId.fill(LLUUID::null);
+        material->mBaseColor = LLColor4(0.35f, 0.35f, 0.35f, 1.f); // linear; a mid grey on screen
+        material->mEmissiveColor = LLColor3::black;
+        material->mMetallicFactor = 0.f;
+        material->mRoughnessFactor = 0.9f;
+        material->mAlphaMode = LLGLTFMaterial::ALPHA_MODE_OPAQUE;
+        material->mDoubleSided = false;
+    }
+}
+// </FS>
+
 class AssetLoadUserData
 {
 public:
@@ -526,6 +551,17 @@ void LLGLTFMaterialList::onAssetLoadComplete(const LLUUID& id, LLAssetType::ETyp
     if (status != LL_ERR_NOERR)
     {
         LL_WARNS("GLTF") << "Error getting material asset data: " << LLAssetStorage::getErrorString(status) << " (" << status << ")" << LL_ENDL;
+        // <FS> Missing material placeholder
+        if (use_missing_material_placeholder())
+        {
+            apply_missing_material_placeholder(asset_data->mMaterial);
+            FSMissingAssetLog::logMaterialGivenUp(id, asset_data->mMaterial,
+                llformat("asset request failed: %s (%d)", LLAssetStorage::getErrorString(status).c_str(), status));
+            asset_data->mMaterial->materialComplete(true);
+            delete asset_data;
+            return;
+        }
+        // </FS>
         asset_data->mMaterial->materialComplete(false);
         delete asset_data;
     }
@@ -608,6 +644,13 @@ void LLGLTFMaterialList::onAssetLoadComplete(const LLUUID& id, LLAssetType::ETyp
             else
             {
                 LL_DEBUGS("GLTF") << "Failed to get material " << id << LL_ENDL;
+                // <FS> Missing material placeholder
+                if (use_missing_material_placeholder())
+                {
+                    apply_missing_material_placeholder(asset_data->mMaterial);
+                    FSMissingAssetLog::logMaterialGivenUp(id, asset_data->mMaterial, "the asset could not be read or decoded");
+                }
+                // </FS>
             }
 
             asset_data->mMaterial->materialComplete(true);
