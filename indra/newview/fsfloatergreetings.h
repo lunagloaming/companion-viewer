@@ -66,7 +66,7 @@ private:
     void addTab(const std::string& prefix, const std::vector<std::pair<std::string, std::string>>& editors,
                 std::function<std::string(const std::string&)> try_line);
     void onEdited(size_t tab);
-    void refresh(size_t tab);
+    void refreshTab(size_t tab);
 
     std::string tryWelcome(const std::string& line) const;
     std::string tryTip(const std::string& line) const;
