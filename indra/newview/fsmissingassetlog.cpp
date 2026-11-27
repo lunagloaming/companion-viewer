@@ -30,6 +30,8 @@
 #include "fsmissingassetlog.h"
 
 #include "llagent.h"
+#include "llappviewer.h"
+#include "llcoros.h"
 #include "fscommon.h"
 #include "llstartup.h"
 #include "llviewercontrol.h"
@@ -148,6 +150,13 @@ void FSMissingAssetLog::warnInChat(const std::string& text)
     static LLCachedControl<bool> enabled(gSavedSettings, "FSMissingAssetChatWarning", true);
     if (!enabled || LLStartUp::getStartupState() < STATE_STARTED)
     {
+        return;
+    }
+    // Asset callbacks run in coroutines (a failed material fetch does), and adding a nearby chat line
+    // saves the transcript under an LLMutex, which may only be locked on the main coroutine.
+    if (!LLCoros::on_main_thread_main_coro())
+    {
+        LLAppViewer::instance()->postToMainCoro([text]() { warnInChat(text); });
         return;
     }
     // A broken region can fail dozens of assets at once: the log has them all.
