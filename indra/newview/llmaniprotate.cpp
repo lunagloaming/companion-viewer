@@ -1243,9 +1243,13 @@ bool LLManipRotate::updateVisiblity()
         // x axis range is (-aspect * 0.5f, +aspect * 0.5)
         // y axis range is (-0.5, 0.5)
         // so use getWorldViewHeightRaw as scale factor when converting to pixel coordinates
+        // <FS:Luna Witch> the world view may not start at the window's corner
+        //mCenterScreen.set((S32)((0.5f - center.mV[VY]) / gAgentCamera.mHUDCurZoom * gViewerWindow->getWorldViewHeightScaled()),
+        //                    (S32)((center.mV[VZ] + 0.5f) / gAgentCamera.mHUDCurZoom * gViewerWindow->getWorldViewHeightScaled()));
         const LLRect world_rect = gViewerWindow->getWorldViewRectScaled();
         mCenterScreen.set(world_rect.mLeft + (S32)((0.5f - center.mV[VY]) / gAgentCamera.mHUDCurZoom * gViewerWindow->getWorldViewHeightScaled()),
                           world_rect.mBottom + (S32)((center.mV[VZ] + 0.5f) / gAgentCamera.mHUDCurZoom * gViewerWindow->getWorldViewHeightScaled()));
+        // </FS:Luna Witch>
         visible = true;
     }
     else
@@ -1782,9 +1786,13 @@ void LLManipRotate::mouseToRay( S32 x, S32 y, LLVector3* ray_pt, LLVector3* ray_
 {
     if (LLSelectMgr::getInstance()->getSelection()->getSelectType() == SELECT_TYPE_HUD)
     {
+        // <FS:Luna Witch> the world view may not start at the window's corner
+        //F32 mouse_x = (((F32)x / gViewerWindow->getWorldViewRectScaled().getWidth()) - 0.5f) / gAgentCamera.mHUDCurZoom;
+        //F32 mouse_y = ((((F32)y) / gViewerWindow->getWorldViewRectScaled().getHeight()) - 0.5f) / gAgentCamera.mHUDCurZoom;
         const LLRect world_rect = gViewerWindow->getWorldViewRectScaled();
         F32 mouse_x = (((F32)(x - world_rect.mLeft) / world_rect.getWidth()) - 0.5f) / gAgentCamera.mHUDCurZoom;
         F32 mouse_y = ((((F32)(y - world_rect.mBottom)) / world_rect.getHeight()) - 0.5f) / gAgentCamera.mHUDCurZoom;
+        // </FS:Luna Witch>
 
         *ray_pt = LLVector3(-1.f, -mouse_x, mouse_y);
         *ray_dir = LLVector3(1.f, 0.f, 0.f);
