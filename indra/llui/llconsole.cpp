@@ -782,8 +782,8 @@ void LLConsole::update()
 {
     // Take the pending lines under the lock, then lay them out without it. Laying out a line can
     // log (font fallback, for one), and the debug console records log lines, so holding mMutex
-    // here made the logging thread lock it again and deadlock. Lines logged meanwhile are laid
-    // out on the next update.
+    // here made the same thread lock it again and deadlock. Lines logged meanwhile are laid out
+    // on the next update.
     std::deque<LLWString> lines;
     std::deque<LLColor4> line_colors;
     std::deque<LLFontGL::StyleFlags> line_styles;
