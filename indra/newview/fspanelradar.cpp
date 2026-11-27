@@ -104,6 +104,7 @@ FSPanelRadar::FSPanelRadar()
     mColumnBits["range"] = 256;
     mColumnBits["has_notes"] = 512;
     mColumnBits["greeted"] = 1024;
+    mColumnBits["height"] = 2048; // <FS:Luna Witch/>
 }
 
 FSPanelRadar::~FSPanelRadar()
@@ -422,6 +423,9 @@ void FSPanelRadar::updateList(const std::vector<LLSD>& entries, const LLSD& stat
         row_data["columns"][11]["column"] = "greeted";
         row_data["columns"][11]["type"] = "checkbox";
         row_data["columns"][11]["value"] = FSRadar::getInstance()->isGreeted(avatar_id);
+
+        row_data["columns"][12]["column"] = "height"; // <FS:Luna Witch/>
+        row_data["columns"][12]["value"] = entry["height"];
 
         LLScrollListItem* row = mRadarList->addElement(row_data);
 

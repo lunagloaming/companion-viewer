@@ -668,6 +668,17 @@ void FSRadar::updateRadarList()
         entry["range"] = (avRange > AVATAR_UNKNOWN_RANGE ? llformat("%3.2f", avRange) : llformat(">%3.2f", drawRadius));
         entry["typing"] = (avVo && avVo->isTyping());
         entry["sitting"] = (avVo && (avVo->getParent() || avVo->isMotionActive(ANIM_AGENT_SIT_GROUND) || avVo->isMotionActive(ANIM_AGENT_SIT_GROUND_CONSTRAINED)));
+        // <FS:Luna Witch> Height as Edit Shape shows it, in its units (HeightUnits): known once the appearance has loaded
+        entry["height"] = "";
+        if (avVo && avVo->isFullyLoaded() && avVo->mBodySize.mV[VZ] > 0.f)
+        {
+            static LLCachedControl<bool> sHeightInMeters(gSavedSettings, "HeightUnits");
+            constexpr F32 EDIT_SHAPE_ADJUSTMENT = 0.195f; // as LLPanelEditWearable adds
+            constexpr F32 ONE_FOOT = 0.3048f;
+            const F32 meters = avVo->mBodySize.mV[VZ] + EDIT_SHAPE_ADJUSTMENT;
+            entry["height"] = sHeightInMeters ? llformat("%.2f m", meters) : llformat("%.2f ft", meters / ONE_FOOT);
+        }
+        // </FS:Luna Witch>
 
         if (!gRlvHandler.hasBehaviour(RLV_BHVR_SHOWNAMES))
         {
