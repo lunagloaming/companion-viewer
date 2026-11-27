@@ -363,8 +363,14 @@ public:
     // to the specified text
     void setDebugText(const std::string& text);
 
-    void setIsMissingAsset(bool is_missing = true);
+    // reason: why the texture is given up on, for the log (FSMissingTexturePlaceholder).
+    void setIsMissingAsset(bool is_missing = true, const std::string& reason = std::string());
     /*virtual*/ bool isMissingAsset() const override { return mIsMissingAsset; }
+
+    // True while the texture shows the missing texture placeholder instead of its own image.
+    bool usesMissingTexturePlaceholder() const { return mUsesPlaceholder || mPlaceholderPending; }
+    // Drops the placeholder and fetches the real texture again (rebake, texture refresh).
+    void retryAfterPlaceholder();
 
     // returns dimensions of original image for local files (before power of two scaling)
     // and returns 0 for all asset system images
@@ -484,6 +490,19 @@ protected:
 
     FTType mFTType; // What category of image is this - map tile, server bake, etc?
     mutable bool mIsMissingAsset;       // True if we know that there is no image asset with this image id in the database.
+
+    // Missing texture placeholder (FSMissingTexturePlaceholder): a texture the viewer gives up on
+    // shows a placeholder image instead, and everything using it carries on as if it had loaded.
+    bool canUsePlaceholder() const;
+    void applyMissingTexturePlaceholder();
+    bool mUsesPlaceholder = false;      // The placeholder is this texture's image.
+    bool mPlaceholderPending = false;   // Given up; the placeholder goes in at the next updateFetch().
+    bool mPlaceholderUnusable = false;  // The placeholder could not be used: mark the texture missing as before.
+    U32 mFetchFailures = 0;             // Failed fetches since the texture was last loaded or reset.
+    bool mFetchRetryPending = false;    // A failed fetch waits for mFetchRetryTimer before it is tried again.
+    LLFrameTimer mFetchRetryTimer;
+    F64 mNoDataSince = 0.0;             // When the current wait for a first image began.
+    F64 mLastFetchUpdate = 0.0;         // When updateFetch() last ran.
 
     typedef std::list<LLLoadedCallbackEntry*> callback_list_t;
     S8              mLoadedCallbackDesiredDiscardLevel;

@@ -600,9 +600,18 @@ LLGLTFMaterial* LLTextureEntry::getGLTFRenderMaterial() const
         return mGLTFRenderMaterial;
     }
 
+    // <FS> Log the object before the assert below ends a debug build.
+    if (sRenderMaterialMissingCallback && getGLTFMaterialOverride() && !getGLTFMaterialOverride()->isClearedForBaseMaterial())
+    {
+        sRenderMaterialMissingCallback(this);
+    }
+    // </FS>
     llassert(getGLTFMaterialOverride() == nullptr || getGLTFMaterialOverride()->isClearedForBaseMaterial());
     return getGLTFMaterial();
 }
+
+// <FS>
+void (*LLTextureEntry::sRenderMaterialMissingCallback)(const LLTextureEntry* entry) = nullptr;
 
 S32 LLTextureEntry::setGLTFRenderMaterial(LLGLTFMaterial* mat)
 {
