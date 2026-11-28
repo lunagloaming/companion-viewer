@@ -53,9 +53,11 @@ void ValidatorImpl::setLastErrorShowTime()
 
 void Validator::showLastErrorUsingTimeout(U32 timeout)
 {
-    // Companion Viewer: no "invalid keystroke" tip. The rejected character simply doesn't appear.
+    // <FS:Luna Witch> no "invalid keystroke" tip: the rejected character simply doesn't appear
+    //if (mImpl && (U32Seconds)LLTimer::getTotalTime() >= mImpl->getLastErrorShowTime() + timeout)
     constexpr bool SHOW_INVALID_KEYSTROKE_NOTIFICATION = false;
     if (SHOW_INVALID_KEYSTROKE_NOTIFICATION && mImpl && (U32Seconds)LLTimer::getTotalTime() >= mImpl->getLastErrorShowTime() + timeout)
+    // </FS:Luna Witch>
     {
         mImpl->setLastErrorShowTime();
         std::string reason = LLTrans::getString(mImpl->getLastErrorName(), mImpl->getLastErrorValues());
