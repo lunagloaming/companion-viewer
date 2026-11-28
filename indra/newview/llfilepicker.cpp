@@ -1818,6 +1818,12 @@ bool LLFilePicker::openFileDialog( int32_t filter, bool blocking, EType aType )
     else if( aType == eSaveFile )
         flType = Fl_Native_File_Chooser::BROWSE_SAVE_FILE;
 
+    // <FS:Luna Witch> [FIRE-36765] [LLBUG] owned through a pointer so it can be destroyed before this returns, see below
+    //Fl_Native_File_Chooser flDlg;
+    std::unique_ptr<Fl_Native_File_Chooser> flDlgOwner = std::make_unique<Fl_Native_File_Chooser>();
+    Fl_Native_File_Chooser& flDlg = *flDlgOwner;
+    // </FS:Luna Witch>
+
     std::string file_dialog_title;
     std::string file_dialog_filter;
 
@@ -2015,18 +2021,17 @@ bool LLFilePicker::openFileDialog( int32_t filter, bool blocking, EType aType )
         }
     }
 
-    // <FS:Luna Witch> Dialog stayed on screen after cancel/close: the chooser is destroyed only when
-    // this function returns, with no event loop left to process the unmap. Own it in a scope and pump events.
-    int res = -1;
-    {
-    Fl_Native_File_Chooser flDlg;
     flDlg.title(file_dialog_title.c_str());
     flDlg.type(flType);
+
     if (!file_dialog_filter.empty())
     {
         flDlg.filter(file_dialog_filter.c_str());
     }
-    res = flDlg.show();
+
+    int res = flDlg.show();
+    //gViewerWindow->getWindow()->afterDialog(); // <FS:Luna Witch/> [FIRE-36765] [LLBUG] moved below
+
     if( res == 0 )
     {
         int32_t count = flDlg.count();
@@ -2043,7 +2048,11 @@ bool LLFilePicker::openFileDialog( int32_t filter, bool blocking, EType aType )
     {
         LL_WARNS() << "FLTK failed: " <<  flDlg.errmsg() << LL_ENDL;
     }
-    }
+
+    // <FS:Luna Witch> [FIRE-36765] [LLBUG] The chooser stayed on screen after Cancel, Close or an upload (seen
+    // under XWayland): it was destroyed only when this function returned, with no FLTK event loop left to
+    // process the unmap. Destroy it now and let FLTK process the events, then hand back to the viewer window.
+    flDlgOwner.reset();
     for (int i = 0; i < 10; ++i)
     {
         Fl::wait(0.01);
