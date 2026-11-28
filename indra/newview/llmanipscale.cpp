@@ -538,7 +538,10 @@ void LLManipScale::highlightManipulators(S32 x, S32 y)
         F32 half_width = (F32)world_view_rect.getWidth() / 2.f;
         F32 half_height = (F32)world_view_rect.getHeight() / 2.f;
         LLVector2 manip2d;
+        // <FS:Luna Witch> the world view may not start at the window's corner
+        //LLVector2 mousePos((F32)x - half_width, (F32)y - half_height);
         LLVector2 mousePos((F32)(x - world_view_rect.getCenterX()), (F32)(y - world_view_rect.getCenterY()));
+        // </FS:Luna Witch>
         LLVector2 delta;
 
         mHighlightedPart = LL_NO_PART;
