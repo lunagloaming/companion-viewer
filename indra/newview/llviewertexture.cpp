@@ -2105,7 +2105,7 @@ bool LLViewerFetchedTexture::processFetchResults(S32& desired_discard, S32 curre
             // We finished but received no data
             if (getDiscardLevel() < 0 && canUsePlaceholder() && mFetchFailures == 0)
             {
-                // <FS> Missing texture placeholder: a failed fetch is tried once more before giving up.
+                // <FS:Luna Witch> Missing texture placeholder: a failed fetch is tried once more before giving up.
                 ++mFetchFailures;
                 LL_WARNS("Texture") << mID << " fetch failed (" << mLastHttpGetStatus.toTerseString()
                     << ", worker state " << mFetchState << "), trying once more" << LL_ENDL;
@@ -2194,7 +2194,7 @@ bool LLViewerFetchedTexture::updateFetch()
         // but don't check until we've processed the raw data we have
         return false;
     }
-    // <FS> Missing texture placeholder
+    // <FS:Luna Witch> Missing texture placeholder
     if (mPlaceholderPending)
     {
         applyMissingTexturePlaceholder();
@@ -2204,7 +2204,7 @@ bool LLViewerFetchedTexture::updateFetch()
     {
         return false; // shows the placeholder until a rebake or texture refresh
     }
-    // </FS>
+    // </FS:Luna Witch>
     if (mIsMissingAsset)
     {
         LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("vftuf - missing asset");
@@ -2276,7 +2276,7 @@ bool LLViewerFetchedTexture::updateFetch()
         }
     }
 
-    // <FS> Missing texture placeholder: give up on a texture that has been wanted for
+    // <FS:Luna Witch> Missing texture placeholder: give up on a texture that has been wanted for
     // FSMissingTextureTimeout seconds without receiving any image at all.
     if (canUsePlaceholder())
     {
@@ -2295,7 +2295,7 @@ bool LLViewerFetchedTexture::updateFetch()
             return false;
         }
     }
-    // </FS>
+    // </FS:Luna Witch>
 
     desired_discard = llmin(desired_discard, getMaxDiscardLevel());
 
@@ -2320,7 +2320,7 @@ bool LLViewerFetchedTexture::updateFetch()
         LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("vftuf - current < min");
         make_request = false;
     }
-    else if (mFetchRetryPending && mFetchRetryTimer.getElapsedTimeF32() < 15.f) // <FS> wait before trying a failed fetch again
+    else if (mFetchRetryPending && mFetchRetryTimer.getElapsedTimeF32() < 15.f) // <FS:Luna Witch> wait before trying a failed fetch again
     {
         make_request = false;
     }
@@ -2377,7 +2377,7 @@ bool LLViewerFetchedTexture::updateFetch()
         if (fetch_request_response >= 0) // positive values and 0 are discard values
         {
             LL_PROFILE_ZONE_NAMED_CATEGORY_TEXTURE("vftuf - request created");
-            mFetchRetryPending = false; // <FS> Missing texture placeholder
+            mFetchRetryPending = false; // <FS:Luna Witch> Missing texture placeholder
             mHasFetcher = true;
             mIsFetching = true;
             mLastWorkerDiscardLevel = worker_discard;
@@ -2442,7 +2442,7 @@ void LLViewerFetchedTexture::clearFetchedResults()
 {
     // <FS:Ansariel> For texture refresh
     mIsMissingAsset = false;
-    // <FS> Missing texture placeholder: fetch the real texture again
+    // <FS:Luna Witch> Missing texture placeholder: fetch the real texture again
     mUsesPlaceholder = false;
     mPlaceholderPending = false;
     mPlaceholderUnusable = false;
@@ -2483,7 +2483,7 @@ void LLViewerFetchedTexture::setIsMissingAsset(bool is_missing, const std::strin
         retryAfterPlaceholder();
         return;
     }
-    // <FS> Missing texture placeholder: show the placeholder instead of marking the texture missing.
+    // <FS:Luna Witch> Missing texture placeholder: show the placeholder instead of marking the texture missing.
     if (is_missing && !mPlaceholderPending && canUsePlaceholder())
     {
         FSMissingAssetLog::logTextureGivenUp(this, reason.empty() ? std::string("marked missing") : reason);
@@ -2500,7 +2500,7 @@ void LLViewerFetchedTexture::setIsMissingAsset(bool is_missing, const std::strin
         mPlaceholderPending = true; // applied by the next updateFetch(), outside any texture creation in progress
         return;
     }
-    // </FS>
+    // </FS:Luna Witch>
     if (is_missing == mIsMissingAsset)
     {
         return;
@@ -2538,7 +2538,7 @@ void LLViewerFetchedTexture::setIsMissingAsset(bool is_missing, const std::strin
     mIsMissingAsset = is_missing;
 }
 
-// <FS> Missing texture placeholder
+// <FS:Luna Witch> Missing texture placeholder
 namespace
 {
     // The placeholder image, read once. Null if the file is missing or unreadable.
@@ -2631,7 +2631,7 @@ void LLViewerFetchedTexture::retryAfterPlaceholder()
     LL_INFOS("Texture") << mID << ": dropping the missing texture placeholder, fetching the texture again" << LL_ENDL;
     clearFetchedResults();
 }
-// </FS>
+// </FS:Luna Witch>
 
 void LLViewerFetchedTexture::setLoadedCallback( loaded_callback_func loaded_callback,
                                        S32 discard_level, bool keep_imageraw, bool needs_aux, void* userdata,

@@ -201,7 +201,7 @@ public:
     // GLTF override
     LLGLTFMaterial* getGLTFMaterialOverride() const { return mGLTFMaterialOverrides; }
 
-    // <FS> Called, if set, when getGLTFRenderMaterial() finds a material override but no render
+    // <FS:Luna Witch> Called, if set, when getGLTFRenderMaterial() finds a material override but no render
     // material made from it, so the viewer can log which object and face it is.
     static void (*sRenderMaterialMissingCallback)(const LLTextureEntry* entry);
     S32 setGLTFMaterialOverride(LLGLTFMaterial* mat);

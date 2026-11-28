@@ -3071,10 +3071,10 @@ LLViewerFetchedTexture *LLVOAvatar::getBakedTextureImage(const U8 te, const LLUU
         LL_DEBUGS("Avatar") << avString() << "get server-bake image from URL " << url << LL_ENDL;
         result = LLViewerTextureManager::getFetchedTextureFromUrl(
             url, FTT_SERVER_BAKE, true, LLGLTexture::BOOST_NONE, LLViewerTexture::LOD_TEXTURE, 0, 0, uuid);
-        // <FS> Missing texture placeholder: a rebake fetches a bake that failed again too
+        // <FS:Luna Witch> Missing texture placeholder: a rebake fetches a bake that failed again too
         //if (result->isMissingAsset())
         if (result->isMissingAsset() || result->usesMissingTexturePlaceholder())
-        // </FS>
+        // </FS:Luna Witch>
         {
             result->setIsMissingAsset(false);
         }
@@ -13290,7 +13290,7 @@ LLVOAvatar::AvatarOverallAppearance LLVOAvatar::getOverallAppearance() const
         {
             result = AOA_JELLYDOLL;
         }
-        // </FS>
+        // </FS:Luna Witch>
         else if (mVisuallyMuteSetting == AV_ALWAYS_RENDER)
         {
             result = AOA_NORMAL;
