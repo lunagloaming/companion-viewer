@@ -381,6 +381,7 @@ void LLFloaterPreferenceGraphicsAdvanced::refreshEnabledState()
     {
         // Not selectable, and shown unticked, where the graphics card can't do BC7: it would do nothing here.
         // Only the box is changed, not the setting.
+        //getChildView("texture compression")->setEnabled(false);
         LLUICtrl* texture_compression = getChild<LLUICtrl>("texture compression");
         texture_compression->setEnabled(false);
         texture_compression->setValue(false);

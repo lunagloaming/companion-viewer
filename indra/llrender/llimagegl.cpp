@@ -1815,6 +1815,7 @@ bool LLImageGL::createGLTexture(S32 discard_level, const LLImageRaw* imageraw, S
     }
     LLGLuint created_name = 0;
     LLGLuint* name_out = tex_name ? tex_name : &created_name;
+    //return createGLTexture(discard_level, rawdata, false, usename, defer_copy, tex_name);
     const bool created = createGLTexture(discard_level, rawdata, false, usename, defer_copy, name_out);
     if (created && bc7_source.notNull() && *name_out != 0)
     {
@@ -2268,15 +2269,18 @@ S64 LLImageGL::getMipBytes(S32 discard_level) const
     }
     S32 w = mWidth>>discard_level;
     S32 h = mHeight>>discard_level;
-    const S32 format = mIsBC7 ? mBC7Format : mFormatPrimary; // <FS:Luna Witch/>
+    // <FS:Luna Witch> a BC7 texture is counted in its compressed size
+    //S64 res = dataFormatBytes(mFormatPrimary, w, h);
+    const S32 format = mIsBC7 ? mBC7Format : mFormatPrimary;
     S64 res = dataFormatBytes(format, w, h);
+    // </FS:Luna Witch>
     if (mUseMipMaps)
     {
         while (w > 1 && h > 1)
         {
             w >>= 1; if (w == 0) w = 1;
             h >>= 1; if (h == 0) h = 1;
-            res += dataFormatBytes(format, w, h);
+            res += dataFormatBytes(format, w, h); // <FS:Luna Witch/> was mFormatPrimary
         }
     }
     return res;
