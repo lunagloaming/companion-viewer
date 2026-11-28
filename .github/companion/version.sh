@@ -18,8 +18,8 @@ set -euo pipefail
 kind="${1:-}"
 commit="${2:-HEAD}"
 case "$kind" in
-    nightly) prefix=Companion_Nightly_; branch=nightly ;;
-    release) prefix=Companion_Release_; branch=release ;;
+    nightly) prefix=Companion_Nightly_; branch=CVNIGHTLY ;;
+    release) prefix=Companion_Release_; branch=CVRELEASE ;;
     *) echo "usage: $0 <nightly|release> [commit]" >&2; exit 2 ;;
 esac
 
