@@ -50,7 +50,7 @@
 #include <iomanip>
 #include <time.h>
 #include "llmachineid.h"
-// <FS:Luna Witch> Read saved logins with the address of any network interface
+// <FS:Luna Witch> [LLBUG] Read saved logins with the address of any network interface
 #include <algorithm>
 #include <array>
 #include <filesystem>
@@ -1472,7 +1472,7 @@ void LLSecAPIBasicHandler::_readProtectedData(unsigned char *unique_id, U32 id_l
 
 void LLSecAPIBasicHandler::_readProtectedData()
 {
-    // <FS:Luna Witch> Try every key the store may have been written with (protected_data_keys)
+    // <FS:Luna Witch> [LLBUG] Try every key the store may have been written with (protected_data_keys)
     const std::vector<machine_key_t> keys = protected_data_keys();
     for (size_t i = 0; i < keys.size(); ++i)
     {
@@ -1503,7 +1503,7 @@ void LLSecAPIBasicHandler::_readProtectedData()
         return;
     }
     // </FS:Luna Witch>
-#if 0 // <FS:Luna Witch> Tried only the machine ID and the legacy ID
+#if 0 // <FS:Luna Witch> [LLBUG] Tried only the machine ID and the legacy ID
     unsigned char unique_id[MAC_ADDRESS_BYTES];
     try
     {
@@ -1561,7 +1561,7 @@ void LLSecAPIBasicHandler::_writeProtectedData()
         // todo: ctx error handling
 
         EVP_EncryptInit(ctx, EVP_rc4(), salt, NULL);
-        // <FS:Luna Witch> The best key there is (protected_data_write_key), not always the machine ID
+        // <FS:Luna Witch> [LLBUG] The best key there is (protected_data_write_key), not always the machine ID
         //unsigned char unique_id[MAC_ADDRESS_BYTES];
         //LLMachineID::getUniqueID(unique_id, sizeof(unique_id));
         //LLXORCipher cipher(unique_id, sizeof(unique_id));
