@@ -51,7 +51,7 @@
 
 #include <unordered_set>
 
-#include "fsmissingassetlog.h" // <FS> Missing material placeholder
+#include "fsmissingassetlog.h" // <FS:Luna Witch> Missing material placeholder
 
 LLGLTFMaterialList gGLTFMaterialList;
 
@@ -512,7 +512,7 @@ void LLGLTFMaterialList::addSelectionUpdateCallback(void(*update_callback)(const
     handle_gltf_override_message.addCallback(update_callback);
 }
 
-// <FS> Missing material placeholder: a material asset that cannot be loaded becomes a plain
+// <FS:Luna Witch> Missing material placeholder: a material asset that cannot be loaded becomes a plain
 // matte grey material, and everything using it carries on as if it had loaded.
 namespace
 {
@@ -533,7 +533,7 @@ namespace
         material->mDoubleSided = false;
     }
 }
-// </FS>
+// </FS:Luna Witch>
 
 class AssetLoadUserData
 {
@@ -551,7 +551,7 @@ void LLGLTFMaterialList::onAssetLoadComplete(const LLUUID& id, LLAssetType::ETyp
     if (status != LL_ERR_NOERR)
     {
         LL_WARNS("GLTF") << "Error getting material asset data: " << LLAssetStorage::getErrorString(status) << " (" << status << ") for asset " << id << LL_ENDL;
-        // <FS> Missing material placeholder
+        // <FS:Luna Witch> Missing material placeholder
         if (use_missing_material_placeholder())
         {
             apply_missing_material_placeholder(asset_data->mMaterial);
@@ -561,7 +561,7 @@ void LLGLTFMaterialList::onAssetLoadComplete(const LLUUID& id, LLAssetType::ETyp
             delete asset_data;
             return;
         }
-        // </FS>
+        // </FS:Luna Witch>
         asset_data->mMaterial->materialComplete(false);
         delete asset_data;
     }
@@ -644,13 +644,13 @@ void LLGLTFMaterialList::onAssetLoadComplete(const LLUUID& id, LLAssetType::ETyp
             else
             {
                 LL_DEBUGS("GLTF") << "Failed to get material " << id << LL_ENDL;
-                // <FS> Missing material placeholder
+                // <FS:Luna Witch> Missing material placeholder
                 if (use_missing_material_placeholder())
                 {
                     apply_missing_material_placeholder(asset_data->mMaterial);
                     FSMissingAssetLog::logMaterialGivenUp(id, asset_data->mMaterial, "the asset could not be read or decoded");
                 }
-                // </FS>
+                // </FS:Luna Witch>
             }
 
             asset_data->mMaterial->materialComplete(true);

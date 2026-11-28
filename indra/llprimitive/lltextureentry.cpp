@@ -600,12 +600,12 @@ LLGLTFMaterial* LLTextureEntry::getGLTFRenderMaterial() const
         return mGLTFRenderMaterial;
     }
 
-    // <FS> Log the object before the assert below ends a debug build.
+    // <FS:Luna Witch> Log the object whose face has a PBR override but no render material
     if (sRenderMaterialMissingCallback && getGLTFMaterialOverride() && !getGLTFMaterialOverride()->isClearedForBaseMaterial())
     {
         sRenderMaterialMissingCallback(this);
     }
-    // </FS>
+    // </FS:Luna Witch>
     // <FS:Luna Witch> [LLBUG] A face can carry a PBR override with no base material, and then no render material
     // is ever built for it: seen on an attachment worn by another avatar, whose face had an override and no base
     // material. The assert stopped debug builds; release builds draw the face without a material, as here.
@@ -618,7 +618,7 @@ LLGLTFMaterial* LLTextureEntry::getGLTFRenderMaterial() const
     return getGLTFMaterial();
 }
 
-// <FS>
+// <FS:Luna Witch>
 void (*LLTextureEntry::sRenderMaterialMissingCallback)(const LLTextureEntry* entry) = nullptr;
 
 S32 LLTextureEntry::setGLTFRenderMaterial(LLGLTFMaterial* mat)
