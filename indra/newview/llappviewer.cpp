@@ -3904,7 +3904,7 @@ bool LLAppViewer::initWindow()
     }
 
     // Set this flag in case we crash while initializing GL
-    // <FS:Luna Witch> Only the first instance keeps this crash flag. Instances sharing settings.xml read
+    // <FS:Luna Witch> [LLBUG] Only the first instance keeps this crash flag. Instances sharing settings.xml read
     // each other's "true" while one was still initialising GL, then dropped to Low graphics and saved
     // the Low settings for every instance.
     //gSavedSettings.setBOOL("RenderInitError", true);
@@ -3922,7 +3922,7 @@ bool LLAppViewer::initWindow()
     stop_glerror();
     gViewerWindow->initGLDefaults();
 
-    // <FS:Luna Witch> see above
+    // <FS:Luna Witch> [LLBUG] see above
     //gSavedSettings.setBOOL("RenderInitError", false);
     //gSavedSettings.saveToFile( gSavedSettings.getString("ClientSettingsFile"), true );
     if (!mSecondInstance)
