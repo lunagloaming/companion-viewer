@@ -115,6 +115,23 @@ static void add_tex_bytes_to(U32 texName, U64 size, bool is_mip)
 void LLImageGLMemory::alloc_tex_image(U32 width, U32 height, U32 intformat, U32 count)
 {
     // <FS:Luna Witch> Replace whatever was counted for this texture before
+    //U32 texUnit = gGL.getCurrentTexUnitIndex();
+    //llassert(texUnit == 0); // allocations should always be done on tex unit 0
+    //U32 texName = gGL.getTexUnit(texUnit)->getCurrTexture();
+    //U64 size = LLImageGL::dataFormatBytes(intformat, width, height);
+    //size *= count;
+    //
+    //llassert(size >= 0);
+    //
+    //sTexMemMutex.lock();
+    //
+    //// it is a precondition that no existing allocation exists for this texture
+    //llassert(sTextureAllocs.find(texName) == sTextureAllocs.end());
+    //
+    //sTextureAllocs[texName] = size;
+    //sTextureBytes += size;
+    //
+    //sTexMemMutex.unlock();
     U64 size = LLImageGL::dataFormatBytes(intformat, width, height);
     size *= count;
     set_tex_bytes(bound_tex_name(), size, width, height);
