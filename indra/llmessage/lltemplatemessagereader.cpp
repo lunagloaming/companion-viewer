@@ -605,7 +605,8 @@ bool LLTemplateMessageReader::decodeData(const U8* buffer, const LLHost& sender 
 
         LLMsgBlkData* cur_data_block = NULL;
         // <FS:Beq> Tracy Message processing
-		LL_DEBUGS("LLMessage") << "Processing " << mbci->mName << " with " << (U32)repeat_number << " repetitions" << LL_ENDL;
+		//LL_DEBUGS("LLMessage") << "Processing " << mbci->mName << " with " << repeat_number << " repetitions" << LL_ENDL;
+		LL_DEBUGS("LLMessage") << "Processing " << mbci->mName << " with " << (U32)repeat_number << " repetitions" << LL_ENDL; // <FS:Luna Witch/> [FSBUG] a U8 streams as a character
 		#ifdef TRACY_ENABLE
 		strncpy(msgstr, mbci->mName, 35);
 		LL_PROFILE_ZONE_TEXT(msgstr, 35);
