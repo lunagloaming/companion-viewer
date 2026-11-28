@@ -2309,7 +2309,7 @@ LLViewerWindow::LLViewerWindow(const Params& p)
     }
 
     // If we crashed while initializng GL stuff last time, disable certain features
-    // <FS:Luna Witch> A second instance sharing settings.xml would see the first one's flag set while it is
+    // <FS:Luna Witch> [LLBUG] A second instance sharing settings.xml would see the first one's flag set while it is
     // still initialising GL (see LLAppViewer::initWindow), so only the first instance acts on it.
     //if (gSavedSettings.getBOOL("RenderInitError"))
     if (!LLAppViewer::instance()->isSecondInstance() && gSavedSettings.getBOOL("RenderInitError"))
