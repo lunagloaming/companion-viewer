@@ -783,7 +783,24 @@ void LLConsole::update()
     {
         LLCoros::LockType lock(mMutex);
 
-        while (!mLines.empty())
+        // <FS:Luna Witch> [LLBUG] Lay the pending lines out without holding mMutex. Laying out a line can log
+        // (the font fallback lookup does, at debug level), and the debug console records log lines, so the same
+        // thread locked mMutex again in removeExtraLines(): the fiber mutex throws, and the crash handler's own
+        // log line then waits on the lock forever. Take the lines under the lock and release it; lines logged
+        // meanwhile are laid out on the next update.
+        std::deque<LLWString> lines;
+        std::deque<LLColor4> line_colors;
+        std::deque<LLFontGL::StyleFlags> line_styles;
+        std::deque<LLUUID> session_ids;
+        lines.swap(mLines);
+        line_colors.swap(mLineColors);
+        line_styles.swap(mLineStyle);
+        session_ids.swap(mSessionIDs);
+        lock.unlock();
+        // </FS:Luna Witch>
+
+        //while (!mLines.empty())
+        while (!lines.empty()) // <FS:Luna Witch/> [LLBUG] the lines taken above
         {
             // <FS:Ansariel> Chat console
             //mParagraphs.push_back(
@@ -794,23 +811,42 @@ void LLConsole::update()
             //              (F32)getRect().getWidth()));
             //mLines.pop_front();
 
+            // <FS:Luna Witch> [LLBUG] the lines taken above, not the members
+            //mParagraphs.push_back(
+            //    Paragraph(  mLines.front(),
+            //                (!mLineColors.empty() ? mLineColors.front() : LLColor4::white),
+            //                mTimer.getElapsedTimeF32(),
+            //                mFont,
+            //                (F32)getRect().getWidth(),
+            //                (!mLineStyle.empty() ? mLineStyle.front() : LLFontGL::NORMAL),
+            //                (!mSessionIDs.empty() ? mSessionIDs.front(): LLUUID::null),
+            //                mParseUrls,
+            //                this));
+            //mLines.pop_front();
+            //if (!mLineColors.empty())
+            //    mLineColors.pop_front();
+            //if (!mLineStyle.empty())
+            //    mLineStyle.pop_front();
+            //if (!mSessionIDs.empty())
+            //    mSessionIDs.pop_front();
             mParagraphs.push_back(
-                Paragraph(  mLines.front(),
-                            (!mLineColors.empty() ? mLineColors.front() : LLColor4::white),
+                Paragraph(  lines.front(),
+                            (!line_colors.empty() ? line_colors.front() : LLColor4::white),
                             mTimer.getElapsedTimeF32(),
                             mFont,
                             (F32)getRect().getWidth(),
-                            (!mLineStyle.empty() ? mLineStyle.front() : LLFontGL::NORMAL),
-                            (!mSessionIDs.empty() ? mSessionIDs.front(): LLUUID::null),
+                            (!line_styles.empty() ? line_styles.front() : LLFontGL::NORMAL),
+                            (!session_ids.empty() ? session_ids.front(): LLUUID::null),
                             mParseUrls,
                             this));
-            mLines.pop_front();
-            if (!mLineColors.empty())
-                mLineColors.pop_front();
-            if (!mLineStyle.empty())
-                mLineStyle.pop_front();
-            if (!mSessionIDs.empty())
-                mSessionIDs.pop_front();
+            lines.pop_front();
+            if (!line_colors.empty())
+                line_colors.pop_front();
+            if (!line_styles.empty())
+                line_styles.pop_front();
+            if (!session_ids.empty())
+                session_ids.pop_front();
+            // </FS:Luna Witch>
             // </FS:Ansariel>
         }
     }
