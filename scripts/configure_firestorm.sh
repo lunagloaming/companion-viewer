@@ -432,7 +432,8 @@ fi
 if [ \( $WANTS_VERSION -eq $TRUE \) -o \( $WANTS_CONFIG -eq $TRUE \) ] ; then
     echo "Versioning..."
     pushd ..
-    if [ -d .git ]
+    # In a git worktree .git is a file, not a folder: ask git whether this is a repository
+    if git rev-parse --git-dir > /dev/null 2>&1
     then
         buildVer=`git rev-list --count HEAD`
     else
