@@ -21,12 +21,12 @@ case "$kind" in
     nightly)
         pkg=companion-viewer-nightly
         label="Companion Viewer Nightly"
-        summary="Nightly build of the nightly branch, untested."
+        summary="Nightly build of the CVNIGHTLY branch, untested."
         ;;
     release)
         pkg=companion-viewer
         label="Companion Viewer"
-        summary="Release build of the release branch."
+        summary="Release build of the CVRELEASE branch."
         ;;
     *) echo "unknown kind '$kind'" >&2; exit 2 ;;
 esac
