@@ -121,13 +121,13 @@ S32 LLMachineID::getUniqueID(unsigned char *unique_id, size_t len)
     memcpy(unique_id, gMACAddress, len);
     return 1;
 }
-// <FS:Luna Witch> A legacy ID for the key tests (test<10>); none by default
+// <FS:Luna Witch> [LLBUG] A legacy ID for the key tests (test<10>); none by default
 unsigned char gLegacyAddress[MAC_ADDRESS_BYTES] = {0,0,0,0,0,0};
 bool gHasLegacyAddress = false;
 // </FS:Luna Witch>
 S32 LLMachineID::getLegacyID(unsigned char *unique_id, size_t len)
 {
-    // <FS:Luna Witch>
+    // <FS:Luna Witch> [LLBUG]
     //return 0;
     if (!gHasLegacyAddress)
     {
@@ -1470,7 +1470,7 @@ namespace tut
         test_store->validate(0, test_chain, validation_params);
     }
 
-    // <FS:Luna Witch> Saved logins written with one machine ID are read with another one that is still around and
+    // <FS:Luna Witch> [LLBUG] Saved logins written with one machine ID are read with another one that is still around and
     // written again with the current one; a store is never written with the all-zero key while a real one exists,
     // and a store written with zeros (no network address when it was saved) is read and written with a real key.
     template<> template<>
