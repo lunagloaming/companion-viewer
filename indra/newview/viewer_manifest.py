@@ -916,6 +916,12 @@ class Windows_x86_64_Manifest(ViewerManifest):
             path = path.replace('/', '\\')
             return path
 
+        # <FS:Luna Witch> [LLBUG] NSIS splits its arguments at spaces, so a packaged file or folder whose
+        # name has a space ended the build (File: "...\\name" -> no files found). Quote such paths.
+        def quoted(path):
+            return '"%s"' % path if ' ' in path else path
+        # </FS:Luna Witch>
+
         result = ""
         dest_files = [pair[1] for pair in self.file_list if pair[0] and os.path.isfile(pair[1]) and not pair[1].endswith(".pdb") ] #<FS:ND/> Don't include pdb files.
         # sort deepest hierarchy first
@@ -928,11 +934,14 @@ class Windows_x86_64_Manifest(ViewerManifest):
             if installed_dir != out_path:
                 if install:
                     out_path = installed_dir
-                    result += 'SetOutPath ' + out_path + '\n'
+                    #result += 'SetOutPath ' + out_path + '\n'
+                    result += 'SetOutPath ' + quoted(out_path) + '\n' # <FS:Luna Witch/> [LLBUG] see quoted()
             if install:
-                result += 'File ' + pkg_file + '\n'
+                #result += 'File ' + pkg_file + '\n'
+                result += 'File ' + quoted(pkg_file) + '\n' # <FS:Luna Witch/> [LLBUG] see quoted()
             else:
-                result += 'Delete ' + wpath(os.path.join('$INSTDIR', rel_file)) + '\n'
+                #result += 'Delete ' + wpath(os.path.join('$INSTDIR', rel_file)) + '\n'
+                result += 'Delete ' + quoted(wpath(os.path.join('$INSTDIR', rel_file))) + '\n' # <FS:Luna Witch/> [LLBUG] see quoted()
 
         # at the end of a delete, just rmdir all the directories
         if not install:
@@ -946,7 +955,8 @@ class Windows_x86_64_Manifest(ViewerManifest):
             prev = None
             for d in deleted_dirs:
                 if d != prev:   # skip duplicates
-                    result += 'RMDir ' + wpath(os.path.join('$INSTDIR', os.path.normpath(d))) + '\n'
+                    #result += 'RMDir ' + wpath(os.path.join('$INSTDIR', os.path.normpath(d))) + '\n'
+                    result += 'RMDir ' + quoted(wpath(os.path.join('$INSTDIR', os.path.normpath(d)))) + '\n' # <FS:Luna Witch/> [LLBUG] see quoted()
                 prev = d
 
         return result
